@@ -44,7 +44,7 @@ contract Cohort is Ownable, AccessControl {
         Type6
     }
 
-    AuditTypes audits;
+    AuditTypes public audits;
 
     enum ValidationStatus {
         Undefined,
@@ -60,18 +60,18 @@ contract Cohort is Ownable, AccessControl {
         mapping(address => ValidationStatus) validatorChoice;
     }
 
-    mapping(bytes32 => Validation) validations;
+    mapping(bytes32 => Validation) public validations;
     mapping(address => uint256) public deposits;        //track deposits per user
 
 
-    event ValidationInitialized(bytes32 validationHash, uint initTime, address enterprise);
-    event ValidatorValidated(bytes32 documentHash, uint256 validationTime, ValidationStatus decision );
+    event ValidationInitialized(bytes32 validationHash, uint indexed initTime, address enterprise, address cohort);
+    event ValidatorValidated(address validator, bytes32 documentHash, uint256 validationTime, ValidationStatus decision );
     event RewardsDeposited(address cohort, uint256 timeStamp);
-    event ValidationExecuted(bytes32 validationHash, uint256 timeExecuted);
+    event ValidationExecuted(bytes32 indexed validationHash, uint256 indexed timeExecuted);
     event LogRewardsRedeemed(address user, uint256 amount);
     
 
-    function initialize(Token _auditTokenContract, 
+    function initialize(address _auditTokenAddress, 
                         CohortFactory _cohortFactory, 
                         Members _members,
                         address _enterprise, 
@@ -81,8 +81,8 @@ contract Cohort is Ownable, AccessControl {
         enterprise =_enterprise;
         validators = _validators;
         audits = AuditTypes(_audits);
-        require(_auditTokenContract != Token(0), "Cohort:constructor - Audit token address can't be 0");
-        auditToken = _auditTokenContract;
+        require(_auditTokenAddress != address(0), "Cohort:constructor - Audit token address can't be 0");
+        auditToken = Token(_auditTokenAddress);
         cohortFactory = _cohortFactory;
         members = _members;
         _setupRole(DEFAULT_ADMIN_ROLE, auditToken.owner());
@@ -125,9 +125,7 @@ contract Cohort is Ownable, AccessControl {
         require(enterprise == msg.sender, "Cohort:initializeValidation - Only enterprise owing this cohort can call this function");
         Validation storage newValidation =  validations[validationHash];
         newValidation.validationTime = block.timestamp;
-        emit ValidationInitialized(validationHash, validationTime, msg.sender);
-    
-
+        emit ValidationInitialized(validationHash, validationTime, msg.sender, address(this));
     }
 
     function collectValidationResults(bytes32 validationHash)public view isController() returns (address[] memory, uint256[] memory, ValidationStatus[] memory) {
@@ -144,6 +142,12 @@ contract Cohort is Ownable, AccessControl {
         }
         return (validatorsList, stake, validatorsValues);
     }
+
+    function isValidated(bytes32 validationHash) public view returns (ValidationStatus) {
+
+        return validations[validationHash].validatorChoice[msg.sender];
+    }
+
 
     function calculateVoteQuorum(bytes32 validationHash) public view returns(uint256) {
 
@@ -177,11 +181,20 @@ contract Cohort is Ownable, AccessControl {
         Validation storage validation =  validations[validationHash];
         require(members.validatorMap(msg.sender), "Cohort:validate - Validator is not authorized.");
         require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
+        require(validation.validatorChoice[msg.sender] == ValidationStatus.Undefined,
+                "Cohort:validate - This document has been attested already.");
         // require(validation.executionTime == 0, "Cohort:validate - The task has been already executed");
         validation.validatorChoice[msg.sender] = decision;
 
         executeValidation(validationHash);
             
-        emit ValidatorValidated(documentHash, validationTime, decision );
+        emit ValidatorValidated(msg.sender, documentHash, validationTime, decision );
+    }
+
+    function validateMultiple(bytes32[] memory documentHash, uint256[] memory validationTime, ValidationStatus[] memory decision) public {
+        uint256 length = documentHash.length;
+        for (uint256 i = 0; i < length; i++) {
+            validate(documentHash[i], validationTime[i], decision[i]);
+        }
     }
 }

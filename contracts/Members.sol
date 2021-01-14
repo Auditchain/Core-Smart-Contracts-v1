@@ -100,8 +100,8 @@ contract Members is  AccessControl {
 
      function stake(uint256 amount) public {
 
-        require(amount >= 5e21, "Staking:stake - Minimum contribution amount is 5000 AUDT tokens");  
-        require(amount <= 25e21, "Staking:stake - Maximum contribution amount is 25000 AUDT tokens");     
+        require(amount + deposits[msg.sender] >= 5e21, "Staking:stake - Minimum contribution amount is 5000 AUDT tokens");  
+        require(amount + deposits[msg.sender] <= 25e21, "Staking:stake - Maximum contribution amount is 25000 AUDT tokens");     
         require(validatorMap[msg.sender], "Staking:stake - User has been not registered as a validator."); 
         stakedAmount = stakedAmount.add(amount);  // track tokens contributed so far
         auditToken.safeTransferFrom(msg.sender, address(this), amount);
@@ -162,6 +162,16 @@ contract Members is  AccessControl {
     function returnValidatorCount() public view returns (uint256) {
 
         return validators.length;
+    }
+
+    function returnEnterpriseName(address enterprise) public view returns (string memory) {
+
+        for (uint256 i = 0; i < enterprises.length; i++){
+
+            if (enterprises[i].user == enterprise)
+                return enterprises[i].name;
+        }
+        return "";
     }
 
 }
