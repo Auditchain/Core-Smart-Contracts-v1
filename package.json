@@ -20,7 +20,7 @@
   "license": "ISC",
   "homepage": "",
   "dependencies": {
-    "@openzeppelin/contracts": "^3.3.0",
+    "@openzeppelin/contracts": "^3.4.1",
     "@truffle/hdwallet-provider": "^1.2.1",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "babel-polyfill": "^6.26.0",

@@ -22,7 +22,7 @@ module.exports = {
     development: {
       host: "localhost",
       port: 8545,
-      gas: 10000000,
+      gas: 6721975,
       gasPrice: 0x01,
       network_id: "*", // Match any network id
       accounts: 10,
@@ -90,7 +90,7 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: '0.7.0',
+      version: '0.7.6',
     },
   },
   settings: {

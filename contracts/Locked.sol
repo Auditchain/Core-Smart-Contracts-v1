@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity >=0.7.0 <0.8.0;
 
-
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /// @title Locked
 /// @dev Smart contract to enable locking and unlocking of token holders. 
-contract Locked is Ownable, AccessControl {
+contract Locked is AccessControl {
 
     mapping (address => bool) public lockedList;
 
@@ -18,7 +16,7 @@ contract Locked is Ownable, AccessControl {
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
 
        modifier isController {
-            require(hasRole(CONTROLLER_ROLE, msg.sender), "Locked:isController - Caller is not a controller");
+            require(hasRole(CONTROLLER_ROLE, msg.sender), "Locked::isController - Caller is not a controller");
 
         _;
     }
@@ -29,9 +27,9 @@ contract Locked is Ownable, AccessControl {
     /// @param _to  - user involved in process
     modifier isNotLocked(address _from, address _to) {
 
-        if (_from != owner()) {  // allow contract owner on sending tokens even if recipient is locked
-            require(!lockedList[_from], "User is locked");
-            require(!lockedList[_to], "User is locked");
+        if (hasRole(DEFAULT_ADMIN_ROLE, _from)){  // allow contract admin on sending tokens even if recipient is locked
+            require(!lockedList[_from], "Locked::isNotLocked - User is locked");
+            require(!lockedList[_to], "Locked::isNotLocked - User is locked");
         }
         _;
     }
