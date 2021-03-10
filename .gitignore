@@ -332,11 +332,6 @@ ASALocalRun/
 # custom files and directories
 
 .env
-*.DS_Store
-.vscode/
-assets1/
-pages/
-dist/
 build/
 package-lock.json
 
