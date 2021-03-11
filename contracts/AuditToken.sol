@@ -113,13 +113,11 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
         super.burnFrom(user, amount);
     }
 
-     function pause() public isController()  {       
-           require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "AuditToken-pause: Only admin can call this function");
+     function pause() public isController()  {                  
         super._pause();
     }
 
-    function unpause() public  isController() {    
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "AuditToken-unpaus: Only admin can call this function");    
+    function unpause() public  isController() {          
         super._unpause();
     }
 

@@ -4,9 +4,10 @@ import {
 } from './helpers/utils.js';
 
 const MEMBERS = artifacts.require('../Members');
-const TOKEN = artifacts.require('../Token');
+const TOKEN = artifacts.require('../AuditToken');
 const COHORTFACTORY = artifacts.require('../CohortFactory');
 const Cohort = require('../build/contracts/Cohort.json');
+const CREATECOHORT = artifacts.require('../CreateCohort');
 
 
 
@@ -18,23 +19,29 @@ contract("cohortFactory contract", (accounts) => {
     const validator2 = accounts[3];
     const validator3 = accounts[4];
     const validator4 = accounts[5];
+    const platformAccount = accounts[6];
 
     let members;
     let token;
     let cohortFactory;
+    let createCohort;
     let auditTokenMin = "5000000000000000000000";
     let auditTokenLesMin = "1";
     let auditTokenMorMax = "25100000000000000000000";
+    let CONTROLLER_ROLE = web3.utils.keccak256("CONTROLLER_ROLE");
 
     beforeEach(async () => {
 
-        token = await TOKEN.new();
+        token = await TOKEN.new(owner);
 
-        members = await MEMBERS.new(token.address);
-        cohortFactory = await COHORTFACTORY.new(members.address, token.address);
+        members = await MEMBERS.new(token.address, platformAccount);
+        createCohort = await CREATECOHORT.new(members.address, token.address)
+        cohortFactory = await COHORTFACTORY.new(members.address, createCohort.address);
 
-        let CONTROLLER_ROLE = web3.utils.keccak256("CONTROLLER_ROLE");
+
+       
         await members.grantRole(CONTROLLER_ROLE, owner, { from: owner });
+        await members.setCohortFactory(cohortFactory.address, { from: owner });
     })
 
 
@@ -42,7 +49,7 @@ contract("cohortFactory contract", (accounts) => {
 
         it("Should succeed. Initialize cohortFactory with Audit token", async () => {
 
-            let tokenAddress = await cohortFactory.auditToken();
+            let tokenAddress = await members.auditToken();
             assert.strictEqual(tokenAddress, token.address);
         })
     })
@@ -227,16 +234,16 @@ contract("cohortFactory contract", (accounts) => {
 
             await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
             await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
+            await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
 
         })
 
         it("Should succeed. Cohort created by enterprise", async () => {
 
-            await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
 
+            await createCohort.grantRole(CONTROLLER_ROLE, cohortFactory.address, { from: owner });
 
             let result = await cohortFactory.createCohort(0, { from: enterprise1 });
-            // console.log("result", result)
             assert.lengthOf(result.logs, 2);
 
             let event = result.logs[1];
@@ -261,22 +268,5 @@ contract("cohortFactory contract", (accounts) => {
             }
 
         })
-
-        // it("Should fail. Attempted to create another cohort with the same address.", async () => {
-
-        //     await createCohort.acceptInvitation(enterprise1, 2, { from: validator3 });
-
-        //     try {
-
-        //         let result = await createCohort.createCohort(0, { from: enterprise1 });
-        //     } catch (error) {
-        //         ensureException(error);
-        //     }
-
-        // })
-
-
-
-
     })
 })
