@@ -1,0 +1,337 @@
+{
+  "contractName": "MigrationAgent",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "migrateFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_from\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"migrateFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"title\":\"Migration Agent interface\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol\":\"MigrationAgent\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol\":{\"keccak256\":\"0xf0fd00c8f2edb8d21ad74ad075a3643a5510f2661200c4ad5b960c77ef619243\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0c6ccacb2517a7f16d288bb923e825d833754b3f1c2a12f56e1046b8e9295612\",\"dweb:/ipfs/QmexFCCJdtXJXnap1HVr3ehu1pCPD1BvsyZA4YUhUk385S\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity >=0.7.0 <0.8.0;\n\n/// @title Migration Agent interface\nabstract contract MigrationAgent {\n\n    function migrateFrom(address _from, uint256 _value) public virtual;\n}",
+  "sourcePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol",
+  "ast": {
+    "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol",
+    "exportedSymbols": {
+      "MigrationAgent": [
+        5820
+      ]
+    },
+    "id": 5821,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 5811,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.7",
+          ".0",
+          "<",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:31:9"
+      },
+      {
+        "abstract": true,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 5812,
+          "nodeType": "StructuredDocumentation",
+          "src": "65:37:9",
+          "text": "@title Migration Agent interface"
+        },
+        "fullyImplemented": false,
+        "id": 5820,
+        "linearizedBaseContracts": [
+          5820
+        ],
+        "name": "MigrationAgent",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "7a3130e3",
+            "id": 5819,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "migrateFrom",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 5817,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5814,
+                  "mutability": "mutable",
+                  "name": "_from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5819,
+                  "src": "163:13:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 5813,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "163:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5816,
+                  "mutability": "mutable",
+                  "name": "_value",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5819,
+                  "src": "178:14:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5815,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "178:7:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "162:31:9"
+            },
+            "returnParameters": {
+              "id": 5818,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "208:0:9"
+            },
+            "scope": 5820,
+            "src": "142:67:9",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "public"
+          }
+        ],
+        "scope": 5821,
+        "src": "102:109:9"
+      }
+    ],
+    "src": "32:179:9"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol",
+      "exportedSymbols": {
+        "MigrationAgent": [
+          5820
+        ]
+      },
+      "license": "MIT"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            ">=",
+            "0.7",
+            ".0",
+            "<",
+            "0.8",
+            ".0"
+          ]
+        },
+        "id": 5811,
+        "name": "PragmaDirective",
+        "src": "32:31:9"
+      },
+      {
+        "attributes": {
+          "abstract": true,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            5820
+          ],
+          "name": "MigrationAgent",
+          "scope": 5821
+        },
+        "children": [
+          {
+            "attributes": {
+              "text": "@title Migration Agent interface"
+            },
+            "id": 5812,
+            "name": "StructuredDocumentation",
+            "src": "65:37:9"
+          },
+          {
+            "attributes": {
+              "functionSelector": "7a3130e3",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "migrateFrom",
+              "scope": 5820,
+              "stateMutability": "nonpayable",
+              "virtual": true,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_from",
+                      "scope": 5819,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 5813,
+                        "name": "ElementaryTypeName",
+                        "src": "163:7:9"
+                      }
+                    ],
+                    "id": 5814,
+                    "name": "VariableDeclaration",
+                    "src": "163:13:9"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_value",
+                      "scope": 5819,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 5815,
+                        "name": "ElementaryTypeName",
+                        "src": "178:7:9"
+                      }
+                    ],
+                    "id": 5816,
+                    "name": "VariableDeclaration",
+                    "src": "178:14:9"
+                  }
+                ],
+                "id": 5817,
+                "name": "ParameterList",
+                "src": "162:31:9"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5818,
+                "name": "ParameterList",
+                "src": "208:0:9"
+              }
+            ],
+            "id": 5819,
+            "name": "FunctionDefinition",
+            "src": "142:67:9"
+          }
+        ],
+        "id": 5820,
+        "name": "ContractDefinition",
+        "src": "102:109:9"
+      }
+    ],
+    "id": 5821,
+    "name": "SourceUnit",
+    "src": "32:179:9"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.6+commit.7338295f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-03-11T15:30:25.620Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "title": "Migration Agent interface",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
