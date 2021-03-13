@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.7.0 <0.8.0;
+pragma solidity =0.7.6;
 pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -56,7 +56,7 @@ contract Members is  AccessControl {
     }
 
 
-     /// @dev check if caller is a controller     
+     /// @dev check if caller is a setter     
     modifier isSetter {
         require(hasRole(SETTER_ROLE, msg.sender), "Members:isSetter - Caller is not a setter");
 

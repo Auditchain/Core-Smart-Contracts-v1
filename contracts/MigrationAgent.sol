@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.7.0 <0.8.0;
+pragma solidity =0.7.6;
 
 /// @title Migration Agent interface
 abstract contract MigrationAgent {
