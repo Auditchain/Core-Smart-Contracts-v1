@@ -7,10 +7,9 @@ import "./CreateCohort.sol";
 
 /**
  * @title CohortFactory
- * @dev AccessControl 
  * Allows on creation of invitations by Enterprise and acceptance of Validators of those 
  * invitations. Finally Enterprise can create cohort consisting of invited Validators
- * and enterprise. 
+ * and Enterprise. 
  */
 
 contract CohortFactory is  AccessControl {
@@ -45,18 +44,39 @@ contract CohortFactory is  AccessControl {
     mapping (address =>  Invitation[]) public invitations;      // invitations list
     address platformAddress;                                    // address to deposit platform fees
     address createCohortAddress;
+    uint256 public minValidatorPerCohort = 3;
+
+    bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
 
     event ValidatorInvited(address indexed inviting, address indexed invitee, AuditTypes audits, uint256 invitationNumber);
     event InvitationAccepted(address indexed validator, uint256 invitationNumber);
     event CohortCreated(address indexed enterprise, address indexed cohort, AuditTypes audits);
+    event UpdateMinValidatorsPerCohort(uint256 minValidatorPerCohort);
 
+    /// @dev check if caller is a setter     
+    modifier isSetter {
+        require(hasRole(SETTER_ROLE, msg.sender), "Members:isSetter - Caller is not a setter");
+
+        _;
+    }
 
     constructor(Members _members,  address _createCohortAddress ) {
         members = _members;
         createCohortAddress = _createCohortAddress;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender); // 
     }
+   
 
+    /**
+    * @dev to be called by Governance contract to update new value for min validators per cohort
+    * @param _minValidatorPerCohort new value 
+    */
+    function updatMinValidatorsPerCohort(uint256 _minValidatorPerCohort) public isSetter() {
+
+        require(_minValidatorPerCohort != 0, "CreateCohort:updatMinValidatorsPerCohort - New value for the  min validator per cohort can't be 0");
+        minValidatorPerCohort = _minValidatorPerCohort;
+        emit UpdateMinValidatorsPerCohort(_minValidatorPerCohort);
+    }
 
     /**
     * @dev Used by Enterprise to invite validator
@@ -179,19 +199,34 @@ contract CohortFactory is  AccessControl {
         return (cohort, audits);
     }
 
+     /**
+     * @dev Function to calculate outstanding validations for enterprise. 
+     */   
+    function returnOutstandingValidations() public view returns(uint256) {
+
+         (address[] memory cohorts, ) = returnCohorts(msg.sender);
+         uint totalOutstandingValidations;
+
+         for (uint256 i; i< cohorts.length; i++)
+             totalOutstandingValidations = totalOutstandingValidations + CohortInterface(cohorts[i]).outstandingValidations();
+
+        return totalOutstandingValidations;
+    }
+
     /**
-    * @dev creates a new cohort using create2 methods based on the audit type
+    * @dev Initiate creation a new cohort using create2 methods based on the audit type and enterprise combination
     * @param audit type
     */
     function createCohort(AuditTypes audit) public {
         address[] memory validatorsList = new address[](returnInvitationCount(msg.sender, audit));
-         uint k;
+        uint k;
         for (uint i=0; i < invitations[msg.sender].length; ++i ){
             if (invitations[msg.sender][i].audits == audit && invitations[msg.sender][i].acceptanceDate > 0){
                 validatorsList[k] = invitations[msg.sender][i].validator;
                 k++;
             }
         }
+        require(k >= minValidatorPerCohort, "CohortFactory:createCohort - At least 3 validators are reqired to create new cohort");
 
         address cohortAddress = CreateCohort(createCohortAddress).createCohort(uint256(audit),  validatorsList, msg.sender );
         cohortList[msg.sender].push();

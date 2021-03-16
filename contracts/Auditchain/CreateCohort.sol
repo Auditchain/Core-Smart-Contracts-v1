@@ -24,7 +24,7 @@ contract CreateCohort is  AccessControl {
 
     
 
-    Members public members;                                            // pointer to Members contract
+    Members public members;                                     // pointer to Members contract
     mapping (address => address[]) public validatorCohortList;  // list of validators
     address public auditToken;                                  // AUDT token contract
 
@@ -32,19 +32,25 @@ contract CreateCohort is  AccessControl {
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");  
 
 
- /**
-    * @dev Used to determine cohorts in which validator is included
+
+
+
+
+    constructor(address _members, address _auditTokenAddress ) {
+        require (_members != address(0), "CreateCohort:constructor - Members contract address can't be 0");
+        require (_auditTokenAddress != address(0), "CreateCohort:constructor - Audit Token address can't be 0");
+        members = Members(_members);
+        auditToken = _auditTokenAddress;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender); // 
+    }
+
+
+    /**
+    * @dev Used to determine cohorts count for given validator
     * @param validator address of the validator
     */
     function returnValidatorCohortsCount(address validator) public view returns (uint256){
         return validatorCohortList[validator].length;
-    }
-
-
-    constructor(Members _members, address _auditTokenAddress ) {
-        members = Members(_members);
-        auditToken = _auditTokenAddress;
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender); // 
     }
    
 

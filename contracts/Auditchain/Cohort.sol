@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.7.6;
+pragma solidity >=0.6.0 <0.8.0;
 
-import "./../AuditToken.sol";
+import "../AuditToken.sol";
 import "./Members.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
- * @title CohortF
+ * @title Cohort
  * @dev AccessControl 
  * Allows on creation of invitations by Enterprise and acceptance of Validators of those 
  * invitations. Finally Enterprise can create cohort consisting of invited Validators
@@ -31,11 +31,18 @@ contract Cohort is AccessControl {
 
     // Create a new role identifier for the controller role
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");  
+     bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
   
 
     // check if caller is authorized to make the call  
     modifier isController {
         require(hasRole(CONTROLLER_ROLE, msg.sender), "Cohort:isController - Caller is not a controller");
+
+        _;
+    }
+        /// @dev check if caller is a setter     
+    modifier isSetter {
+        require(hasRole(SETTER_ROLE, msg.sender), "Members:isSetter - Caller is not a setter");
 
         _;
     }
@@ -115,7 +122,7 @@ contract Cohort is AccessControl {
     * @dev to be called by administrator to update new amount for required quorum
     * @param _requiredQuorum new value of required quorum
     */
-    function updateQuorum(uint256 _requiredQuorum) public isController() {
+    function updateQuorum(uint256 _requiredQuorum) public isSetter() {
 
         require(_requiredQuorum != 0, "New quorum value can't be 0");
         requiredQuorum = _requiredQuorum;
@@ -123,8 +130,8 @@ contract Cohort is AccessControl {
 
     function resetOutstandingValidations() public isController() {
 
-        emit LogOutstandingValidationRest(outstandingValidations);
         outstandingValidations = 0;
+        emit LogOutstandingValidationRest(outstandingValidations);
     }
 
     /**
@@ -149,7 +156,7 @@ contract Cohort is AccessControl {
     }
 
     /**
-    * @dev only controller can call this function to obtain full state of validation
+    * @dev retriev the validation results
     * @param validationHash - consist of hash of hashed document and timestamp
     * @return array  of validators
     * @return array of stakes of each validator
@@ -196,7 +203,7 @@ contract Cohort is AccessControl {
 
         for (uint256 i=0; i< validators.length; i++ ){
             totalStaked += members.deposits(validators[i]);
-            if (validation.validatorChoice[validators[i]] ==  ValidationStatus.Yes || validation.validatorChoice[validators[i]] == ValidationStatus.No )
+            if (validation.validatorChoice[validators[i]] !=  ValidationStatus.Undefined)
                 currentlyVoted += members.deposits(validators[i]);
         }
         return currentlyVoted * 100/totalStaked;
@@ -228,7 +235,7 @@ contract Cohort is AccessControl {
         Validation storage validation =  validations[validationHash];
         require(members.validatorMap(msg.sender), "Cohort:validate - Validator is not authorized.");
         require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
-        require(validation.validatorChoice[msg.sender] != ValidationStatus.Yes,
+        require(validation.validatorChoice[msg.sender] == ValidationStatus.Undefined,
                 "Cohort:validate - This document has been validated already.");
         validation.validatorChoice[msg.sender] = decision;
         

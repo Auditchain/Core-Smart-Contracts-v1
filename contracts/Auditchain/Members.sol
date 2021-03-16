@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "./CohortFactory.sol";
-import "./Cohort.sol";
+// import "./CohortFactory.sol";
+// import "./Cohort.sol";
 import "./../AuditToken.sol";
 
 /**
@@ -32,11 +32,11 @@ contract Members is  AccessControl {
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
     bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
     AuditToken public auditToken;                            //AUDT token 
-    CohortFactory public cohortFactory;
+    CohortFactoryInterface public cohortFactory;
     uint256 public stakedAmount;                        //total number of staked tokens   
     mapping(address => uint256) public deposits;        //track deposits per user
-    mapping(address => DataSubscriberTypes[]) public dataSubscribers;
-    mapping(address => mapping(address => bool)) public dataSubscribersMap;
+    mapping(address => DataSubscriberTypes[]) public dataSubscriberCohorts;
+     mapping(address => mapping(address => bool)) public dataSubscriberCohortMap;
     uint256 public amountTokensPerValidation =  1e18;    //New minted amount per validation
 
     uint256 public accessFee = 1000e18;
@@ -55,34 +55,44 @@ contract Members is  AccessControl {
         _;
     }
 
-
-     /// @dev check if caller is a setter     
+    /// @dev check if caller is a setter     
     modifier isSetter {
         require(hasRole(SETTER_ROLE, msg.sender), "Members:isSetter - Caller is not a setter");
 
         _;
     }
 
-    // Structure to store address and name of the Enterprise
-    struct Enterprise {  
+     // Audit types to be used. Three types added for future expansion 
+    enum UserType {
+        Enterprise,
+        Validator,
+        DataSubscriber
+    }
+
+    // Structure to store address and name of the registered
+    struct User {  
         address user;
         string name;                                                                                                                         
     }
 
-    // Structure to store address and name of the validator
-    struct Validator {
-        address user;
-        string name;
-    }
+    // // Structure to store address and name of the validator
+    // struct Validator {
+    //     address user;
+    //     string name;
+    // }
 
-    Enterprise[] public enterprises;
+    User[] public enterprises;
     mapping(address => bool) public enterpriseMap;
 
-    Validator[] public validators;
+    User[] public validators;
     mapping(address => bool) public validatorMap;
+
+    User[] public dataSubscribers;
+    mapping(address => bool) public dataSubscriberMap;
+   
     
     event EnterpriseUserAdded(address indexed user, string name);
-    event ValidatorUserAdded(address indexed user, string name);
+    event ValidatorUserAdded(address indexed user, string name, UserType userType);
     event LogDepositReceived(address indexed from, uint amount);
     event LogRewardsRedeemed(address indexed from, uint256 amount);
     event LogDataSubscriberPaid(address indexed from, uint256 accessFee,  address cohortAddress, address enterprise, uint256 enterpriseShare);
@@ -96,8 +106,8 @@ contract Members is  AccessControl {
 
     constructor(AuditToken _auditToken, address _platformAddress ) {
 
-        require(_auditToken != AuditToken(0), "Members:constructor - Audit token address can't be 0");
-        require(_platformAddress != address(0), "Members:constructor - Platform address can't be 0");
+        // require(_auditToken != AuditToken(0), "Members:constructor - Audit token address can't be 0");
+        // require(_platformAddress != address(0), "Members:constructor - Platform address can't be 0");
         auditToken = _auditToken;        
         platformAddress = _platformAddress;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -107,10 +117,10 @@ contract Members is  AccessControl {
     * @dev to be called by administrator to set cohort Factory contract
     * @param _cohortFactory cohortFactory contract
     */
-    function setCohortFactory(CohortFactory _cohortFactory) public isController() {
+    function setCohortFactory(address _cohortFactory) public isController() {
 
-        require(_cohortFactory != CohortFactory(0), "Members:setCohortFactory - CohortFactory address can't be 0");
-        cohortFactory = _cohortFactory;
+        require(_cohortFactory != address(0), "Members:setCohortFactory - CohortFactory address can't be 0");
+        cohortFactory = CohortFactoryInterface(_cohortFactory);
     }
 
 
@@ -120,7 +130,7 @@ contract Members is  AccessControl {
     */
     function updateRewards(uint256 _amountTokensPerValidation) public isSetter() {
 
-        require(_amountTokensPerValidation != 0, "Cohort:updateRewards - New value for the reward can't be 0");
+        require(_amountTokensPerValidation != 0, "Members:updateRewards - New value for the reward can't be 0");
         amountTokensPerValidation = _amountTokensPerValidation;
         emit LogUpdateRewards(_amountTokensPerValidation);
     }
@@ -155,7 +165,7 @@ contract Members is  AccessControl {
     */
     function setDataSubscriberShares(uint256 _enterpriseShareSubscriber, uint256 _validatorShareSubscriber ) public isSetter()  {
 
-        require(_enterpriseShareSubscriber + validatorShareSubscriber <=100, "Enterprise and Validator shares can't be larger than 100");
+        require(_enterpriseShareSubscriber.add(validatorShareSubscriber) <=100, "Enterprise and Validator shares can't be larger than 100");
         enterpriseShareSubscriber = _enterpriseShareSubscriber;
         validatorShareSubscriber = _validatorShareSubscriber;
     }
@@ -165,6 +175,8 @@ contract Members is  AccessControl {
      * @param amount number of AUDT tokens sent to contract for staking     
      */ 
      function stake(uint256 amount) public {
+
+        require(amount > 0, "Members:stake - Amount can't be 0");
 
         if (validatorMap[msg.sender]){ 
             require(amount + deposits[msg.sender] >= 5e21, "Staking:stake - Minimum contribution amount is 5000 AUDT tokens");  
@@ -184,13 +196,17 @@ contract Members is  AccessControl {
     */
     function updateDailyEarningsTransferFunds(address[] memory _validators, uint256[] memory tokens, address cohort) public isController() {
 
+        require(cohort != address(0), "Cohort address can't be 0");
+        require(_validators.length == tokens.length, "Members:updateDailyEarningsTransferFunds - List of validators doesn't match list  of their respective tokens");
+
         uint256 totalRewardTokens;
 
-        address enterpriseAddress = Cohort(cohort).enterprise();
-        Cohort(cohort).resetOutstandingValidations();
+        address enterpriseAddress = CohortInterface(cohort).enterprise();
+        CohortInterface(cohort).resetOutstandingValidations();
         uint256 totalEnterprisePay;
 
         for (uint256 i=0; i< _validators.length; i++){
+            require(_validators[i] != address(0), "One of the validators in the list has address 0");
             // 1e4 to adjust for 4 decimal points for enterpriseMatch
             uint256 enterprisePortion =  (tokens[i].mul(enterpriseMatch).div(1e4));
             totalEnterprisePay = totalEnterprisePay.add(enterprisePortion);
@@ -219,19 +235,20 @@ contract Members is  AccessControl {
 
         require(cohortAddress != address(0), "Members:dataSubscriberPayment - Cohort address can't be 0");
         require(audits >=0 && audits <=5, "Audit type is not in the required range");
-        require(!dataSubscribersMap[msg.sender][cohortAddress], "Members:dataSubscriberPayment - You are already subscribed");
+        require(!dataSubscriberCohortMap[msg.sender][cohortAddress], "Members:dataSubscriberPayment - You are already subscribed");
+        require(dataSubscriberMap[msg.sender], "Members:dataSubscriberPayment - You have to register as data subscriber");
 
         auditToken.safeTransferFrom(msg.sender, address(this), accessFee);
         auditToken.safeTransfer(platformAddress, accessFee.mul((uint256(100)).sub(enterpriseShareSubscriber).sub(validatorShareSubscriber)).div(100));
 
-        address cohortOwner = Cohort(cohortAddress).enterprise();
+        address cohortOwner = CohortInterface(cohortAddress).enterprise();
         uint256 enterpriseShare = accessFee.mul(enterpriseShareSubscriber).div(100);
         deposits[cohortOwner] = deposits[cohortOwner].add(enterpriseShare);
-        allocateValidatorDataSubscriberFee(Cohort(cohortAddress), accessFee.mul(validatorShareSubscriber).div(100));
-        dataSubscribers[msg.sender].push();
-        dataSubscribers[msg.sender][dataSubscribers[msg.sender].length -1].cohort = cohortAddress;
-        dataSubscribers[msg.sender][dataSubscribers[msg.sender].length- 1].audits = audits;
-        dataSubscribersMap[msg.sender][cohortAddress] = true;
+        allocateValidatorDataSubscriberFee(cohortAddress, accessFee.mul(validatorShareSubscriber).div(100));
+        dataSubscriberCohorts[msg.sender].push();
+        dataSubscriberCohorts[msg.sender][dataSubscriberCohorts[msg.sender].length -1].cohort = cohortAddress;
+        dataSubscriberCohorts[msg.sender][dataSubscriberCohorts[msg.sender].length- 1].audits = audits;
+        dataSubscriberCohortMap[msg.sender][cohortAddress] = true;
 
         emit LogDataSubscriberPaid(msg.sender, accessFee, cohortAddress, cohortOwner, enterpriseShare);
     }
@@ -242,7 +259,7 @@ contract Members is  AccessControl {
     * @return the structure with cohort address and their types for subscriber
     */
     function returnCohortsForDataSubscriber(address subscriber) public view returns(DataSubscriberTypes[] memory){
-            return (dataSubscribers[subscriber]);
+            return (dataSubscriberCohorts[subscriber]);
     }
 
     /**
@@ -266,9 +283,9 @@ contract Members is  AccessControl {
     * @param cohortAddress - address of cohort holding list of validators
     * @param amount - total amount of tokens available for allocation
     */
-    function allocateValidatorDataSubscriberFee(Cohort cohortAddress, uint amount) internal  {
+    function allocateValidatorDataSubscriberFee(address cohortAddress, uint amount) internal  {
 
-        address[] memory cohortValidators = Cohort(cohortAddress).returnValidators();
+        address[] memory cohortValidators = CohortInterface(cohortAddress).returnValidators();
         uint256 totalDeposits;
 
         for (uint i=0; i < cohortValidators.length; i++){
@@ -291,7 +308,7 @@ contract Members is  AccessControl {
 
           if (enterpriseMap[msg.sender]){
               // div(1e4) to adjust for four decimal points
-            require(deposits[msg.sender].sub(enterpriseMatch.mul(amountTokensPerValidation).mul(returnOutstandingValidations()).div(1e4)) >= amount, 
+            require(deposits[msg.sender].sub(enterpriseMatch.mul(amountTokensPerValidation).mul(cohortFactory.returnOutstandingValidations()).div(1e4)) >= amount, 
             "Member:redeem - Your deposit will be too low to fullfil your outstanding payments.");
           }
 
@@ -302,50 +319,36 @@ contract Members is  AccessControl {
         
     }
 
-    /**
-     * @dev Function to calculate outstanding validations for enterprise. 
-     */   
-    function returnOutstandingValidations() public view returns(uint256) {
-
-         (address[] memory cohorts, ) = CohortFactory(cohortFactory).returnCohorts(msg.sender);
-         uint totalOutstandingValidations;
-
-         for (uint256 i; i< cohorts.length; i++)
-             totalOutstandingValidations = totalOutstandingValidations.add(Cohort(cohorts[i]).outstandingValidations());
-
-        return totalOutstandingValidations;
-    }
-
-    /**
-    * @dev add enterprise user
-    * @param user to add
-    * @param name name of the user
-    */
-    function addEnterpriseUser (address user, string memory name) public  isController() {    
-        Enterprise memory newEnterprise;
-        require(!enterpriseMap[user], "Members:addEnterpriseUser - This Enterprise already exist.");
-        newEnterprise.user = user;
-        newEnterprise.name = name;
-        
-        enterprises.push(newEnterprise);
-        enterpriseMap[user] = true;
-        emit EnterpriseUserAdded(user, name);
-    }
-
+   
     /*
-    * @dev add validator user
+    * @dev add new platform user
     * @param user to add
     * @param name name of the user
+    * @param userType  
     */
-    function addValidatorUser(address user, string memory name) public isController() {
+    function addUser(address user, string memory name, UserType userType) public isController() {
 
-        Validator memory newValidator;
-        require(!validatorMap[user], "Members:addValidatorUser - This Validator already exist.");
-        newValidator.user = user;
-        newValidator.name = name;
-        validators.push(newValidator);
-        validatorMap[user] = true;
-        emit ValidatorUserAdded(user, name);
+        User memory newUser;
+        newUser.user = user;
+        newUser.name = name;
+
+        if (userType == UserType.DataSubscriber){
+            require(!dataSubscriberMap[user], "Members:addUser - This Data Subscriber already exist.");
+            dataSubscribers.push(newUser);
+            dataSubscriberMap[user]= true;
+        }
+        else if (userType == UserType.Validator){            
+            require(!validatorMap[user], "Members:addUser - This Validator already exist.");
+            validators.push(newUser);
+            validatorMap[user]= true;
+        }
+        else if (userType == UserType.Enterprise){
+            require(!enterpriseMap[user], "Members:addUser - This Enterprise already exist.");
+            enterprises.push(newUser);
+            enterpriseMap[user]= true;
+        }
+
+        emit ValidatorUserAdded(user, name, userType);
     }
 
     /*
@@ -364,32 +367,27 @@ contract Members is  AccessControl {
         return validators.length;
     }
 
-    /*
-    * @dev return name of the enterprise
-    * @param enterprise to return the name
+      /*
+    * @dev return data subscribers count
     */
-    function returnEnterpriseName(address enterprise) public view returns (string memory) {
+    function returnDataSubscriberCount() public view returns (uint256) {
 
-        for (uint256 i = 0; i < enterprises.length; i++){
-
-            if (enterprises[i].user == enterprise)
-                return enterprises[i].name;
-        }
-        return "Not Enterprise";
+        return dataSubscribers.length;
     }
 
-    /*
-    * @dev return name of the validator
-    * @param validator to return the name
-    */
-    function returnValidatorName(address validator) public view returns (string memory) {
+}
 
-        for (uint256 i = 0; i < validators.length; i++){
+interface CohortFactoryInterface {
 
-            if (validators[i].user == validator)
-                return validators[i].name;
-        }
-        return "Not Validator";
-    }
+    function returnCohorts(address enterprise) external view returns (address[] memory, uint256[] memory);
+    function returnOutstandingValidations() external view returns(uint256);
+}
+
+interface CohortInterface {
+    function resetOutstandingValidations() external;
+    function enterprise() external returns (address);
+    function outstandingValidations() external view returns (uint256);
+    function returnValidators() external view returns(address[] memory);
+
 
 }

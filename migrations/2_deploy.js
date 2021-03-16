@@ -4,6 +4,8 @@ const Cohort = require('../build/contracts/Cohort.json');
 const CohortFactory = artifacts.require('..build/contracts/CohortFactory.sol');
 const CreateCohort = artifacts.require('..build/contracts/CreateCohort.sol');
 const GovernorAlpha = artifacts.require('../build/contracts/GovernorAlpha.sol')
+const MemberHelpers = artifacts.require('../build/contracts/MemberHelpers.sol')
+
 
 const Timelock = artifacts.require('./Governance/Timelock.sol');
 const TestContract = artifacts.require('./Governance/TestSetDelay.sol');
@@ -67,6 +69,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await deployer.deploy(TestContract, 5);
   await TestContract.deployed();
 
+  await deployer.deploy(MemberHelpers, members.address);
+  await MemberHelpers.deployed();  
+
   await timelock.setPendingAdmin(gov.address, { from: admin });
   await timelock.acceptAdmin({ from: admin });
 
@@ -77,15 +82,15 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await members.setCohortFactory(cohortFactory.address, { from: admin });
 
 
-  await members.addEnterpriseUser(admin, "Admin 1", { from: controller });
+  await members.addUser(admin, "Admin 1", 0, { from: controller });
 
-  await members.addEnterpriseUser(enterprise1, "Enterprise 1", { from: controller });
-  await members.addEnterpriseUser(enterprise2, "Enterprise 2", { from: controller });
+  await members.addUser(enterprise1, "Enterprise 1", 0, { from: controller });
+  await members.addUser(enterprise2, "Enterprise 2", 0, { from: controller });
 
-  await members.addValidatorUser(validator1, "Validators 1", { from: controller });
-  await members.addValidatorUser(validator2, "Validators 2", { from: controller });
-  await members.addValidatorUser(validator3, "Validators 3", { from: controller });
-  await members.addValidatorUser(validator4, "Validators 4", { from: controller });
+  await members.addUser(validator1, "Validators 1", 1, { from: controller });
+  await members.addUser(validator2, "Validators 2", 1, { from: controller });
+  await members.addUser(validator3, "Validators 3", 1, { from: controller });
+  await members.addUser(validator4, "Validators 4", 1, { from: controller });
 
 
   await token.transfer(accounts[1], tokenAmount1);
@@ -214,6 +219,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 200000 });
 
   await token.approve(members.address, subscriberFee, { from: dataSubscriber });
+
+  await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: controller });
+
   await members.dataSubscriberPayment(cohortAddress, 1, { from: dataSubscriber });
 
 

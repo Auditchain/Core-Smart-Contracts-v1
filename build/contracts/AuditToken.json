@@ -15019,40 +15019,40 @@
     "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/AuditToken.sol",
     "exportedSymbols": {
       "AccessControl": [
-        6136
+        6195
       ],
       "Address": [
-        7640
+        7699
       ],
       "AuditToken": [
         1027
       ],
       "Context": [
-        7663
+        7722
       ],
       "ERC20": [
-        6994
-      ],
-      "ERC20Burnable": [
         7053
       ],
+      "ERC20Burnable": [
+        7112
+      ],
       "EnumerableSet": [
-        8155
+        8214
       ],
       "IERC20": [
-        7131
+        7190
       ],
       "Locked": [
-        5809
+        5868
       ],
       "MigrationAgent": [
-        5820
+        5879
       ],
       "Pausable": [
-        8247
+        8306
       ],
       "SafeMath": [
-        6491
+        6550
       ]
     },
     "id": 1028,
@@ -15085,7 +15085,7 @@
         "id": 3,
         "nodeType": "ImportDirective",
         "scope": 1028,
-        "sourceUnit": 7054,
+        "sourceUnit": 7113,
         "src": "92:63:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -15096,7 +15096,7 @@
         "id": 4,
         "nodeType": "ImportDirective",
         "scope": 1028,
-        "sourceUnit": 8248,
+        "sourceUnit": 8307,
         "src": "156:52:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -15107,7 +15107,7 @@
         "id": 5,
         "nodeType": "ImportDirective",
         "scope": 1028,
-        "sourceUnit": 6995,
+        "sourceUnit": 7054,
         "src": "209:55:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -15118,7 +15118,7 @@
         "id": 6,
         "nodeType": "ImportDirective",
         "scope": 1028,
-        "sourceUnit": 7054,
+        "sourceUnit": 7113,
         "src": "265:63:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -15129,7 +15129,7 @@
         "id": 7,
         "nodeType": "ImportDirective",
         "scope": 1028,
-        "sourceUnit": 5821,
+        "sourceUnit": 5880,
         "src": "329:30:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -15140,7 +15140,7 @@
         "id": 8,
         "nodeType": "ImportDirective",
         "scope": 1028,
-        "sourceUnit": 5810,
+        "sourceUnit": 5869,
         "src": "360:22:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -15153,10 +15153,10 @@
               "id": 9,
               "name": "Locked",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 5809,
+              "referencedDeclaration": 5868,
               "src": "407:6:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Locked_$5809",
+                "typeIdentifier": "t_contract$_Locked_$5868",
                 "typeString": "contract Locked"
               }
             },
@@ -15169,10 +15169,10 @@
               "id": 11,
               "name": "ERC20",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 6994,
+              "referencedDeclaration": 7053,
               "src": "415:5:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ERC20_$6994",
+                "typeIdentifier": "t_contract$_ERC20_$7053",
                 "typeString": "contract ERC20"
               }
             },
@@ -15185,10 +15185,10 @@
               "id": 13,
               "name": "Pausable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 8247,
+              "referencedDeclaration": 8306,
               "src": "422:8:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Pausable_$8247",
+                "typeIdentifier": "t_contract$_Pausable_$8306",
                 "typeString": "contract Pausable"
               }
             },
@@ -15201,10 +15201,10 @@
               "id": 15,
               "name": "ERC20Burnable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 7053,
+              "referencedDeclaration": 7112,
               "src": "432:13:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ERC20Burnable_$7053",
+                "typeIdentifier": "t_contract$_ERC20Burnable_$7112",
                 "typeString": "contract ERC20Burnable"
               }
             },
@@ -15214,26 +15214,26 @@
           }
         ],
         "contractDependencies": [
-          5809,
-          6136,
-          6994,
+          5868,
+          6195,
           7053,
-          7131,
-          7663,
-          8247
+          7112,
+          7190,
+          7722,
+          8306
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 1027,
         "linearizedBaseContracts": [
           1027,
+          7112,
+          8306,
           7053,
-          8247,
-          6994,
-          7131,
-          5809,
-          6136,
-          7663
+          7190,
+          5868,
+          6195,
+          7722
         ],
         "name": "AuditToken",
         "nodeType": "ContractDefinition",
@@ -16597,7 +16597,7 @@
                       "name": "_mint",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 6870,
+                      "referencedDeclaration": 6929,
                       "src": "2544:5:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -16631,7 +16631,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5879,
+                        "referencedDeclaration": 5938,
                         "src": "2601:18:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -16666,7 +16666,7 @@
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 6062,
+                      "referencedDeclaration": 6121,
                       "src": "2590:10:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
@@ -16745,10 +16745,10 @@
                   "name": "ERC20",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 6994,
+                  "referencedDeclaration": 7053,
                   "src": "2419:5:0",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_type$_t_contract$_ERC20_$6994_$",
+                    "typeIdentifier": "t_type$_t_contract$_ERC20_$7053_$",
                     "typeString": "type(contract ERC20)"
                   }
                 },
@@ -17016,7 +17016,7 @@
           },
           {
             "baseFunctions": [
-              6615
+              6674
             ],
             "body": {
               "id": 198,
@@ -17274,7 +17274,7 @@
                       "lValueRequested": false,
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 6615,
+                      "referencedDeclaration": 6674,
                       "src": "3324:14:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
@@ -17361,7 +17361,7 @@
                   "name": "isNotLocked",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 5696,
+                  "referencedDeclaration": 5755,
                   "src": "3155:11:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_address_$_t_address_$",
@@ -17512,7 +17512,7 @@
           },
           {
             "baseFunctions": [
-              6692
+              6751
             ],
             "body": {
               "id": 239,
@@ -17772,7 +17772,7 @@
                       "lValueRequested": false,
                       "memberName": "transferFrom",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 6692,
+                      "referencedDeclaration": 6751,
                       "src": "3728:18:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_address_$_t_uint256_$returns$_t_bool_$",
@@ -17845,7 +17845,7 @@
                   "name": "isNotLocked",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 5696,
+                  "referencedDeclaration": 5755,
                   "src": "3590:11:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_address_$_t_address_$",
@@ -18224,7 +18224,7 @@
                       "name": "_mint",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 6870,
+                      "referencedDeclaration": 6929,
                       "src": "4175:5:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -18293,7 +18293,7 @@
                   "name": "isController",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 5665,
+                  "referencedDeclaration": 5724,
                   "src": "4040:12:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -18407,7 +18407,7 @@
           },
           {
             "baseFunctions": [
-              7019
+              7078
             ],
             "body": {
               "id": 289,
@@ -18456,7 +18456,7 @@
                       "lValueRequested": false,
                       "memberName": "burn",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 7019,
+                      "referencedDeclaration": 7078,
                       "src": "4396:10:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_uint256_$returns$__$",
@@ -18556,7 +18556,7 @@
                   "name": "isNotLocked",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 5696,
+                  "referencedDeclaration": 5755,
                   "src": "4350:11:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_address_$_t_address_$",
@@ -18622,7 +18622,7 @@
           },
           {
             "baseFunctions": [
-              7052
+              7111
             ],
             "body": {
               "id": 312,
@@ -18687,7 +18687,7 @@
                       "lValueRequested": false,
                       "memberName": "burnFrom",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 7052,
+                      "referencedDeclaration": 7111,
                       "src": "4615:14:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -18787,7 +18787,7 @@
                   "name": "isNotLocked",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 5696,
+                  "referencedDeclaration": 5755,
                   "src": "4569:11:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_address_$_t_address_$",
@@ -18908,7 +18908,7 @@
                       "lValueRequested": false,
                       "memberName": "_pause",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 8230,
+                      "referencedDeclaration": 8289,
                       "src": "4725:12:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
@@ -18949,7 +18949,7 @@
                   "name": "isController",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 5665,
+                  "referencedDeclaration": 5724,
                   "src": "4681:12:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -19010,7 +19010,7 @@
                       "lValueRequested": false,
                       "memberName": "_unpause",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 8246,
+                      "referencedDeclaration": 8305,
                       "src": "4814:14:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
@@ -19051,7 +19051,7 @@
                   "name": "isController",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 5665,
+                  "referencedDeclaration": 5724,
                   "src": "4779:12:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -19161,7 +19161,7 @@
                       "name": "balanceOf",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 6594,
+                      "referencedDeclaration": 6653,
                       "src": "4975:9:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$_t_address_$returns$_t_uint256_$",
@@ -19491,7 +19491,7 @@
                       "name": "_addLock",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5791,
+                      "referencedDeclaration": 5850,
                       "src": "5179:8:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
@@ -19586,7 +19586,7 @@
                           "name": "balanceOf",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6594,
+                          "referencedDeclaration": 6653,
                           "src": "5227:9:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_address_$returns$_t_uint256_$",
@@ -19624,7 +19624,7 @@
                       "name": "_burn",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 6926,
+                      "referencedDeclaration": 6985,
                       "src": "5209:5:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -19772,10 +19772,10 @@
                           "name": "MigrationAgent",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 5820,
+                          "referencedDeclaration": 5879,
                           "src": "5291:14:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_MigrationAgent_$5820_$",
+                            "typeIdentifier": "t_type$_t_contract$_MigrationAgent_$5879_$",
                             "typeString": "type(contract MigrationAgent)"
                           }
                         },
@@ -19790,7 +19790,7 @@
                         "src": "5291:30:0",
                         "tryCall": false,
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_MigrationAgent_$5820",
+                          "typeIdentifier": "t_contract$_MigrationAgent_$5879",
                           "typeString": "contract MigrationAgent"
                         }
                       },
@@ -19801,7 +19801,7 @@
                       "lValueRequested": false,
                       "memberName": "migrateFrom",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 5819,
+                      "referencedDeclaration": 5878,
                       "src": "5291:42:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -19868,7 +19868,7 @@
                       "name": "_removeLock",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5808,
+                      "referencedDeclaration": 5867,
                       "src": "5362:11:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
@@ -20014,7 +20014,7 @@
                   "name": "whenNotPaused",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 8203,
+                  "referencedDeclaration": 8262,
                   "src": "4933:13:0",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -20061,7 +20061,7 @@
                             "name": "DEFAULT_ADMIN_ROLE",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 5879,
+                            "referencedDeclaration": 5938,
                             "src": "5685:18:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
@@ -20110,7 +20110,7 @@
                           "name": "hasRole",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 5925,
+                          "referencedDeclaration": 5984,
                           "src": "5677:7:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_bytes32_$_t_address_$returns$_t_bool_$",
@@ -20722,7 +20722,7 @@
                                       "name": "name",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 6552,
+                                      "referencedDeclaration": 6611,
                                       "src": "6823:4:0",
                                       "typeDescriptions": {
                                         "typeIdentifier": "t_function_internal_view$__$returns$_t_string_memory_ptr_$",
@@ -24303,7 +24303,7 @@
                           "name": "balanceOf",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6594,
+                          "referencedDeclaration": 6653,
                           "src": "9638:9:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_address_$returns$_t_uint256_$",
@@ -28215,40 +28215,40 @@
       "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/AuditToken.sol",
       "exportedSymbols": {
         "AccessControl": [
-          6136
+          6195
         ],
         "Address": [
-          7640
+          7699
         ],
         "AuditToken": [
           1027
         ],
         "Context": [
-          7663
+          7722
         ],
         "ERC20": [
-          6994
-        ],
-        "ERC20Burnable": [
           7053
         ],
+        "ERC20Burnable": [
+          7112
+        ],
         "EnumerableSet": [
-          8155
+          8214
         ],
         "IERC20": [
-          7131
+          7190
         ],
         "Locked": [
-          5809
+          5868
         ],
         "MigrationAgent": [
-          5820
+          5879
         ],
         "Pausable": [
-          8247
+          8306
         ],
         "SafeMath": [
-          6491
+          6550
         ]
       },
       "license": "MIT"
@@ -28280,7 +28280,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 7054,
+          "SourceUnit": 7113,
           "absolutePath": "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol",
           "file": "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol",
           "scope": 1028,
@@ -28295,7 +28295,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 8248,
+          "SourceUnit": 8307,
           "absolutePath": "@openzeppelin/contracts/utils/Pausable.sol",
           "file": "@openzeppelin/contracts/utils/Pausable.sol",
           "scope": 1028,
@@ -28310,7 +28310,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 6995,
+          "SourceUnit": 7054,
           "absolutePath": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
           "file": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
           "scope": 1028,
@@ -28325,7 +28325,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 7054,
+          "SourceUnit": 7113,
           "absolutePath": "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol",
           "file": "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol",
           "scope": 1028,
@@ -28340,7 +28340,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 5821,
+          "SourceUnit": 5880,
           "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol",
           "file": "./MigrationAgent.sol",
           "scope": 1028,
@@ -28355,7 +28355,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 5810,
+          "SourceUnit": 5869,
           "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Locked.sol",
           "file": "./Locked.sol",
           "scope": 1028,
@@ -28372,25 +28372,25 @@
         "attributes": {
           "abstract": false,
           "contractDependencies": [
-            5809,
-            6136,
-            6994,
+            5868,
+            6195,
             7053,
-            7131,
-            7663,
-            8247
+            7112,
+            7190,
+            7722,
+            8306
           ],
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             1027,
+            7112,
+            8306,
             7053,
-            8247,
-            6994,
-            7131,
-            5809,
-            6136,
-            7663
+            7190,
+            5868,
+            6195,
+            7722
           ],
           "name": "AuditToken",
           "scope": 1028
@@ -28402,7 +28402,7 @@
               {
                 "attributes": {
                   "name": "Locked",
-                  "referencedDeclaration": 5809,
+                  "referencedDeclaration": 5868,
                   "type": "contract Locked"
                 },
                 "id": 9,
@@ -28420,7 +28420,7 @@
               {
                 "attributes": {
                   "name": "ERC20",
-                  "referencedDeclaration": 6994,
+                  "referencedDeclaration": 7053,
                   "type": "contract ERC20"
                 },
                 "id": 11,
@@ -28438,7 +28438,7 @@
               {
                 "attributes": {
                   "name": "Pausable",
-                  "referencedDeclaration": 8247,
+                  "referencedDeclaration": 8306,
                   "type": "contract Pausable"
                 },
                 "id": 13,
@@ -28456,7 +28456,7 @@
               {
                 "attributes": {
                   "name": "ERC20Burnable",
-                  "referencedDeclaration": 7053,
+                  "referencedDeclaration": 7112,
                   "type": "contract ERC20Burnable"
                 },
                 "id": 15,
@@ -29745,7 +29745,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 6994,
+                      "referencedDeclaration": 7053,
                       "type": "type(contract ERC20)",
                       "value": "ERC20"
                     },
@@ -29983,7 +29983,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6870,
+                              "referencedDeclaration": 6929,
                               "type": "function (address,uint256)",
                               "value": "_mint"
                             },
@@ -30059,7 +30059,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6062,
+                              "referencedDeclaration": 6121,
                               "type": "function (bytes32,address)",
                               "value": "_setupRole"
                             },
@@ -30072,7 +30072,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5879,
+                              "referencedDeclaration": 5938,
                               "type": "bytes32",
                               "value": "DEFAULT_ADMIN_ROLE"
                             },
@@ -30341,7 +30341,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                6615
+                6674
               ],
               "functionSelector": "a9059cbb",
               "implemented": true,
@@ -30472,7 +30472,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 5696,
+                      "referencedDeclaration": 5755,
                       "type": "modifier (address,address)",
                       "value": "isNotLocked"
                     },
@@ -30808,7 +30808,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "transfer",
-                              "referencedDeclaration": 6615,
+                              "referencedDeclaration": 6674,
                               "type": "function (address,uint256) returns (bool)"
                             },
                             "children": [
@@ -30879,7 +30879,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                6692
+                6751
               ],
               "functionSelector": "23b872dd",
               "implemented": true,
@@ -31037,7 +31037,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 5696,
+                      "referencedDeclaration": 5755,
                       "type": "modifier (address,address)",
                       "value": "isNotLocked"
                     },
@@ -31347,7 +31347,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "transferFrom",
-                              "referencedDeclaration": 6692,
+                              "referencedDeclaration": 6751,
                               "type": "function (address,address,uint256) returns (bool)"
                             },
                             "children": [
@@ -31554,7 +31554,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 5665,
+                      "referencedDeclaration": 5724,
                       "type": "modifier ()",
                       "value": "isController"
                     },
@@ -31762,7 +31762,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6870,
+                              "referencedDeclaration": 6929,
                               "type": "function (address,uint256)",
                               "value": "_mint"
                             },
@@ -31844,7 +31844,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                7019
+                7078
               ],
               "functionSelector": "42966c68",
               "implemented": true,
@@ -31926,7 +31926,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 5696,
+                      "referencedDeclaration": 5755,
                       "type": "modifier (address,address)",
                       "value": "isNotLocked"
                     },
@@ -32027,7 +32027,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "burn",
-                              "referencedDeclaration": 7019,
+                              "referencedDeclaration": 7078,
                               "type": "function (uint256)"
                             },
                             "children": [
@@ -32085,7 +32085,7 @@
           {
             "attributes": {
               "baseFunctions": [
-                7052
+                7111
               ],
               "functionSelector": "79cc6790",
               "implemented": true,
@@ -32194,7 +32194,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 5696,
+                      "referencedDeclaration": 5755,
                       "type": "modifier (address,address)",
                       "value": "isNotLocked"
                     },
@@ -32299,7 +32299,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "burnFrom",
-                              "referencedDeclaration": 7052,
+                              "referencedDeclaration": 7111,
                               "type": "function (address,uint256)"
                             },
                             "children": [
@@ -32414,7 +32414,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 5665,
+                      "referencedDeclaration": 5724,
                       "type": "modifier ()",
                       "value": "isController"
                     },
@@ -32459,7 +32459,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "_pause",
-                              "referencedDeclaration": 8230,
+                              "referencedDeclaration": 8289,
                               "type": "function ()"
                             },
                             "children": [
@@ -32548,7 +32548,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 5665,
+                      "referencedDeclaration": 5724,
                       "type": "modifier ()",
                       "value": "isController"
                     },
@@ -32593,7 +32593,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "_unpause",
-                              "referencedDeclaration": 8246,
+                              "referencedDeclaration": 8305,
                               "type": "function ()"
                             },
                             "children": [
@@ -32690,7 +32690,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 8203,
+                      "referencedDeclaration": 8262,
                       "type": "modifier ()",
                       "value": "whenNotPaused"
                     },
@@ -32764,7 +32764,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6594,
+                              "referencedDeclaration": 6653,
                               "type": "function (address) view returns (uint256)",
                               "value": "balanceOf"
                             },
@@ -33112,7 +33112,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5791,
+                              "referencedDeclaration": 5850,
                               "type": "function (address)",
                               "value": "_addLock"
                             },
@@ -33190,7 +33190,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6926,
+                              "referencedDeclaration": 6985,
                               "type": "function (address,uint256)",
                               "value": "_burn"
                             },
@@ -33252,7 +33252,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 6594,
+                                  "referencedDeclaration": 6653,
                                   "type": "function (address) view returns (uint256)",
                                   "value": "balanceOf"
                                 },
@@ -33385,7 +33385,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "migrateFrom",
-                              "referencedDeclaration": 5819,
+                              "referencedDeclaration": 5878,
                               "type": "function (address,uint256) external"
                             },
                             "children": [
@@ -33415,7 +33415,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 5820,
+                                      "referencedDeclaration": 5879,
                                       "type": "type(contract MigrationAgent)",
                                       "value": "MigrationAgent"
                                     },
@@ -33525,7 +33525,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5808,
+                              "referencedDeclaration": 5867,
                               "type": "function (address)",
                               "value": "_removeLock"
                             },
@@ -33831,7 +33831,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 5925,
+                                  "referencedDeclaration": 5984,
                                   "type": "function (bytes32,address) view returns (bool)",
                                   "value": "hasRole"
                                 },
@@ -33844,7 +33844,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 5879,
+                                  "referencedDeclaration": 5938,
                                   "type": "bytes32",
                                   "value": "DEFAULT_ADMIN_ROLE"
                                 },
@@ -34808,7 +34808,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 6552,
+                                              "referencedDeclaration": 6611,
                                               "type": "function () view returns (string memory)",
                                               "value": "name"
                                             },
@@ -38401,7 +38401,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 6594,
+                                  "referencedDeclaration": 6653,
                                   "type": "function (address) view returns (uint256)",
                                   "value": "balanceOf"
                                 },
@@ -42461,7 +42461,7 @@
     "version": "0.7.6+commit.7338295f.Emscripten.clang"
   },
   "networks": {
-    "5777": {
+    "1615735860701": {
       "events": {
         "0x1b6f28dfffb89ba40ba9067329c3c0e8bd926256b970cf7d060cd48b1cd0e44e": {
           "anonymous": false,
@@ -42756,10 +42756,10 @@
         }
       },
       "links": {},
-      "address": "0x554E8567a9b3b2706E334b410b082a673A87C75F",
-      "transactionHash": "0x832fe9f7080896826b065fedac31b7bc945bef7db9b2be34483d4e98fb11f408"
+      "address": "0x6fEf635566d63CfB0a339900cEB2D4f3B62dA39B",
+      "transactionHash": "0x8a180918230687516dea469c23146716d463d0219c4fe6b9ed5f22cae50142ed"
     },
-    "1615489019002": {
+    "1615931391688": {
       "events": {
         "0x1b6f28dfffb89ba40ba9067329c3c0e8bd926256b970cf7d060cd48b1cd0e44e": {
           "anonymous": false,
@@ -43054,310 +43054,12 @@
         }
       },
       "links": {},
-      "address": "0xEE835dAB73c638b03D0793d19AB6918bdA4Caea5",
-      "transactionHash": "0xeb186eeede3c2509a4be87f4efc344c92fcf0415bac6b590fc0defa27a67d817"
-    },
-    "1615491591666": {
-      "events": {
-        "0x1b6f28dfffb89ba40ba9067329c3c0e8bd926256b970cf7d060cd48b1cd0e44e": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "user",
-              "type": "address"
-            }
-          ],
-          "name": "AddedLock",
-          "type": "event"
-        },
-        "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "owner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "spender",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "value",
-              "type": "uint256"
-            }
-          ],
-          "name": "Approval",
-          "type": "event"
-        },
-        "0x3134e8a2e6d97e929a7e54011ea5485d7d196dd5f0ba4d4ef95803e8e3fc257f": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "delegator",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "fromDelegate",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "toDelegate",
-              "type": "address"
-            }
-          ],
-          "name": "DelegateChanged",
-          "type": "event"
-        },
-        "0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "delegate",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "previousBalance",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "newBalance",
-              "type": "uint256"
-            }
-          ],
-          "name": "DelegateVotesChanged",
-          "type": "event"
-        },
-        "0x8907895491a85a1a5bce30a1aca3f15b8b87609063973a35e6beaaebf2808e4e": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "controller",
-              "type": "address"
-            }
-          ],
-          "name": "LogControllerRevoked",
-          "type": "event"
-        },
-        "0xa07f9163b8dfda25fbd0b2d0515607d972a8ed0d637918acaeaa08b1498dfb53": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "controller",
-              "type": "address"
-            }
-          ],
-          "name": "LogControllerSet",
-          "type": "event"
-        },
-        "0x18df02dcc52b9c494f391df09661519c0069bd8540141946280399408205ca1a": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "from",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "to",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "value",
-              "type": "uint256"
-            }
-          ],
-          "name": "Migrate",
-          "type": "event"
-        },
-        "0x53002f2ca3e2737f3405e7f734101551690f8426e082167285f3caa8e6c6a182": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "migrationAgent",
-              "type": "address"
-            }
-          ],
-          "name": "MigrationAgentSet",
-          "type": "event"
-        },
-        "0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            }
-          ],
-          "name": "Paused",
-          "type": "event"
-        },
-        "0x6134e30ca79f58d7566528b3768c7d33c9c30815c63cfeae3b69f52cf31dd61a": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "user",
-              "type": "address"
-            }
-          ],
-          "name": "RemovedLock",
-          "type": "event"
-        },
-        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "bytes32",
-              "name": "role",
-              "type": "bytes32"
-            },
-            {
-              "indexed": true,
-              "internalType": "bytes32",
-              "name": "previousAdminRole",
-              "type": "bytes32"
-            },
-            {
-              "indexed": true,
-              "internalType": "bytes32",
-              "name": "newAdminRole",
-              "type": "bytes32"
-            }
-          ],
-          "name": "RoleAdminChanged",
-          "type": "event"
-        },
-        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "bytes32",
-              "name": "role",
-              "type": "bytes32"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "sender",
-              "type": "address"
-            }
-          ],
-          "name": "RoleGranted",
-          "type": "event"
-        },
-        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "bytes32",
-              "name": "role",
-              "type": "bytes32"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "sender",
-              "type": "address"
-            }
-          ],
-          "name": "RoleRevoked",
-          "type": "event"
-        },
-        "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "from",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "to",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "value",
-              "type": "uint256"
-            }
-          ],
-          "name": "Transfer",
-          "type": "event"
-        },
-        "0x5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            }
-          ],
-          "name": "Unpaused",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0x74eCf93F032650D7ce666fE73B5648fc38EEa99B",
-      "transactionHash": "0x8642451fa08b133222f3c01332dbf60787f53ab5982b1ebb9410663136439ba5"
+      "address": "0x9eAd9a1647A17781b886Fb1699ebd6AAf21270a9",
+      "transactionHash": "0xd6583c5ef63f97d5673ea7899252c2a35d534cbf3941856b4d5c3f9c5021efd5"
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-12T23:32:31.757Z",
+  "updatedAt": "2021-03-16T22:19:11.513Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
