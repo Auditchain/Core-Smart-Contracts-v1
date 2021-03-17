@@ -70,7 +70,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await TestContract.deployed();
 
   await deployer.deploy(MemberHelpers, members.address);
-  await MemberHelpers.deployed();  
+  let memberHelper = await MemberHelpers.deployed();  
 
   await timelock.setPendingAdmin(gov.address, { from: admin });
   await timelock.acceptAdmin({ from: admin });
@@ -330,12 +330,19 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   console.log("\n\n" + '"AUDT_TOKEN_ADDRESS":"' + token.address + '",');
   console.log('"MEMBERS_ADDRESS":"' + members.address + '",');
+  console.log('"MEMBER_HELPERS_ADDRESS":"' + memberHelper.address + '",');
   console.log('"CREATE_COHORT_ADDRESS":"' + createCohort.address + '",');
-  console.log('"COHORT_FACTORY_ADDRESS":"' + cohortFactory.address + '"' + "\n\n");
+  console.log('"COHORT_FACTORY_ADDRESS":"' + cohortFactory.address + '",');
+  console.log('"GOVERNOR_ALPHA_ADDRESS":"' + gov.address + '",');
+  console.log('"TIMELOCK_ADDRESS":"' + timelock.address+ '"' + "\n\n");
+
 
   console.log('COHORT_FACTORY_ADDRESS=' + cohortFactory.address);
   console.log('AUDT_TOKEN_ADDRESS=' + token.address);
   console.log('MEMBER_ADDRESS=' + members.address);
+  console.log('MEMBER_HELPERS_ADDRESS=' + memberHelper.address);
+  console.log('GOVERNOR_ALPHA_ADDRESS=' + gov.address);
+  console.log('TIMELOCK_ADDRESS='+ timelock.address);
 
 
 };

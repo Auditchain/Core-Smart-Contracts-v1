@@ -92,7 +92,7 @@ contract Members is  AccessControl {
    
     
     event EnterpriseUserAdded(address indexed user, string name);
-    event ValidatorUserAdded(address indexed user, string name, UserType userType);
+    event UserAdded(address indexed user, string name, UserType userType);
     event LogDepositReceived(address indexed from, uint amount);
     event LogRewardsRedeemed(address indexed from, uint256 amount);
     event LogDataSubscriberPaid(address indexed from, uint256 accessFee,  address cohortAddress, address enterprise, uint256 enterpriseShare);
@@ -241,6 +241,11 @@ contract Members is  AccessControl {
         auditToken.safeTransferFrom(msg.sender, address(this), accessFee);
         auditToken.safeTransfer(platformAddress, accessFee.mul((uint256(100)).sub(enterpriseShareSubscriber).sub(validatorShareSubscriber)).div(100));
 
+        if (validatorMap[msg.sender] || enterpriseMap[msg.sender]){
+            stakedAmount = stakedAmount.sub(accessFee);  // track tokens contributed so far
+            deposits[msg.sender] = deposits[msg.sender].sub(accessFee);
+        }
+
         address cohortOwner = CohortInterface(cohortAddress).enterprise();
         uint256 enterpriseShare = accessFee.mul(enterpriseShareSubscriber).div(100);
         deposits[cohortOwner] = deposits[cohortOwner].add(enterpriseShare);
@@ -348,7 +353,7 @@ contract Members is  AccessControl {
             enterpriseMap[user]= true;
         }
 
-        emit ValidatorUserAdded(user, name, userType);
+        emit UserAdded(user, name, userType);
     }
 
     /*
