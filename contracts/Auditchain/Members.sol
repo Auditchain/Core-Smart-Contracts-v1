@@ -382,17 +382,18 @@ contract Members is  AccessControl {
 
 }
 
-interface CohortFactoryInterface {
+    interface CohortFactoryInterface {
 
-    function returnCohorts(address enterprise) external view returns (address[] memory, uint256[] memory);
-    function returnOutstandingValidations() external view returns(uint256);
-}
+        function returnCohorts(address enterprise) external view returns (address[] memory, uint256[] memory);
+        function returnOutstandingValidations() external view returns(uint256);
+    }
 
-interface CohortInterface {
-    function resetOutstandingValidations() external;
-    function enterprise() external returns (address);
-    function outstandingValidations() external view returns (uint256);
-    function returnValidators() external view returns(address[] memory);
+    interface CohortInterface {
+        function resetOutstandingValidations() external;
+        function enterprise() external returns (address);
+        function outstandingValidations() external view returns (uint256);
+        function returnValidators() external view returns(address[] memory);
+        function addAdditionalValidator(address additionalValidator) external returns (bool);
+        function removeValidator(address validator) external returns (bool);
+    }
 
-
-}

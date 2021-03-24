@@ -84,7 +84,7 @@ contract CreateCohort is  AccessControl {
             cohortAddress := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
         createValidatorCohortList(validatorsList, cohortAddress);
-        Cohort(cohortAddress).initialize(auditToken, members, enterprise, validatorsList, uint256(audit));
+        Cohort(cohortAddress).initialize(auditToken, members, enterprise, validatorsList, uint256(audit), msg.sender);
     
         emit CohortCreatedFinal(enterprise, cohortAddress, AuditTypes(audit));
         return cohortAddress;

@@ -18,6 +18,8 @@ const abi = new ethers.utils.AbiCoder();
 module.exports = async function (deployer, network, accounts) { // eslint-disable-line..
 
   let admin = accounts[0];
+  // let admin = "0x67794670742BA1E53FD04d8bA22a9b4487CE65B4";
+
   let controller = accounts[1];
   let dataSubscriber = accounts[2];
   let validator1 = accounts[3];
@@ -30,6 +32,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   let validatorAmountMin = "5000000000000000000000";
   let validatorAmountMax = "8000000000000000000000";
   let subscriberFee = "1000000000000000000000";
+  let addressZero = "0x0000000000000000000000000000000000000000"
 
   const tokenAmount1 = "9000000000000000000000000";
   const tokenAmount2 = "8500000000000000000000000";
@@ -44,6 +47,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   await deployer.deploy(Token, admin);
   let token = await Token.deployed();
+
+  console.log("token address:", token.address);
 
   await deployer.deploy(Members, token.address, admin);
   let members = await Members.deployed();
@@ -120,12 +125,12 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await members.stake(validatorAmountMin, { from: validator4 });
   await members.stake(validatorAmountMin, { from: enterprise1 });
 
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 0, { from: enterprise2 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise2 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise2 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 0, { from: enterprise1 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise1 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise1 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 0, addressZero, { from: enterprise2 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, addressZero, { from: enterprise2 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, addressZero, { from: enterprise2 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3], 0, addressZero, { from: enterprise1 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, addressZero, { from: enterprise1 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, addressZero, { from: enterprise1 });
 
   await cohortFactory.acceptInvitation(enterprise2, 0, { from: validator1 });
   await cohortFactory.acceptInvitation(enterprise2, 1, { from: validator2 });
@@ -135,13 +140,13 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
   await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
   await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
-  await cohortFactory.acceptInvitation(enterprise1, 3, { from: validator4 });
+  // await cohortFactory.acceptInvitation(enterprise1, 3, { from: validator4 });
 
 
-  await cohortFactory.acceptInvitation(enterprise1, 4, { from: validator1 });
-  await cohortFactory.acceptInvitation(enterprise1, 5, { from: validator2 });
-  await cohortFactory.acceptInvitation(enterprise1, 6, { from: validator3 });
-  await cohortFactory.acceptInvitation(enterprise1, 7, { from: validator4 });
+  await cohortFactory.acceptInvitation(enterprise1, 3, { from: validator1 });
+  await cohortFactory.acceptInvitation(enterprise1, 4, { from: validator2 });
+  await cohortFactory.acceptInvitation(enterprise1, 5, { from: validator3 });
+  await cohortFactory.acceptInvitation(enterprise1, 6, { from: validator4 });
 
   await createCohort.grantRole(CONTROLLER_ROLE, cohortFactory.address, { from: admin });
 

@@ -31,6 +31,8 @@ contract CohortFactory is  AccessControl {
         uint256 invitationDate;      
         uint256 acceptanceDate;
         AuditTypes audits;
+        address cohort;
+        bool deleted;
     }
 
     struct Cohorts {
@@ -48,10 +50,11 @@ contract CohortFactory is  AccessControl {
 
     bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
 
-    event ValidatorInvited(address indexed inviting, address indexed invitee, AuditTypes audits, uint256 invitationNumber);
+    event ValidatorInvited(address indexed inviting, address indexed invitee, AuditTypes audits, uint256 invitationNumber, address cohort);
     event InvitationAccepted(address indexed validator, uint256 invitationNumber);
     event CohortCreated(address indexed enterprise, address indexed cohort, AuditTypes audits);
     event UpdateMinValidatorsPerCohort(uint256 minValidatorPerCohort);
+    event ValidatorCleared(address validator, AuditTypes audit, address cohort, address enterprise);
 
     /// @dev check if caller is a setter     
     modifier isSetter {
@@ -83,7 +86,7 @@ contract CohortFactory is  AccessControl {
     * @param validator address of the validator to invite
     * @param audit type of the audit
     */
-    function inviteValidator(address validator, AuditTypes audit) public {
+    function inviteValidator(address validator, AuditTypes audit, address cohort) public {
 
         Invitation memory newInvitation;
         bool approvedValidator = members.validatorMap(validator);
@@ -96,8 +99,10 @@ contract CohortFactory is  AccessControl {
         newInvitation.validator = validator;
         newInvitation.invitationDate = block.timestamp;     
         newInvitation.audits = audit;   
+        newInvitation.cohort = cohort;
         invitations[msg.sender].push(newInvitation);
-        emit ValidatorInvited(msg.sender, validator, audit, invitations[msg.sender].length - 1);
+       
+        emit ValidatorInvited(msg.sender, validator, audit, invitations[msg.sender].length - 1, cohort);
         }
 
     /**
@@ -105,12 +110,12 @@ contract CohortFactory is  AccessControl {
     * @param validator address of the validator to invite
     * @param audit type of the audit
     */
-    function inviteValidatorMultiple(address[] memory validator, AuditTypes audit) public{
+    function inviteValidatorMultiple(address[] memory validator, AuditTypes audit, address cohort) public{
 
         uint256 length = validator.length;
         require(length <= 256, "CohortFactory-inviteValidatorMultiple: List too long");
         for (uint256 i = 0; i < length; i++) {
-            inviteValidator(validator[i], audit);
+            inviteValidator(validator[i], audit, cohort);
         }
     }
 
@@ -125,8 +130,24 @@ contract CohortFactory is  AccessControl {
         require( invitations[enterprise][invitationNumber].acceptanceDate == 0, "CohortFactory:acceptInvitation- This invitation has been accepted already .");
         require( invitations[enterprise][invitationNumber].validator == msg.sender, "CohortFactory:acceptInvitation - You are accepting invitation to which you were not invited or this invitation doesn't exist.");
         invitations[enterprise][invitationNumber].acceptanceDate = block.timestamp;
+         if (invitations[enterprise][invitationNumber].cohort != address(0))
+            require(CohortInterface(invitations[enterprise][invitationNumber].cohort).addAdditionalValidator(msg.sender), "CohortFactory:inviteValidator - Problem adding new validator");
         emit InvitationAccepted(msg.sender, invitationNumber);
     }
+
+    function clearInvitationRemoveValidator(address validator, AuditTypes audit, address cohort) public {
+
+        for (uint256 i = 0; i < invitations[msg.sender].length; i++){
+            if (invitations[msg.sender][i].audits == audit && 
+                invitations[msg.sender][i].validator ==  validator){
+                // require(invitations[msg.sender][i].enterprise == msg.sender, "CohortFactory:clearInvitationRemoveValidator - You can't delete this invitation");
+                invitations[msg.sender][i].deleted = true;
+                require(CohortInterface(cohort).removeValidator(validator), "CohortFactory:clearInvitationValidator - Problem removing validator in Cohort contract");
+                emit ValidatorCleared(validator, audit, cohort, msg.sender);
+            }
+        }
+    }
+
 
      /**
     * @dev Used by Validator to accept multiple Enterprise invitation
@@ -142,7 +163,7 @@ contract CohortFactory is  AccessControl {
     }
 
      /**
-    * @dev Used to determine size of validator list to be included in Cohort
+    * @dev To return invitation count
     * @param enterprise address of the Enterprise who created invitation
     * @param audit type
     * @return count of invitations
@@ -152,7 +173,9 @@ contract CohortFactory is  AccessControl {
         uint256 count;
 
         for (uint i=0; i < invitations[enterprise].length; ++i ){
-            if (invitations[enterprise][i].audits == audit && invitations[enterprise][i].acceptanceDate != 0)
+            if (invitations[enterprise][i].audits == audit && 
+                invitations[enterprise][i].acceptanceDate != 0 &&
+                !invitations[enterprise][i].deleted)
                 count ++;
         }
         return count;
@@ -169,7 +192,9 @@ contract CohortFactory is  AccessControl {
     function isValidatorInvited(address enterprise, address validator, AuditTypes audits) public view returns (bool, bool) {
 
         for (uint i=0; i < invitations[enterprise].length; ++i ){
-            if (invitations[enterprise][i].audits == audits && invitations[enterprise][i].validator == validator ){
+            if (invitations[enterprise][i].audits == audits && 
+                invitations[enterprise][i].validator == validator &&
+                !invitations[enterprise][i].deleted){
                 if (invitations[enterprise][i].acceptanceDate > 0)
                     return (true, true);
                 return (true, false);
