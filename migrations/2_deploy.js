@@ -87,7 +87,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await members.setCohortFactory(cohortFactory.address, { from: admin });
 
 
-  await members.addUser(admin, "Admin 1", 0, { from: controller });
+  // await members.addUser(admin, "Admin 1", 0, { from: controller });
 
   await members.addUser(enterprise1, "Enterprise 1", 0, { from: controller });
   await members.addUser(enterprise2, "Enterprise 2", 0, { from: controller });
