@@ -14,15 +14,11 @@ import "./CreateCohort.sol";
 
 contract CohortFactory is  AccessControl {
 
-    // Audit types to be used. Three types added for future expansion 
+        // Audit types to be used. Three types added for future expansion 
     enum AuditTypes {
-        Financial,
-        System,
-        Contract,
-        Type4,
-        Type5,
-        Type6
+        Financial, System, Contract, NFT, Type5, Type6
     }
+
 
     // Invitation structure to hold info about its status
     struct Invitation {
@@ -103,7 +99,7 @@ contract CohortFactory is  AccessControl {
         invitations[msg.sender].push(newInvitation);
        
         emit ValidatorInvited(msg.sender, validator, audit, invitations[msg.sender].length - 1, cohort);
-        }
+    }
 
     /**
     * @dev Used by Enterprise to invite multiple validators in one call 
@@ -130,26 +126,31 @@ contract CohortFactory is  AccessControl {
         require( invitations[enterprise][invitationNumber].acceptanceDate == 0, "CohortFactory:acceptInvitation- This invitation has been accepted already .");
         require( invitations[enterprise][invitationNumber].validator == msg.sender, "CohortFactory:acceptInvitation - You are accepting invitation to which you were not invited or this invitation doesn't exist.");
         invitations[enterprise][invitationNumber].acceptanceDate = block.timestamp;
-         if (invitations[enterprise][invitationNumber].cohort != address(0))
-            require(CohortInterface(invitations[enterprise][invitationNumber].cohort).addAdditionalValidator(msg.sender), "CohortFactory:inviteValidator - Problem adding new validator");
+            if (invitations[enterprise][invitationNumber].cohort != address(0)) // adding validator to existng cohort
+                require(ICohort(invitations[enterprise][invitationNumber].cohort).addAdditionalValidator(msg.sender), "CohortFactory:inviteValidator - Problem adding new validator");
         emit InvitationAccepted(msg.sender, invitationNumber);
     }
 
+    /**
+    * @dev Used by Enterprise to remove existing validator
+    * @param validator validator to remove
+    * @param audit type of audit 
+    * @param cohort cohort from which validator is removed
+    */
     function clearInvitationRemoveValidator(address validator, AuditTypes audit, address cohort) public {
 
         for (uint256 i = 0; i < invitations[msg.sender].length; i++){
             if (invitations[msg.sender][i].audits == audit && 
                 invitations[msg.sender][i].validator ==  validator){
-                // require(invitations[msg.sender][i].enterprise == msg.sender, "CohortFactory:clearInvitationRemoveValidator - You can't delete this invitation");
                 invitations[msg.sender][i].deleted = true;
-                require(CohortInterface(cohort).removeValidator(validator), "CohortFactory:clearInvitationValidator - Problem removing validator in Cohort contract");
+                require(ICohort(cohort).removeValidator(validator), 
+                        "CohortFactory:clearInvitationValidator - Problem removing validator in Cohort contract");
                 emit ValidatorCleared(validator, audit, cohort, msg.sender);
             }
         }
     }
 
-
-     /**
+    /**
     * @dev Used by Validator to accept multiple Enterprise invitation
     * @param enterprise address of the Enterprise who created invitation
     * @param invitationNumber invitation number
@@ -162,7 +163,7 @@ contract CohortFactory is  AccessControl {
         }
     }
 
-     /**
+    /**
     * @dev To return invitation count
     * @param enterprise address of the Enterprise who created invitation
     * @param audit type
@@ -214,12 +215,9 @@ contract CohortFactory is  AccessControl {
         address[] memory cohort = new address[](cohortList[enterprise].length);
         uint256[] memory audits = new uint256[](cohortList[enterprise].length);
 
-
         for (uint256 i; i < cohortList[enterprise].length; i++){
-
             cohort[i] = cohortList[enterprise][i].cohort;
             audits[i] = uint256(cohortList[enterprise][i].audits);
-
         }
         return (cohort, audits);
     }
@@ -233,7 +231,7 @@ contract CohortFactory is  AccessControl {
          uint totalOutstandingValidations;
 
          for (uint256 i; i< cohorts.length; i++)
-             totalOutstandingValidations = totalOutstandingValidations + CohortInterface(cohorts[i]).outstandingValidations();
+             totalOutstandingValidations = totalOutstandingValidations + ICohort(cohorts[i]).outstandingValidations();
 
         return totalOutstandingValidations;
     }

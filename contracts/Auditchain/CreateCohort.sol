@@ -12,14 +12,9 @@ import "./Members.sol";
 
 contract CreateCohort is  AccessControl {
 
-    // Audit types to be used. Three types added for future expansion 
+    // Audit types to be used. Two types added for future expansion 
     enum AuditTypes {
-        Financial,
-        System,
-        Contract,
-        Type4,
-        Type5,
-        Type6
+        Financial, System, Contract, NFT, Type5, Type6
     }
 
     
@@ -30,11 +25,6 @@ contract CreateCohort is  AccessControl {
 
     event CohortCreatedFinal(address indexed enterprise, address indexed cohort, AuditTypes audits);
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");  
-
-
-
-
-
 
     constructor(address _members, address _auditTokenAddress ) {
         require (_members != address(0), "CreateCohort:constructor - Members contract address can't be 0");
@@ -50,6 +40,7 @@ contract CreateCohort is  AccessControl {
     * @param validator address of the validator
     */
     function returnValidatorCohortsCount(address validator) public view returns (uint256){
+
         return validatorCohortList[validator].length;
     }
    
@@ -73,6 +64,7 @@ contract CreateCohort is  AccessControl {
     */
     function createCohort(uint256 audit,  address[] memory validatorsList, address enterprise ) public returns(address) {
 
+        // Only Cohort factoty is authorized to call this contract
         require(hasRole(CONTROLLER_ROLE, msg.sender), "CreateCohort:createCohort - Caller is not a controller");
 
         bytes memory bytecode = type(Cohort).creationCode;        

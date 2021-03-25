@@ -3,10 +3,13 @@ pragma solidity =0.7.6;
 import "./Members.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+/**
+ * @title MemberHelpers
+ * Additional function for Members 
+ */
 contract MemberHelpers is  AccessControl {
 
     Members members;
-
 
     constructor(address  _members ) {
 
@@ -14,6 +17,7 @@ contract MemberHelpers is  AccessControl {
         members = Members(_members);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
+
 
     /*
     * @dev return name of the enterprise

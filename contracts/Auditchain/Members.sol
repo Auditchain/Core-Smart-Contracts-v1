@@ -5,13 +5,12 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-// import "./CohortFactory.sol";
-// import "./Cohort.sol";
+import "./ICohort.sol";
+import "./ICohortFactory.sol";
 import "./../AuditToken.sol";
 
 /**
  * @title Members
- * @dev AccessControl 
  * Allows on creation of Enterprise and Validator accounts and staking of funds by validators
  * Validators also have ability to withdraw their staking
  */
@@ -32,7 +31,7 @@ contract Members is  AccessControl {
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
     bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
     AuditToken public auditToken;                            //AUDT token 
-    CohortFactoryInterface public cohortFactory;
+    ICohortFactory public cohortFactory;
     uint256 public stakedAmount;                        //total number of staked tokens   
     mapping(address => uint256) public deposits;        //track deposits per user
     mapping(address => DataSubscriberTypes[]) public dataSubscriberCohorts;
@@ -62,24 +61,14 @@ contract Members is  AccessControl {
         _;
     }
 
-     // Audit types to be used. Three types added for future expansion 
-    enum UserType {
-        Enterprise,
-        Validator,
-        DataSubscriber
-    }
+     // Audit types to be used. Two types added for future expansion 
+    enum UserType {Enterprise, Validator, DataSubscriber}
 
     // Structure to store address and name of the registered
     struct User {  
         address user;
         string name;                                                                                                                         
     }
-
-    // // Structure to store address and name of the validator
-    // struct Validator {
-    //     address user;
-    //     string name;
-    // }
 
     User[] public enterprises;
     mapping(address => bool) public enterpriseMap;
@@ -106,8 +95,8 @@ contract Members is  AccessControl {
 
     constructor(AuditToken _auditToken, address _platformAddress ) {
 
-        // require(_auditToken != AuditToken(0), "Members:constructor - Audit token address can't be 0");
-        // require(_platformAddress != address(0), "Members:constructor - Platform address can't be 0");
+        require(_auditToken != AuditToken(0), "Members:constructor - Audit token address can't be 0");
+        require(_platformAddress != address(0), "Members:constructor - Platform address can't be 0");
         auditToken = _auditToken;        
         platformAddress = _platformAddress;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -120,7 +109,7 @@ contract Members is  AccessControl {
     function setCohortFactory(address _cohortFactory) public isController() {
 
         require(_cohortFactory != address(0), "Members:setCohortFactory - CohortFactory address can't be 0");
-        cohortFactory = CohortFactoryInterface(_cohortFactory);
+        cohortFactory = ICohortFactory(_cohortFactory);
     }
 
 
@@ -152,6 +141,7 @@ contract Members is  AccessControl {
     * @param _enterpriseMatch new value of enterprise portion of enterprise value of validation cost
     */
     function updateEnterpriseMatch(uint256 _enterpriseMatch) public isSetter()  {
+
         require(_enterpriseMatch != 0, "Members:updateMinDepositDays - New value for the enterprise match can't be 0");
         enterpriseMatch = _enterpriseMatch;
         emit LogUpdateEnterpriseMatch(_enterpriseMatch);
@@ -201,8 +191,8 @@ contract Members is  AccessControl {
 
         uint256 totalRewardTokens;
 
-        address enterpriseAddress = CohortInterface(cohort).enterprise();
-        CohortInterface(cohort).resetOutstandingValidations();
+        address enterpriseAddress = ICohort(cohort).enterprise();
+        ICohort(cohort).resetOutstandingValidations();
         uint256 totalEnterprisePay;
 
         for (uint256 i=0; i< _validators.length; i++){
@@ -220,7 +210,6 @@ contract Members is  AccessControl {
         uint256 amountTokensPlatform = totalRewardTokens.mul(platformShareValidation).div(85);
         
         recentBlockUpdated = block.number;
-
         auditToken.mint(platformAddress, amountTokensPlatform);
         auditToken.mint(address(this), totalRewardTokens);
         emit LogRewardsDeposited(cohort, totalRewardTokens, totalEnterprisePay, enterpriseAddress);
@@ -246,7 +235,7 @@ contract Members is  AccessControl {
             deposits[msg.sender] = deposits[msg.sender].sub(accessFee);
         }
 
-        address cohortOwner = CohortInterface(cohortAddress).enterprise();
+        address cohortOwner = ICohort(cohortAddress).enterprise();
         uint256 enterpriseShare = accessFee.mul(enterpriseShareSubscriber).div(100);
         deposits[cohortOwner] = deposits[cohortOwner].add(enterpriseShare);
         allocateValidatorDataSubscriberFee(cohortAddress, accessFee.mul(validatorShareSubscriber).div(100));
@@ -290,7 +279,7 @@ contract Members is  AccessControl {
     */
     function allocateValidatorDataSubscriberFee(address cohortAddress, uint amount) internal  {
 
-        address[] memory cohortValidators = CohortInterface(cohortAddress).returnValidators();
+        address[] memory cohortValidators = ICohort(cohortAddress).returnValidators();
         uint256 totalDeposits;
 
         for (uint i=0; i < cohortValidators.length; i++){
@@ -313,7 +302,11 @@ contract Members is  AccessControl {
 
           if (enterpriseMap[msg.sender]){
               // div(1e4) to adjust for four decimal points
-            require(deposits[msg.sender].sub(enterpriseMatch.mul(amountTokensPerValidation).mul(cohortFactory.returnOutstandingValidations()).div(1e4)) >= amount, 
+            require(deposits[msg.sender]
+            .sub(enterpriseMatch
+            .mul(amountTokensPerValidation)
+            .mul(cohortFactory.returnOutstandingValidations())
+            .div(1e4)) >= amount, 
             "Member:redeem - Your deposit will be too low to fullfil your outstanding payments.");
           }
 
@@ -382,18 +375,4 @@ contract Members is  AccessControl {
 
 }
 
-    interface CohortFactoryInterface {
-
-        function returnCohorts(address enterprise) external view returns (address[] memory, uint256[] memory);
-        function returnOutstandingValidations() external view returns(uint256);
-    }
-
-    interface CohortInterface {
-        function resetOutstandingValidations() external;
-        function enterprise() external returns (address);
-        function outstandingValidations() external view returns (uint256);
-        function returnValidators() external view returns(address[] memory);
-        function addAdditionalValidator(address additionalValidator) external returns (bool);
-        function removeValidator(address validator) external returns (bool);
-    }
 

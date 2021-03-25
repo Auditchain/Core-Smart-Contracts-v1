@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  * @dev AccessControl
  * Allows on creation of invitations by Enterprise and acceptance of Validators of those
  * invitations. Finally Enterprise can create cohort consisting of invited Validators
- * and enterprise.
+ * and enterprise. Later Enterprise can remove inactive validators and invite new ones. 
  */
 contract Cohort is AccessControl {
     using SafeMath for uint256;
@@ -25,7 +25,6 @@ contract Cohort is AccessControl {
     AuditToken public auditToken;
     Members public members;
     uint256 public outstandingValidations;
-    // uint256 public recentBlockUpdated;
     bool initialized;
     address cohortFactory;
 
@@ -48,7 +47,7 @@ contract Cohort is AccessControl {
     }
 
     // Audit types to be used. Three types added for future expansion
-    enum AuditTypes {Financial, System, Contract, Type4, Type5, Type6}
+    enum AuditTypes {Financial, System, Contract, NFT, Type5, Type6}
 
     AuditTypes public audits;
 
@@ -155,7 +154,6 @@ contract Cohort is AccessControl {
             for (uint256 i; i< validators.length; i++){
 
                 if (validators[i] == validator) {
-
                     validators[i] =  validators[validators.length - 1] ;
                     validators.pop();                    
                     emit ValidatorRemoved(validator);
@@ -164,6 +162,8 @@ contract Cohort is AccessControl {
             }
          return false;
     }
+
+
     /**
      * @dev to be called by Enterprise to initiate new validation
      * @param documentHash - hash of unique identifier of validated transaction
@@ -187,19 +187,12 @@ contract Cohort is AccessControl {
             "Cohort:initializeValidation - Only enterprise owing this cohort can call this function"
         );
         uint256 validationTime = block.timestamp;
-        bytes32 validationHash =
-            keccak256(abi.encodePacked(documentHash, validationTime));
+        bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
 
         outstandingValidations++;
-
         Validation storage newValidation = validations[validationHash];
         newValidation.validationTime = block.timestamp;
-        emit ValidationInitialized(
-            validationHash,
-            validationTime,
-            msg.sender,
-            address(this)
-        );
+        emit ValidationInitialized(validationHash, validationTime, msg.sender, address(this));
     }
 
     /**
@@ -220,8 +213,7 @@ contract Cohort is AccessControl {
     {
         address[] memory validatorsList = validators;
         uint256[] memory stake = new uint256[](validators.length);
-        ValidationStatus[] memory validatorsValues =
-            new ValidationStatus[](validators.length);
+        ValidationStatus[] memory validatorsValues = new ValidationStatus[](validators.length);
 
         Validation storage validation = validations[validationHash];
 
@@ -237,13 +229,9 @@ contract Cohort is AccessControl {
      * @param validationHash - consist of hash of hashed document and timestamp
      * @return validation choices used by validator
      */
-    function isValidated(bytes32 validationHash)
-        public
-        view
-        returns (ValidationStatus)
-    {
-        return validations[validationHash].validatorChoice[msg.sender];
-    }
+    function isValidated(bytes32 validationHash) public view returns (ValidationStatus){
+            return validations[validationHash].validatorChoice[msg.sender];
+        }
 
     /**
      * @dev to calculate state of the quorum for the validation
@@ -309,13 +297,9 @@ contract Cohort is AccessControl {
             "Cohort:validate - This document has been validated already.");
         validation.validatorChoice[msg.sender] = decision;
 
-        if (validation.executionTime == 0) executeValidation(validationHash);
+        if (validation.executionTime == 0) 
+            executeValidation(validationHash);
 
-        emit ValidatorValidated(
-            msg.sender,
-            documentHash,
-            validationTime,
-            decision
-        );
+        emit ValidatorValidated(msg.sender, documentHash, validationTime, decision);
     }
 }
