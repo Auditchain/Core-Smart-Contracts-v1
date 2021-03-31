@@ -7,5 +7,5 @@ interface ICohort {
     function outstandingValidations() external view returns (uint256);
     function returnValidators() external view returns(address[] memory);
     function addAdditionalValidator(address additionalValidator) external returns (bool);
-    function removeValidator(address validator) external returns (bool);
+    function removeValidator(address validator, address _enterprise) external returns (bool);
 }

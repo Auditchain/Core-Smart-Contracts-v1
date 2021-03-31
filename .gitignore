@@ -338,5 +338,6 @@ assets1/
 pages/
 dist/
 package-lock.json
+build/
 
 

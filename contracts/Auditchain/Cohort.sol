@@ -9,10 +9,9 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
  * @title Cohort
- * @dev AccessControl
- * Allows on creation of invitations by Enterprise and acceptance of Validators of those
- * invitations. Finally Enterprise can create cohort consisting of invited Validators
- * and enterprise. Later Enterprise can remove inactive validators and invite new ones. 
+ * Allows on creation of cohort by Enterprise based on invitations. 
+ * Enterprise can create cohort consisting of invited Validators.
+ * Later Enterprise can remove inactive validators and invite new ones. 
  */
 contract Cohort is AccessControl {
     using SafeMath for uint256;
@@ -63,29 +62,11 @@ contract Cohort is AccessControl {
     mapping(bytes32 => Validation) public validations; // track each validation
     mapping(address => uint256) public deposits; //track deposits per user
 
-    event ValidationInitialized(
-        bytes32 validationHash,
-        uint256 indexed initTime,
-        address indexed enterprise,
-        address cohort
-    );
-    event ValidatorValidated(
-        address validator,
-        bytes32 documentHash,
-        uint256 validationTime,
-        ValidationStatus decision
-    );
-    event ValidationExecuted(
-        bytes32 indexed validationHash,
-        uint256 indexed timeExecuted,
-        address cohort
-    );
-
-    event ValidatorRemoved(
-
-        address validator
-    );
-    // event LogRewardsRedeemed(address user, uint256 amount);
+    event ValidationInitialized(bytes32 validationHash, uint256 indexed initTime);
+    event ValidatorValidated(address validator, bytes32 documentHash, uint256 validationTime, ValidationStatus decision);
+    event ValidationExecuted(bytes32 indexed validationHash, uint256 indexed timeExecuted);
+    event additionalValidatorAdded(address indexed validator);
+    event ValidatorRemoved(address validator);
     event LogOutstandingValidationRest(uint256 count);
 
     /**
@@ -104,9 +85,7 @@ contract Cohort is AccessControl {
         uint256 _audits,
         address _cohortFactory
     ) public {
-        require(!initialized,
-                "Cohort:initialize - this Cohort has been already initialized. "
-        );
+        require(!initialized,"Cohort:initialize - this Cohort has been already initialized.");
         enterprise = _enterprise;
         validators = _validators;
         audits = AuditTypes(_audits);
@@ -141,28 +120,26 @@ contract Cohort is AccessControl {
     }
 
     function addAdditionalValidator(address validator) public returns (bool){
-        // require(msg.sender == enterprise,
-        //     "Cohort:addAdditionalValidator - Only owner of cohort can add additional validators");
+        require(msg.sender == cohortFactory, "Cohort:addAdditionalValidator - You are not authorized to call this function");        
         validators.push(validator);
+        emit additionalValidatorAdded(validator);
         return true;
     }
     
-    function removeValidator(address validator) public returns (bool) {
+    function removeValidator(address validator, address _enterprise) public returns (bool) {
 
-    
-        require(msg.sender == cohortFactory, "Cohort:removeValidator - You are not authorized to call this function");
-            for (uint256 i; i< validators.length; i++){
+        require(msg.sender == cohortFactory && enterprise == _enterprise, "Cohort:removeValidator - You are not authorized to call this function");
+        for (uint256 i; i< validators.length; i++){
 
-                if (validators[i] == validator) {
-                    validators[i] =  validators[validators.length - 1] ;
-                    validators.pop();                    
-                    emit ValidatorRemoved(validator);
-                    return true;
-                }
+            if (validators[i] == validator) {
+                validators[i] =  validators[validators.length - 1] ;
+                validators.pop();                    
+                emit ValidatorRemoved(validator);
+                return (true);
             }
+        }
          return false;
     }
-
 
     /**
      * @dev to be called by Enterprise to initiate new validation
@@ -178,25 +155,19 @@ contract Cohort is AccessControl {
                     .div(1e4),
             "Cohort:initializeValidation - Not sufficient funds. Deposit additional funds."
         );
-        require(
-            documentHash.length > 0,
-            "Cohort:initializeValidation - Document hash value can't be 0"
-        );
-        require(
-            enterprise == msg.sender,
-            "Cohort:initializeValidation - Only enterprise owing this cohort can call this function"
-        );
+        require(documentHash.length > 0, "Cohort:initializeValidation - Document hash value can't be 0");
+        require(enterprise == msg.sender, "Cohort:initializeValidation - Only enterprise owing this cohort can call this function");
         uint256 validationTime = block.timestamp;
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
 
         outstandingValidations++;
         Validation storage newValidation = validations[validationHash];
         newValidation.validationTime = block.timestamp;
-        emit ValidationInitialized(validationHash, validationTime, msg.sender, address(this));
+        emit ValidationInitialized(validationHash, validationTime);
     }
 
     /**
-     * @dev retriev the validation results
+     * @dev Review the validation results
      * @param validationHash - consist of hash of hashed document and timestamp
      * @return array  of validators
      * @return array of stakes of each validator
@@ -230,8 +201,8 @@ contract Cohort is AccessControl {
      * @return validation choices used by validator
      */
     function isValidated(bytes32 validationHash) public view returns (ValidationStatus){
-            return validations[validationHash].validatorChoice[msg.sender];
-        }
+        return validations[validationHash].validatorChoice[msg.sender];
+    }
 
     /**
      * @dev to calculate state of the quorum for the validation
@@ -247,10 +218,7 @@ contract Cohort is AccessControl {
         uint256 currentlyVoted;
 
         Validation storage validation = validations[validationHash];
-        require(
-            validation.validationTime > 0,
-            "Cohort:calculateVoteQuorum - Validation hash doesn't exist"
-        );
+        require(validation.validationTime > 0, "Cohort:calculateVoteQuorum - Validation hash doesn't exist");
 
         for (uint256 i = 0; i < validators.length; i++) {
             totalStaked += members.deposits(validators[i]);
@@ -268,11 +236,7 @@ contract Cohort is AccessControl {
         if (calculateVoteQuorum(validationHash) >= requiredQuorum) {
             Validation storage validation = validations[validationHash];
             validation.executionTime = block.timestamp;
-            emit ValidationExecuted(
-                validationHash,
-                block.timestamp,
-                address(this)
-            );
+            emit ValidationExecuted(validationHash, block.timestamp);
         }
     }
 
@@ -289,12 +253,9 @@ contract Cohort is AccessControl {
     ) public {
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
-        require(members.validatorMap(msg.sender),
-            "Cohort:validate - Validator is not authorized.");
-        require(validation.validationTime == validationTime,
-            "Cohort:validate - the validation params don't match.");
-        require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined,
-            "Cohort:validate - This document has been validated already.");
+        require(members.validatorMap(msg.sender),"Cohort:validate - Validator is not authorized.");
+        require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
+        require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Cohort:validate - This document has been validated already.");
         validation.validatorChoice[msg.sender] = decision;
 
         if (validation.executionTime == 0) 

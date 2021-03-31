@@ -12,7 +12,6 @@ contract MemberHelpers is  AccessControl {
     Members members;
 
     constructor(address  _members ) {
-
         require(_members != address(0), "MemberHelpers:constructor - Member address can't be 0");
         members = Members(_members);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);

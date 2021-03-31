@@ -21,6 +21,7 @@ contract("Cohort contract", (accounts) => {
     const validator3 = accounts[4];
     const validator4 = accounts[5];
     const platformAccount = accounts[6];
+    const addressZero = "0x0000000000000000000000000000000000000000"
 
 
     let members;
@@ -51,14 +52,10 @@ contract("Cohort contract", (accounts) => {
         await members.setCohortFactory(cohortFactory.address, { from: owner });
         await createCohort.grantRole(CONTROLLER_ROLE, cohortFactory.address, { from: owner });
 
-
-
-
-
-        await members.addEnterpriseUser(enterprise1, "Enterprise 1", { from: owner });
-        await members.addValidatorUser(validator1, "Validators 1", { from: owner });
-        await members.addValidatorUser(validator2, "Validators 2", { from: owner });
-        await members.addValidatorUser(validator3, "Validators 3", { from: owner });
+        await members.addUser(enterprise1, "Enterprise 1", 0, { from: owner });
+        await members.addUser(validator1, "Validators 1", 1, { from: owner });
+        await members.addUser(validator2, "Validators 2", 1, { from: owner });
+        await members.addUser(validator3, "Validators 3", 1, { from: owner });
 
         await token.transfer(validator1, auditTokenMin, { from: owner });
         await token.transfer(validator2, auditTokenMin, { from: owner });
@@ -74,17 +71,14 @@ contract("Cohort contract", (accounts) => {
         await members.stake(auditTokenMin, { from: validator3 });
 
 
-        await cohortFactory.inviteValidator(validator1, 0, { from: enterprise1 });
-        await cohortFactory.inviteValidator(validator2, 0, { from: enterprise1 });
-        await cohortFactory.inviteValidator(validator3, 0, { from: enterprise1 });
+        await cohortFactory.inviteValidator(validator1, 0, addressZero, { from: enterprise1 });
+        await cohortFactory.inviteValidator(validator2, 0, addressZero, { from: enterprise1 });
+        await cohortFactory.inviteValidator(validator3, 0, addressZero, { from: enterprise1 });
         await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
         await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
         await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
 
-        // let result = await cohortFactory.createCohort(0, { from: enterprise1 });
         result = await cohortFactory.createCohort(0, { from: enterprise1 });
-
-        // let role = await cohortContract.methods.getRoleAdmin().call();
 
         assert.lengthOf(result.logs, 2);
 
@@ -93,8 +87,7 @@ contract("Cohort contract", (accounts) => {
         cohortAddress = event.args.cohort;
         cohortContract = new web3.eth.Contract(Cohort["abi"], cohortAddress);
 
-        await cohortContract.methods.grantRole(CONTROLLER_ROLE, owner).send({ from: owner });
-        // await token.setController(cohortAddress, { from: owner });
+        // await cohortContract.methods.grantRole(CONTROLLER_ROLE, owner).send({ from: owner });
         await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: owner });
     })
 
@@ -103,7 +96,7 @@ contract("Cohort contract", (accounts) => {
 
         it("Should succeed. Cohort deployed and initialized", async () => {
 
-            // let result = await cohortFactory.createCohort(0, { from: enterprise1 });
+            // let result = await cohortFactory.createCohort(1, { from: enterprise1 });
 
             // let role = await cohortContract.methods.getRoleAdmin().call();
 
@@ -114,14 +107,17 @@ contract("Cohort contract", (accounts) => {
             let cohortAddress = event.args.cohort;
 
             let cohortContract = new web3.eth.Contract(Cohort["abi"], cohortAddress);
+
             let enterpriseInCohort = await cohortContract.methods.enterprise().call();
             assert.strictEqual(enterpriseInCohort, enterprise1);
         })
     })
 
-    describe("Test simple updates", async () => {
+    describe("Test simple governance updates", async () => {
 
         it("It should succeed. Quorum amount was updated by authorized user.", async () => {
+
+            await cohortContract.methods.grantRole(SETTER_ROLE, owner).send({ from: owner });
 
             await cohortContract.methods.updateQuorum("20").send({ from: owner });
             let newQuorum = await cohortContract.methods.requiredQuorum().call();
@@ -155,7 +151,7 @@ contract("Cohort contract", (accounts) => {
             let validationHash = web3.utils.soliditySha3(documentHash, validationTime);
 
             assert.strictEqual(result.events.ValidationInitialized.returnValues.validationHash, validationHash);
-            assert.strictEqual(result.events.ValidationInitialized.returnValues.enterprise, enterprise1);
+            assert.strictEqual(result.events.ValidationInitialized.returnValues.initTime, validationTime);
 
         })
 
@@ -236,11 +232,6 @@ contract("Cohort contract", (accounts) => {
         })
     })
 
-
-
-
-
-
     describe("Check if validator has validated specific document", async () => {
 
         let validationInitTime;
@@ -257,7 +248,6 @@ contract("Cohort contract", (accounts) => {
             validationHash = web3.utils.soliditySha3(documentHash, validationInitTime);
 
         })
-
 
         it("It should succeed. The return value should be true.", async () => {
 

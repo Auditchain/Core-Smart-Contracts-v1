@@ -6,7 +6,8 @@ let contract = require('truffle-contract');
 let Web3 = require('web3');
 let HDWalletProvider = require('@truffle/hdwallet-provider');
 // let dotenv = require('dotenv');
-let dotenv = require('dotenv').config({ path: require('find-config')('.env') })
+// let dotenv = require('dotenv').config({ path: require('find-config')('.env') })
+let dotenv = require('dotenv').config({ path: './.env' })
 
 // dotenv.config();
 

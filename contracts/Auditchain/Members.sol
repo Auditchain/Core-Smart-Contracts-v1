@@ -12,7 +12,8 @@ import "./../AuditToken.sol";
 /**
  * @title Members
  * Allows on creation of Enterprise and Validator accounts and staking of funds by validators
- * Validators also have ability to withdraw their staking
+ * Validators and enterprises have ability to withdraw their staking and earnings 
+ * Contract also contains several update functions controlled by the Governance contracts
  */
 
 contract Members is  AccessControl {
@@ -25,17 +26,15 @@ contract Members is  AccessControl {
         uint256 audits;
     }
 
-    
-
-    // Create a new role identifier for the controller role
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
     bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
-    AuditToken public auditToken;                            //AUDT token 
+
+    AuditToken public auditToken;                       //AUDT token 
     ICohortFactory public cohortFactory;
     uint256 public stakedAmount;                        //total number of staked tokens   
     mapping(address => uint256) public deposits;        //track deposits per user
     mapping(address => DataSubscriberTypes[]) public dataSubscriberCohorts;
-     mapping(address => mapping(address => bool)) public dataSubscriberCohortMap;
+    mapping(address => mapping(address => bool)) public dataSubscriberCohortMap;
     uint256 public amountTokensPerValidation =  1e18;    //New minted amount per validation
 
     uint256 public accessFee = 1000e18;
@@ -180,7 +179,8 @@ contract Members is  AccessControl {
     }
 
     /**
-    * @dev to be called by scheduled calls by platform daily 
+    * @dev to be called by scheduled calls by platform daily to save gas
+    * the process can be called at any time 
     * @param _validators - list of validators eligible for earnings
     * @param tokens - list of tokens earned by each validator
     */

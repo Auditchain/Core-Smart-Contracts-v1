@@ -6,8 +6,6 @@ import "./Members.sol";
 
 /**
  * @title CohortCreation
- * @dev AccessControl 
-
  */
 
 contract CreateCohort is  AccessControl {
@@ -64,7 +62,7 @@ contract CreateCohort is  AccessControl {
     */
     function createCohort(uint256 audit,  address[] memory validatorsList, address enterprise ) public returns(address) {
 
-        // Only Cohort factoty is authorized to call this contract
+        // Only Cohort factory is authorized to call this contract
         require(hasRole(CONTROLLER_ROLE, msg.sender), "CreateCohort:createCohort - Caller is not a controller");
 
         bytes memory bytecode = type(Cohort).creationCode;        

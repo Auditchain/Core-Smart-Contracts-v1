@@ -14,11 +14,12 @@ import "./CreateCohort.sol";
 
 contract CohortFactory is  AccessControl {
 
-        // Audit types to be used. Three types added for future expansion 
+    // Audit types to be used. Two types added for future expansion 
     enum AuditTypes {
         Financial, System, Contract, NFT, Type5, Type6
     }
 
+    uint256[] public minValidatorPerCohort = [3,3,3,3,3,3];
 
     // Invitation structure to hold info about its status
     struct Invitation {
@@ -38,18 +39,17 @@ contract CohortFactory is  AccessControl {
 
     mapping(address => Cohorts[]) public cohortList;
 
-    Members members;                                            // pointer to Members contract
+    Members members;                                            // pointer to Members contract1 
     mapping (address =>  Invitation[]) public invitations;      // invitations list
     address platformAddress;                                    // address to deposit platform fees
     address createCohortAddress;
-    uint256 public minValidatorPerCohort = 3;
 
     bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
 
     event ValidatorInvited(address indexed inviting, address indexed invitee, AuditTypes audits, uint256 invitationNumber, address cohort);
     event InvitationAccepted(address indexed validator, uint256 invitationNumber);
     event CohortCreated(address indexed enterprise, address indexed cohort, AuditTypes audits);
-    event UpdateMinValidatorsPerCohort(uint256 minValidatorPerCohort);
+    event UpdateMinValidatorsPerCohort(uint256 minValidatorPerCohort, AuditTypes audits);
     event ValidatorCleared(address validator, AuditTypes audit, address cohort, address enterprise);
 
     /// @dev check if caller is a setter     
@@ -65,16 +65,16 @@ contract CohortFactory is  AccessControl {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender); // 
     }
    
-
     /**
     * @dev to be called by Governance contract to update new value for min validators per cohort
     * @param _minValidatorPerCohort new value 
     */
-    function updatMinValidatorsPerCohort(uint256 _minValidatorPerCohort) public isSetter() {
+    function updateMinValidatorsPerCohort(uint256 _minValidatorPerCohort, uint256 audits) public isSetter() {
 
-        require(_minValidatorPerCohort != 0, "CreateCohort:updatMinValidatorsPerCohort - New value for the  min validator per cohort can't be 0");
-        minValidatorPerCohort = _minValidatorPerCohort;
-        emit UpdateMinValidatorsPerCohort(_minValidatorPerCohort);
+        require(_minValidatorPerCohort != 0, "CreateCohort:updateMinValidatorsPerCohort - New value for the  min validator per cohort can't be 0");
+        require(audits <= 5 && audits >=0 , "Cohort Factory:updateMinValidatorsPerCohort - Audit type has to be <= 5 and >=0");
+        minValidatorPerCohort[uint256(audits)] = _minValidatorPerCohort;
+        emit UpdateMinValidatorsPerCohort(_minValidatorPerCohort, AuditTypes(audits));
     }
 
     /**
@@ -126,8 +126,14 @@ contract CohortFactory is  AccessControl {
         require( invitations[enterprise][invitationNumber].acceptanceDate == 0, "CohortFactory:acceptInvitation- This invitation has been accepted already .");
         require( invitations[enterprise][invitationNumber].validator == msg.sender, "CohortFactory:acceptInvitation - You are accepting invitation to which you were not invited or this invitation doesn't exist.");
         invitations[enterprise][invitationNumber].acceptanceDate = block.timestamp;
-            if (invitations[enterprise][invitationNumber].cohort != address(0)) // adding validator to existng cohort
-                require(ICohort(invitations[enterprise][invitationNumber].cohort).addAdditionalValidator(msg.sender), "CohortFactory:inviteValidator - Problem adding new validator");
+
+            if (invitations[enterprise][invitationNumber].cohort != address(0)) // adding validator to existing cohort
+                require(
+                    ICohort(invitations[enterprise][invitationNumber].cohort)
+                    .addAdditionalValidator(msg.sender), 
+                    "CohortFactory:inviteValidator - Problem adding new validator"
+                    );
+
         emit InvitationAccepted(msg.sender, invitationNumber);
     }
 
@@ -143,7 +149,7 @@ contract CohortFactory is  AccessControl {
             if (invitations[msg.sender][i].audits == audit && 
                 invitations[msg.sender][i].validator ==  validator){
                 invitations[msg.sender][i].deleted = true;
-                require(ICohort(cohort).removeValidator(validator), 
+                require(ICohort(cohort).removeValidator(validator, msg.sender), 
                         "CohortFactory:clearInvitationValidator - Problem removing validator in Cohort contract");
                 emit ValidatorCleared(validator, audit, cohort, msg.sender);
             }
@@ -205,7 +211,7 @@ contract CohortFactory is  AccessControl {
     }
 
      /**
-    * @dev Used to return of list of cohorts for enterprise
+    * @dev Used to return list of cohorts for enterprise
     * @param enterprise inviting party
     * @return cohort address 
     * @return audit type
@@ -249,7 +255,7 @@ contract CohortFactory is  AccessControl {
                 k++;
             }
         }
-        require(k >= minValidatorPerCohort, "CohortFactory:createCohort - At least 3 validators are reqired to create new cohort");
+        require(k >= minValidatorPerCohort[uint256(audit)], "CohortFactory:createCohort - Number of validators below required minimum.");
 
         address cohortAddress = CreateCohort(createCohortAddress).createCohort(uint256(audit),  validatorsList, msg.sender );
         cohortList[msg.sender].push();

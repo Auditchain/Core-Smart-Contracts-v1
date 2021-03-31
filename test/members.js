@@ -26,6 +26,7 @@ contract("Member contract", (accounts) => {
     const dataSubscriber = accounts[5];
     const platformAccount = accounts[6];
     const validator4 = accounts[7];
+    const addressZero = "0x0000000000000000000000000000000000000000"
 
 
     let members;
@@ -71,7 +72,7 @@ contract("Member contract", (accounts) => {
         it("Should fail.Add enterprise user from unauthorized account", async () => {
 
             try {
-                await members.addEnterpriseUser(enterprise1, "Enterprise 1", { from: enterprise1 });
+                await members.addUser(enterprise1, "Enterprise 1", 0, { from: enterprise1 });
             } catch (error) {
                 ensureException(error);
             }
@@ -79,12 +80,12 @@ contract("Member contract", (accounts) => {
         })
 
         it("Should succeed. Add enterprise user from authorized account", async () => {
-            const result = await members.addEnterpriseUser(enterprise1, "Enterprise 1", { from: owner });
+            const result = await members.addUser(enterprise1, "Enterprise 1", 0, { from: owner });
 
             assert.lengthOf(result.logs, 1);
 
             let event = result.logs[0];
-            assert.equal(event.event, 'EnterpriseUserAdded');
+            assert.equal(event.event, 'UserAdded');
             assert.strictEqual(event.args.user, enterprise1);
             assert.strictEqual(event.args.name, "Enterprise 1");
         })
@@ -98,7 +99,7 @@ contract("Member contract", (accounts) => {
         it("Should fail. Add validator user from unauthorized account", async () => {
 
             try {
-                await members.addValidatorUser(validator1, "Validator 1", { from: enterprise1 });
+                await members.addUser(validator1, "Validator 1", 1, { from: enterprise1 });
             } catch (error) {
                 ensureException(error);
             }
@@ -106,12 +107,12 @@ contract("Member contract", (accounts) => {
         })
 
         it("Should succeed. Add validator user from authorized account", async () => {
-            const result = await members.addValidatorUser(validator1, "Validator 1", { from: owner });
+            const result = await members.addUser(validator1, "Validator 1", 1, { from: owner });
 
             assert.lengthOf(result.logs, 1);
 
             let event = result.logs[0];
-            assert.equal(event.event, 'ValidatorUserAdded');
+            assert.equal(event.event, 'UserAdded');
             assert.strictEqual(event.args.user, validator1);
             assert.strictEqual(event.args.name, "Validator 1");
         })
@@ -123,7 +124,7 @@ contract("Member contract", (accounts) => {
 
         beforeEach(async () => {
 
-            await members.addValidatorUser(validator1, "Validators 1", { from: owner });
+            await members.addUser(validator1, "Validators 1", 1, { from: owner });
             await token.transfer(validator1, auditTokenMin, { from: owner });
             await token.approve(members.address, auditTokenMin, { from: validator1 });
         })
@@ -159,7 +160,7 @@ contract("Member contract", (accounts) => {
 
         it("Should fail. User contributed more than required amount.", async () => {
 
-            await members.addValidatorUser(validator2, "Validators 2", { from: owner });
+            await members.addUser(validator2, "Validators 2", 1, { from: owner });
             await token.transfer(validator2, auditTokenMorMax, { from: owner });
             await token.approve(members.address, auditTokenMorMax, { from: validator2 });
 
@@ -177,7 +178,7 @@ contract("Member contract", (accounts) => {
 
         beforeEach(async () => {
 
-            await members.addEnterpriseUser(enterprise1, "Enterprise 1", { from: owner });
+            await members.addUser(enterprise1, "Enterprise 1", 0, { from: owner });
             await token.transfer(enterprise1, auditTokenMin, { from: owner });
             await token.approve(members.address, auditTokenMin, { from: enterprise1 });
         })
@@ -208,10 +209,10 @@ contract("Member contract", (accounts) => {
 
         beforeEach(async () => {
 
-            await members.addEnterpriseUser(enterprise1, "Enterprise 1", { from: owner });
-            await members.addValidatorUser(validator1, "Validators 1", { from: owner });
-            await members.addValidatorUser(validator2, "Validators 2", { from: owner });
-            await members.addValidatorUser(validator3, "Validators 3", { from: owner });
+            await members.addUser(enterprise1, "Enterprise 1", 0, { from: owner });
+            await members.addUser(validator1, "Validators 1", 1, { from: owner });
+            await members.addUser(validator2, "Validators 2", 1, { from: owner });
+            await members.addUser(validator3, "Validators 3", 1, { from: owner });
 
             await token.transfer(validator1, auditTokenMax, { from: owner });
             await token.transfer(validator2, auditTokenMin, { from: owner });
@@ -226,9 +227,9 @@ contract("Member contract", (accounts) => {
             await members.stake(auditTokenMin, { from: validator3 });
 
 
-            await cohortFactory.inviteValidator(validator1, 0, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator2, 0, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator3, 0, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator1, 0, addressZero, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator2, 0, addressZero, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator3, 0, addressZero, { from: enterprise1 });
 
             await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
             await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
@@ -252,6 +253,8 @@ contract("Member contract", (accounts) => {
             let accessFee = await members.accessFee();
             await token.transfer(dataSubscriber, auditTokenMin, { from: owner });
             await token.approve(members.address, accessFee, { from: dataSubscriber });
+
+            await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: owner });
 
             const balanceBefore = await token.balanceOf(platformAccount);
             let result = await members.dataSubscriberPayment(cohortAddress, 0, { from: dataSubscriber });
@@ -277,6 +280,7 @@ contract("Member contract", (accounts) => {
         it("Should fail. Data subscriber didn't authorize members contract to withdraw funds.", async () => {
 
             await token.transfer(dataSubscriber, auditTokenMin, { from: owner });
+            await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: owner });
 
             try {
                 await members.dataSubscriberPayment(cohortAddress, 0, { from: dataSubscriber });
@@ -289,6 +293,21 @@ contract("Member contract", (accounts) => {
 
         it("Should fail. Data subscriber doesn't have sufficient funds.", async () => {
 
+            await token.approve(members.address, auditTokenMin, { from: dataSubscriber });
+            await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: owner });
+
+            try {
+                await members.dataSubscriberPayment(cohortAddress, 0, { from: dataSubscriber });
+            } catch (error) {
+                ensureException(error);
+            }
+
+
+        })
+
+        it("Should fail. Data subscriber hasn't been registered as data subscriber", async () => {
+
+            await token.transfer(dataSubscriber, auditTokenMin, { from: owner });
             await token.approve(members.address, auditTokenMin, { from: dataSubscriber });
 
             try {
@@ -309,11 +328,11 @@ contract("Member contract", (accounts) => {
 
         beforeEach(async () => {
 
-            await members.addEnterpriseUser(enterprise1, "Enterprise 1", { from: owner });
-            await members.addValidatorUser(validator1, "Validators 1", { from: owner });
-            await members.addValidatorUser(validator2, "Validators 2", { from: owner });
-            await members.addValidatorUser(validator3, "Validators 3", { from: owner });
-            await members.addValidatorUser(validator4, "Validators 4", { from: owner });
+            await members.addUser(enterprise1, "Enterprise 1", 0, { from: owner });
+            await members.addUser(validator1, "Validators 1", 1, { from: owner });
+            await members.addUser(validator2, "Validators 2", 1, { from: owner });
+            await members.addUser(validator3, "Validators 3", 1, { from: owner });
+            await members.addUser(validator4, "Validators 4", 1, { from: owner });
 
 
             await token.transfer(validator1, auditTokenMin, { from: owner });
@@ -335,9 +354,9 @@ contract("Member contract", (accounts) => {
 
 
 
-            await cohortFactory.inviteValidator(validator1, 0, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator2, 0, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator3, 0, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator1, 0, addressZero, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator2, 0, addressZero, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator3, 0, addressZero, { from: enterprise1 });
 
             await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
             await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
@@ -373,17 +392,17 @@ contract("Member contract", (accounts) => {
             await members.updateDailyEarningsTransferFunds(validatorsToSend, amountsToSend, cohortAddress, { from: owner, gas: 200000 });
             let enterpriseMatch = await members.enterpriseMatch();
 
-            // console.log("enterpriseMatch" , enterpriseMatch.toString());
+            // console.log("enterpriseMatch", enterpriseMatch.toString());
 
             let enterprisePortion = new BigNumber (rewardTokens).mult(enterpriseMatch.toString()).div(10000);
 
-            // console.log("enterprisePortion" , enterprisePortion.toString());
+            // console.log("enterprisePortion", enterprisePortion.toString());
 
             
             let result = await members.redeem(new BigNumber(rewardTokens).add(enterprisePortion), { from: validator1 });
             
             let balanceAfter = await members.deposits(validator1);
-            // console.log("balanceAfter" , balanceAfter.toString());
+            // console.log("balanceAfter", balanceAfter.toString());
 
             let event = result.logs[0];
             let amount = event.args.amount;
@@ -494,7 +513,7 @@ contract("Member contract", (accounts) => {
         it("Should succeed. Enterprise can withdraw funds minus obligation to cover payments since recent update. ", async () => {
 
             let balanceBefore = await members.deposits(enterprise1);
-            let outstandingValidations = await members.returnOutstandingValidations({ from: enterprise1 });
+            let outstandingValidations = await cohortFactory.returnOutstandingValidations({ from: enterprise1 });
             let amountTokensPerValidation = await members.amountTokensPerValidation();
             let enterpriseMatch = await members.enterpriseMatch();
 

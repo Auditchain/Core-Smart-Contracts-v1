@@ -11,7 +11,7 @@ const CREATECOHORT = artifacts.require('../CreateCohort');
 
 
 
-contract("cohortFactory contract", (accounts) => {
+contract("create Cohort contract", (accounts) => {
 
     const owner = accounts[0];
     const enterprise1 = accounts[1];

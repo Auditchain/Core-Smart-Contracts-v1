@@ -55,7 +55,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
 
     /// @dev Constructor that gives an account all initial tokens.
     constructor(address account) ERC20("Auditchain", "AUDT") {
-        require(account != address(0), "Audittoken:constructor - Address can't be 0");
+        require(account != address(0), "AuditToken:constructor - Address can't be 0");
         _mint(account, INITIAL_SUPPLY);      
         _setupRole(DEFAULT_ADMIN_ROLE, account);
     }
@@ -70,7 +70,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
         _;
     }
 
-    /// @notice Overwrite parent implementation to add locked verificationm, notSelf modifiers and cal to moveDelegates
+    /// @notice Overwrite parent implementation to add locked verification, notSelf modifiers and cal to moveDelegates
     function transfer(address to, uint256 value)
         public
         override
@@ -82,7 +82,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
         return super.transfer(to, value);
     }
 
-   /// @notice Overwrite parent implementation to add locked verificationm, notSelf modifiers and cal to moveDelegates
+   /// @notice Overwrite parent implementation to add locked verification, notSelf modifiers and cal to moveDelegates
     function transferFrom(
         address from,
         address to,
