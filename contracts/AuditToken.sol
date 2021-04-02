@@ -70,7 +70,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
         _;
     }
 
-    /// @notice Overwrite parent implementation to add locked verification, notSelf modifiers and cal to moveDelegates
+    /// @notice Overwrite parent implementation to add locked verification, notSelf modifiers and call to moveDelegates
     function transfer(address to, uint256 value)
         public
         override
@@ -82,7 +82,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
         return super.transfer(to, value);
     }
 
-   /// @notice Overwrite parent implementation to add locked verification, notSelf modifiers and cal to moveDelegates
+   /// @notice Overwrite parent implementation to add locked verification, notSelf modifiers and call to moveDelegates
     function transferFrom(
         address from,
         address to,

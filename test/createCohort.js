@@ -101,5 +101,5 @@ contract("create Cohort contract", (accounts) => {
 
         })
        
-    })
+    });
 })
