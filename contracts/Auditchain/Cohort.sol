@@ -62,9 +62,9 @@ contract Cohort is AccessControl {
     mapping(bytes32 => Validation) public validations; // track each validation
     mapping(address => uint256) public deposits; //track deposits per user
 
-    event ValidationInitialized(bytes32 validationHash, uint256 indexed initTime);
-    event ValidatorValidated(address validator, bytes32 documentHash, uint256 validationTime, ValidationStatus decision);
-    event ValidationExecuted(bytes32 indexed validationHash, uint256 indexed timeExecuted);
+    event ValidationInitialized(bytes32 validationHash, uint256 indexed initTime, bytes32 documentHash);
+    event ValidatorValidated(address validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
+    event ValidationExecuted(bytes32 indexed validationHash, uint256 indexed timeExecuted, bytes32 documentHash);
     event additionalValidatorAdded(address indexed validator);
     event ValidatorRemoved(address validator);
     event LogOutstandingValidationRest(uint256 count);
@@ -163,7 +163,7 @@ contract Cohort is AccessControl {
         outstandingValidations++;
         Validation storage newValidation = validations[validationHash];
         newValidation.validationTime = block.timestamp;
-        emit ValidationInitialized(validationHash, validationTime);
+        emit ValidationInitialized(validationHash, validationTime, documentHash);
     }
 
     /**
@@ -232,11 +232,11 @@ contract Cohort is AccessControl {
      * @dev to mark validation as executed. This happens when participation level reached "requiredQuorum"
      * @param validationHash - consist of hash of hashed document and timestamp
      */
-    function executeValidation(bytes32 validationHash) internal {
+    function executeValidation(bytes32 validationHash, bytes32 documentHash) internal {
         if (calculateVoteQuorum(validationHash) >= requiredQuorum) {
             Validation storage validation = validations[validationHash];
             validation.executionTime = block.timestamp;
-            emit ValidationExecuted(validationHash, block.timestamp);
+            emit ValidationExecuted(validationHash, block.timestamp, documentHash);
         }
     }
 
@@ -259,7 +259,7 @@ contract Cohort is AccessControl {
         validation.validatorChoice[msg.sender] = decision;
 
         if (validation.executionTime == 0) 
-            executeValidation(validationHash);
+            executeValidation(validationHash, documentHash);
 
         emit ValidatorValidated(msg.sender, documentHash, validationTime, decision);
     }

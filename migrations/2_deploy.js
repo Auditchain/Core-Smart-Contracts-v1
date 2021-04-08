@@ -178,8 +178,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationHash = values.validationHash;
   validationTime = values.initTime;
 
-  await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator1, gas: 200000 });
-  await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator2, gas: 200000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 200000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 200000 });
   await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator3, gas: 200000 });
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 200000 });
 
@@ -195,7 +195,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationTime = values.initTime;
 
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 200000 });
-  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 200000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator2, gas: 200000 });
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator3, gas: 200000 });
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 200000 });
 

@@ -23,6 +23,8 @@ const mnemonic = process.env.MNEMONIC;
 const private_key = process.env.PRIVATE_KEY;
 const CONTROLLER_ROLE = process.env.CONTROLLER_ROLE
 
+console.log(private_key);
+
 const gasPrice = process.env.GAS_PRICE;
 const gasLimit = process.env.GAS_LIMIT;
 
@@ -34,7 +36,7 @@ const auditTokenAddress = process.env.AUDT_TOKEN_ADDRESS;
 
 // Address of member contract
 const membersAddress = process.env.MEMBER_ADDRESS;
-const provider = new HDWalletProvider(private_key, local_host); // change to main_infura_server or another testnet. 
+const provider = new HDWalletProvider(mnemonic, local_host); // change to main_infura_server or another testnet. 
 const web3 = new Web3(provider);
 const owner = provider.addresses[0];
 // const owner = "0x67794670742BA1E53FD04d8bA22a9b4487CE65B4";
