@@ -46,9 +46,9 @@ contract CohortFactory is  AccessControl {
 
     bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
 
-    event ValidatorInvited(address indexed inviting, address indexed invitee, AuditTypes audits, uint256 invitationNumber, address cohort);
+    event ValidatorInvited(address  inviting, address indexed invitee, AuditTypes audits, uint256 invitationNumber, address cohort);
     event InvitationAccepted(address indexed validator, uint256 invitationNumber);
-    event CohortCreated(address indexed enterprise, address indexed cohort, AuditTypes audits);
+    event CohortCreated(address indexed enterprise, address cohort, AuditTypes audits);
     event UpdateMinValidatorsPerCohort(uint256 minValidatorPerCohort, AuditTypes audits);
     event ValidatorCleared(address validator, AuditTypes audit, address cohort, address enterprise);
 
