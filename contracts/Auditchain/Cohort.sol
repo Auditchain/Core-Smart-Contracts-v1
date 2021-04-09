@@ -263,4 +263,14 @@ contract Cohort is AccessControl {
 
         emit ValidatorValidated(msg.sender, documentHash, validationTime, decision);
     }
+
+    function isHashAndTimeCorrect( bytes32 documentHash, uint256 validationTime) public view returns (bool){
+
+        bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
+        Validation storage validation = validations[validationHash];
+        if (validation.validationTime == validationTime)
+            return true;
+        else
+            return false;
+    }
 }
