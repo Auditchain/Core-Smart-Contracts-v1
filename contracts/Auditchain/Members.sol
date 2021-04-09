@@ -71,12 +71,15 @@ contract Members is  AccessControl {
 
     User[] public enterprises;
     mapping(address => bool) public enterpriseMap;
+    mapping(address => uint256) public enterpriseNameMap;
 
     User[] public validators;
     mapping(address => bool) public validatorMap;
+    mapping(address => uint256) public validatorNameMap;
 
     User[] public dataSubscribers;
     mapping(address => bool) public dataSubscriberMap;
+    mapping(address => uint256) public dataSubscriberNameMap;
    
     
     event EnterpriseUserAdded(address indexed user, string name);
@@ -334,16 +337,19 @@ contract Members is  AccessControl {
             require(!dataSubscriberMap[user], "Members:addUser - This Data Subscriber already exist.");
             dataSubscribers.push(newUser);
             dataSubscriberMap[user]= true;
+            dataSubscriberNameMap[user] = dataSubscribers.length - 1;
         }
         else if (userType == UserType.Validator){            
             require(!validatorMap[user], "Members:addUser - This Validator already exist.");
             validators.push(newUser);
             validatorMap[user]= true;
+            validatorNameMap[user] = validators.length - 1;
         }
         else if (userType == UserType.Enterprise){
             require(!enterpriseMap[user], "Members:addUser - This Enterprise already exist.");
             enterprises.push(newUser);
             enterpriseMap[user]= true;
+            enterpriseNameMap[user] = enterprises.length - 1;
         }
 
         emit UserAdded(user, name, userType);
