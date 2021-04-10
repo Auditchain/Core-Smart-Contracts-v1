@@ -38,6 +38,7 @@ contract CohortFactory is  AccessControl {
     }
 
     mapping(address => Cohorts[]) public cohortList;
+    mapping(address => uint256) public cohortMap;
 
     Members members;                                            // pointer to Members contract1 
     mapping (address =>  Invitation[]) public invitations;      // invitations list
@@ -199,7 +200,7 @@ contract CohortFactory is  AccessControl {
     function isValidatorInvited(address enterprise, address validator, AuditTypes audits) public view returns (bool, bool) {
 
         for (uint i=0; i < invitations[enterprise].length; ++i ){
-            if (invitations[enterprise][i].audits == audits && 
+            if (invitations[enterprise][i]. audits == audits && 
                 invitations[enterprise][i].validator == validator &&
                 !invitations[enterprise][i].deleted){
                 if (invitations[enterprise][i].acceptanceDate > 0)
@@ -261,6 +262,8 @@ contract CohortFactory is  AccessControl {
         cohortList[msg.sender].push();
         cohortList[msg.sender][cohortList[msg.sender].length - 1].cohort = cohortAddress;
         cohortList[msg.sender][cohortList[msg.sender].length - 1].audits = audit;
+
+        cohortMap[cohortAddress] = uint256(audit);
 
         emit CohortCreated(msg.sender, cohortAddress, AuditTypes(audit));
         
