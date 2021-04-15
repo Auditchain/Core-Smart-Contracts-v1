@@ -50,7 +50,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   console.log("token address:", token.address);
 
-  await deployer.deploy(Members, token.address, admin);
+  await deployer.deploy(Members, token.address, platformAddress);
   let members = await Members.deployed();
 
   await deployer.deploy(CreateCohort, members.address, token.address);
