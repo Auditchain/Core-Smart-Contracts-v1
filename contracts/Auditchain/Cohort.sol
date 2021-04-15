@@ -141,20 +141,20 @@ contract Cohort is AccessControl {
          return false;
     }
 
+    function checkIfEnterpriseHasFunds(address _enterprise) public view returns (bool) {
+        return ( members.deposits(_enterprise) > members
+                    .amountTokensPerValidation()
+                    .mul(outstandingValidations)
+                    .mul(members.enterpriseMatch())
+                    .div(1e4));
+    }
     /**
      * @dev to be called by Enterprise to initiate new validation
      * @param documentHash - hash of unique identifier of validated transaction
      */
     function initializeValidation(bytes32 documentHash) public {
         // div(1e4) account for precision up to 4 decimal points
-        require(
-            members.deposits(msg.sender) > members
-                    .amountTokensPerValidation()
-                    .mul(outstandingValidations)
-                    .mul(members.enterpriseMatch())
-                    .div(1e4),
-            "Cohort:initializeValidation - Not sufficient funds. Deposit additional funds."
-        );
+        require(checkIfEnterpriseHasFunds(msg.sender), "Cohort:initializeValidation - Not sufficient funds. Deposit additional funds.");
         require(documentHash.length > 0, "Cohort:initializeValidation - Document hash value can't be 0");
         require(enterprise == msg.sender, "Cohort:initializeValidation - Only enterprise owing this cohort can call this function");
         uint256 validationTime = block.timestamp;
