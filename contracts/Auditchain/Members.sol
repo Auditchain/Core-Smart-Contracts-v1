@@ -231,7 +231,9 @@ contract Members is  AccessControl {
         require(dataSubscriberMap[msg.sender], "Members:dataSubscriberPayment - You have to register as data subscriber");
 
         auditToken.safeTransferFrom(msg.sender, address(this), accessFee);
-        auditToken.safeTransfer(platformAddress, accessFee.mul((uint256(100)).sub(enterpriseShareSubscriber).sub(validatorShareSubscriber)).div(100));
+        uint platformShare = (((enterpriseShareSubscriber).add(validatorShareSubscriber)).mul(100)).div(accessFee);
+        auditToken.safeTransfer(platformAddress, accessFee.mul(platformShare).div(100));
+        // auditToken.safeTransfer(platformAddress, accessFee.mul((uint256(100)).sub(enterpriseShareSubscriber).sub(validatorShareSubscriber)).div(100));
 
         if (validatorMap[msg.sender] || enterpriseMap[msg.sender]){
             stakedAmount = stakedAmount.sub(accessFee);  // track tokens contributed so far
@@ -306,10 +308,7 @@ contract Members is  AccessControl {
           if (enterpriseMap[msg.sender]){
               // div(1e4) to adjust for four decimal points
             require(deposits[msg.sender]
-            .sub(enterpriseMatch
-            .mul(amountTokensPerValidation)
-            .mul(cohortFactory.returnOutstandingValidations())
-            .div(1e4)) >= amount, 
+            .sub(enterpriseMatch.mul(amountTokensPerValidation).mul(cohortFactory.returnOutstandingValidations()).div(1e4)) >= amount, 
             "Member:redeem - Your deposit will be too low to fullfil your outstanding payments.");
           }
 
