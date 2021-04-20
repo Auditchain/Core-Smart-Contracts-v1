@@ -15,6 +15,7 @@ contract TestSetDelay {
        
         delay = delay_;
         newAddress = t;
+        // require(delay==1, "");
               
     }
 }

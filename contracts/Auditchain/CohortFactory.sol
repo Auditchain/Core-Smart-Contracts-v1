@@ -69,12 +69,13 @@ contract CohortFactory is  AccessControl {
     /**
     * @dev to be called by Governance contract to update new value for min validators per cohort
     * @param _minValidatorPerCohort new value 
+    * @param audits type of validations
     */
-    function updateMinValidatorsPerCohort(uint256 _minValidatorPerCohort, uint256 audits) public isSetter() {
+    function updateMinValidatorsPerCohort(uint256 _minValidatorPerCohort, uint256 audits) public  {
 
         require(_minValidatorPerCohort != 0, "CreateCohort:updateMinValidatorsPerCohort - New value for the  min validator per cohort can't be 0");
         require(audits <= 5 && audits >=0 , "Cohort Factory:updateMinValidatorsPerCohort - Audit type has to be <= 5 and >=0");
-        minValidatorPerCohort[uint256(audits)] = _minValidatorPerCohort;
+        minValidatorPerCohort[audits] = _minValidatorPerCohort;
         emit UpdateMinValidatorsPerCohort(_minValidatorPerCohort, AuditTypes(audits));
     }
 
