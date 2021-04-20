@@ -325,7 +325,6 @@ async function getProposals(userView, userViewed) {
                     p.vote = "No Vote"
                 }
                 p.showVote = "none"
-                console.log("User has voted: " + voted.hasVoted.toString());
                 proposalsArrayUser[k] = p;
                 k++;
             }
@@ -392,9 +391,6 @@ async function getDelegates() {
 
 
     let tokenSupply = await auditToken.methods.totalSupply().call();
-    // console.log('From call token supply', tokenSupply);
-
-
     const delegations = await auditToken.getPastEvents('DelegateVotesChanged', {
         fromBlock: 0,
         toBlock: 'latest'
@@ -439,10 +435,7 @@ async function getDelegates() {
     delegates.forEach((d, index) => {
         d.voteWeight = (100 * (d.voteWeight / tokenSupply)).toFixed(2) + '%';
         d.rank = index + 1;
-        // d.votes = (d.votes / 1e18).formatMoney(4, ".", ",");
     });
-
-    // console.log(delegates);
     return delegates
 
 }
@@ -461,6 +454,13 @@ async function getProposalEvent(proposalId) {
     })
     return proposalCreatedEvent;
 }
+
+async function getProposal(proposalId) {
+
+    const proposal = await gov.methods.proposals(proposalId).call();
+    return proposal;
+}
+
 
 async function getProposalState(proposalId) {
 
@@ -582,7 +582,6 @@ app.get('/get_delegates_totals', function (req, res) {
         delegates.forEach((d) => {
 
             totalVotes += d.votes;
-            // console.log(d.votes);
         });
         res.end(JSON.stringify([totalVotes, delegates.length]));
     }).catch(function (err) {
@@ -606,6 +605,17 @@ app.get('/get_proposal_event', function (req, res) {
 
     let proposalId = req.query.proposalId;
     getProposalEvent(proposalId).then(async function (proposal) {
+
+        res.end(JSON.stringify(proposal));
+    }).catch(function (err) {
+        console.log(err);
+    })
+})
+
+app.get('/get_proposal', function (req, res) {
+
+    let proposalId = req.query.proposalId;
+    getProposal(proposalId).then(async function (proposal) {
 
         res.end(JSON.stringify(proposal));
     }).catch(function (err) {
