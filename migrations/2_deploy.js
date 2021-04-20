@@ -84,6 +84,15 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
   await token.grantRole(CONTROLLER_ROLE, admin, { from: admin });
 
+  await cohortFactory.grantRole(SETTER_ROLE, timelock.address, { from: admin });
+  await members.grantRole(SETTER_ROLE, timelock.address, { from: admin });
+
+  await cohortFactory.grantRole(SETTER_ROLE, timelock.address, { from: admin });
+
+  // await cohort.grantRole(SETTER_ROLE, gov.address, { from: admin });
+
+
+
   await members.setCohortFactory(cohortFactory.address, { from: admin });
 
 
@@ -241,7 +250,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await token.delegate(accounts[7], { from: accounts[7] });
   await token.delegate(accounts[8], { from: accounts[8] });
 
-  values = ["0", "0"];
+  values = ["0"];
   signatures = ["getBalanceOf(address)", "approve(address)"];
 
   let description1 = "# Changing SAI collateral factor to 55%\n" +
@@ -267,16 +276,21 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
     "This proposal updates the cUSDT interest rate model to a recently deployed\n" +
     "JumpRateModelV2 with the same parameters as the current cDAI interest rate model:\n"
 
-  let calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
-  result = await gov.propose([accounts[2], accounts[1]], values, signatures, calldata, description1, { from: accounts[2] });
+  // let calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
+  let calldata = [abi.encode(['uint256', 'uint256'], [(5e18).toString(), 0])];
+
+  let signature = ['updateMinValidatorsPerCohort(uint256,uint256)'];
+
+  result = await gov.propose([cohortFactory.address], values, signature, calldata, description1, { from: accounts[2] });
 
   let test = await gov.getPastEvents('ProposalCreated');
 
   event = result.logs[0];
 
-  result = await gov.propose([accounts[1], accounts[3]], values, signatures, calldata, description2, { from: accounts[1] });
-
+  
+  values = ["0", "0"];
   calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
+  result = await gov.propose([accounts[1], accounts[3]], values, signatures, calldata, description2, { from: accounts[1] });
 
   result = await gov.propose([accounts[4], accounts[5]], values, signatures, calldata, description3, { from: accounts[4] });
 
@@ -310,6 +324,15 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await gov.execute(1, { from: accounts[0] });
   blockNumber = await web3.eth.getBlockNumber();
 
+
+
+  let newUpdateRewards = await members.amountTokensPerValidation();
+
+  console.log("updateRewards", newUpdateRewards.toString());
+
+  values = ["0", "0"];
+  calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
+
   calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
   result = await gov.propose([accounts[3], accounts[1]], values, signatures, calldata, description4, { from: accounts[3] });
   event = result.logs[0];
@@ -331,6 +354,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   result = await gov.propose([accounts[1], accounts[2]], values, signatures, calldata, "Test to cancel", { from: accounts[1] });
   await gov.cancel(5, { from: accounts[0] });
+
+  
 
 
   console.log("\n\n" + '"AUDT_TOKEN_ADDRESS":"' + token.address + '",');
