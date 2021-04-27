@@ -3,7 +3,7 @@ pragma solidity =0.7.6;
 pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
+// import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "./ICohort.sol";
 import "./ICohortFactory.sol";
@@ -44,7 +44,7 @@ contract Members is  AccessControl {
     uint256 public platformShareValidation = 15;    
     uint256 public recentBlockUpdated;
     uint256 public enterpriseMatch = 15e3;          //allow fractional enterprise match up to 4 decimal points
-    uint256 public minDepositDays = 30;
+    
  
     /// @dev check if caller is a controller     
     modifier isController {
@@ -69,18 +69,13 @@ contract Members is  AccessControl {
         string name;                                                                                                                         
     }
 
-    User[] public enterprises;
-    mapping(address => bool) public enterpriseMap;
-    mapping(address => uint256) public enterpriseNameMap;
+  
 
-    User[] public validators;
-    mapping(address => bool) public validatorMap;
-    mapping(address => uint256) public validatorNameMap;
-
-    User[] public dataSubscribers;
-    mapping(address => bool) public dataSubscriberMap;
-    mapping(address => uint256) public dataSubscriberNameMap;
-   
+    mapping(address => mapping(UserType => string)) public user;
+    mapping(address => mapping(UserType => bool)) public userMap;
+    uint256 public enterpriseCount;
+    uint256 public validatorCount;
+    uint256 public dataSubscriberCount;
     
     event EnterpriseUserAdded(address indexed user, string name);
     event UserAdded(address indexed user, string name, UserType userType);
@@ -93,7 +88,7 @@ contract Members is  AccessControl {
     event LogSubscriptionCompleted(address subscriber, uint256 numberOfSubscriptions);
     event LogUpdateRewards(uint256 rewards);
     event LogUpdateEnterpriseMatch(uint256 portion);
-    event LogUpdateMinDepositDays(uint256 minDepositDays);
+    
 
     constructor(AuditToken _auditToken, address _platformAddress ) {
 
@@ -124,18 +119,6 @@ contract Members is  AccessControl {
         require(_amountTokensPerValidation != 0, "Members:updateRewards - New value for the reward can't be 0");
         amountTokensPerValidation = _amountTokensPerValidation;
         emit LogUpdateRewards(_amountTokensPerValidation);
-    }
-
-
-    /**
-    * @dev to be called by Governance contract to update days to calculate enterprise min deposit requirements
-    * @param _minDepositDays new value of min deposit days
-    */
-    function updateMinDepositDays(uint256 _minDepositDays) public isSetter()  {
-
-        require(_minDepositDays != 0, "Members:updateMinDepositDays - New value for the min deposit days can't be 0");
-        minDepositDays = _minDepositDays;
-        emit LogUpdateMinDepositDays(_minDepositDays);
     }
     
     /**
@@ -170,11 +153,14 @@ contract Members is  AccessControl {
 
         require(amount > 0, "Members:stake - Amount can't be 0");
 
-        if (validatorMap[msg.sender]){ 
+        // user[newUser][userType] = name;
+        // userMap[newUser][userType] = true;
+
+        if (userMap[msg.sender][UserType.Validator]){ 
             require(amount + deposits[msg.sender] >= 5e21, "Staking:stake - Minimum contribution amount is 5000 AUDT tokens");  
             require(amount + deposits[msg.sender] <= 25e21, "Staking:stake - Maximum contribution amount is 25000 AUDT tokens");     
         }
-        require(validatorMap[msg.sender] || enterpriseMap[msg.sender], "Staking:stake - User has been not registered as a validator or enterprise."); 
+        require(userMap[msg.sender][UserType.Validator] || userMap[msg.sender][UserType.Enterprise], "Staking:stake - User has been not registered as a validator or enterprise."); 
         stakedAmount = stakedAmount.add(amount);  // track tokens contributed so far
         auditToken.safeTransferFrom(msg.sender, address(this), amount);
         deposits[msg.sender] = deposits[msg.sender].add(amount);
@@ -228,14 +214,14 @@ contract Members is  AccessControl {
         require(cohortAddress != address(0), "Members:dataSubscriberPayment - Cohort address can't be 0");
         require(audits >=0 && audits <=5, "Audit type is not in the required range");
         require(!dataSubscriberCohortMap[msg.sender][cohortAddress], "Members:dataSubscriberPayment - You are already subscribed");
-        require(dataSubscriberMap[msg.sender], "Members:dataSubscriberPayment - You have to register as data subscriber");
+        require(userMap[msg.sender][UserType.DataSubscriber], "Members:dataSubscriberPayment - You have to register as data subscriber");
 
         auditToken.safeTransferFrom(msg.sender, address(this), accessFee);
         uint platformShare = (((enterpriseShareSubscriber).add(validatorShareSubscriber)).mul(100)).div(accessFee);
         auditToken.safeTransfer(platformAddress, accessFee.mul(platformShare).div(100));
         // auditToken.safeTransfer(platformAddress, accessFee.mul((uint256(100)).sub(enterpriseShareSubscriber).sub(validatorShareSubscriber)).div(100));
 
-        if (validatorMap[msg.sender] || enterpriseMap[msg.sender]){
+        if (userMap[msg.sender][UserType.Validator] || userMap[msg.sender][UserType.Enterprise]){
             stakedAmount = stakedAmount.sub(accessFee);  // track tokens contributed so far
             deposits[msg.sender] = deposits[msg.sender].sub(accessFee);
         }
@@ -305,7 +291,7 @@ contract Members is  AccessControl {
      */
     function redeem(uint256 amount) public {
 
-          if (enterpriseMap[msg.sender]){
+          if (userMap[msg.sender][UserType.Enterprise]){
               // div(1e4) to adjust for four decimal points
             require(deposits[msg.sender]
             .sub(enterpriseMatch.mul(amountTokensPerValidation).mul(cohortFactory.returnOutstandingValidations()).div(1e4)) >= amount, 
@@ -326,58 +312,23 @@ contract Members is  AccessControl {
     * @param name name of the user
     * @param userType  
     */
-    function addUser(address user, string memory name, UserType userType) public isController() {
+    function addUser(address newUser, string memory name, UserType userType) public isController() {
 
-        User memory newUser;
-        newUser.user = user;
-        newUser.name = name;
+        require(!userMap[newUser][userType], "Members:addUser - This user already exist.");
+        user[newUser][userType] = name;
+        userMap[newUser][userType] = true;
 
-        if (userType == UserType.DataSubscriber){
-            require(!dataSubscriberMap[user], "Members:addUser - This Data Subscriber already exist.");
-            dataSubscribers.push(newUser);
-            dataSubscriberMap[user]= true;
-            dataSubscriberNameMap[user] = dataSubscribers.length - 1;
-        }
-        else if (userType == UserType.Validator){            
-            require(!validatorMap[user], "Members:addUser - This Validator already exist.");
-            validators.push(newUser);
-            validatorMap[user]= true;
-            validatorNameMap[user] = validators.length - 1;
-        }
-        else if (userType == UserType.Enterprise){
-            require(!enterpriseMap[user], "Members:addUser - This Enterprise already exist.");
-            enterprises.push(newUser);
-            enterpriseMap[user]= true;
-            enterpriseNameMap[user] = enterprises.length - 1;
-        }
-
-        emit UserAdded(user, name, userType);
-    }
-
-    /*
-    * @dev return enterprise count
-    */
-    function returnEnterpriseCount() public view returns (uint256) {
-
-        return enterprises.length;
-    }
-
-    /*
-    * @dev return validator count
-    */
-    function returnValidatorCount() public view returns (uint256) {
-
-        return validators.length;
-    }
-
-      /*
-    * @dev return data subscribers count
-    */
-    function returnDataSubscriberCount() public view returns (uint256) {
-
-        return dataSubscribers.length;
+        if (userType == UserType.DataSubscriber) 
+            dataSubscriberCount++;
+        else if (userType == UserType.Validator)
+            validatorCount++;
+        else if (userType == UserType.Enterprise)
+            enterpriseCount++;
+     
+        emit UserAdded(newUser, name, userType);
     }
 
 }
+
 
 

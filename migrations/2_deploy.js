@@ -152,10 +152,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   // await cohortFactory.acceptInvitation(enterprise1, 3, { from: validator4 });
 
 
-  await cohortFactory.acceptInvitation(enterprise1, 3, { from: validator1 });
-  await cohortFactory.acceptInvitation(enterprise1, 4, { from: validator2 });
-  await cohortFactory.acceptInvitation(enterprise1, 5, { from: validator3 });
-  await cohortFactory.acceptInvitation(enterprise1, 6, { from: validator4 });
+  await cohortFactory.acceptInvitation(enterprise1, 7, { from: validator1 });
+  await cohortFactory.acceptInvitation(enterprise1, 8, { from: validator2 });
+  await cohortFactory.acceptInvitation(enterprise1, 9, { from: validator3 });
+  await cohortFactory.acceptInvitation(enterprise1, 10, { from: validator4 });
 
   await createCohort.grantRole(CONTROLLER_ROLE, cohortFactory.address, { from: admin });
 
@@ -180,7 +180,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortContract.methods.grantRole(CONTROLLER_ROLE, admin).send({ from: admin });
   await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
 
-  result = await cohortContract.methods.initializeValidation(documentHash).send({ from: enterprise1 });
+  result = await cohortContract.methods.initializeValidation(documentHash, "234").send({ from: enterprise1, gas: 6000000 });
 
 
   values = result.events.ValidationInitialized.returnValues;
@@ -196,7 +196,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
   documentHash = web3.utils.soliditySha3("2+3=5");
-  result = await cohortContract.methods.initializeValidation(documentHash).send({ from: enterprise1 });
+  result = await cohortContract.methods.initializeValidation(documentHash, "234").send({ from: enterprise1, gas: 6000000 });
   timeMachine.advanceTimeAndBlock(10);
 
   values = result.events.ValidationInitialized.returnValues;
@@ -209,7 +209,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 200000 });
 
   timeMachine.advanceTimeAndBlock(10);
-  result = await cohortFactory.createCohort(1, { from: enterprise1 });
+  result = await cohortFactory.createCohort(2, { from: enterprise1 });
 
 
   event = result.logs[1];
@@ -219,7 +219,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
 
-  result = await cohortContract.methods.initializeValidation(documentHash).send({ from: enterprise1 });
+  result = await cohortContract.methods.initializeValidation(documentHash, "234").send({ from: enterprise1, gas: 6000000 });
   values = result.events.ValidationInitialized.returnValues;
   validationHash = values.validationHash;
   validationTime = values.initTime;
