@@ -50,19 +50,25 @@ contract Cohort is AccessControl {
 
     AuditTypes public audits;
 
+
     // Validation can be approved or disapproved. Initial status is undefined.
-    enum ValidationStatus {Undefined, Yes, No}
+    enum ValidationStatus {Undefined, Yes, No}        
 
     struct Validation {
         uint256 validationTime;
         uint256 executionTime;
+        string url;
         mapping(address => ValidationStatus) validatorChoice;
     }
 
+
+  
     mapping(bytes32 => Validation) public validations; // track each validation
+    
+
     mapping(address => uint256) public deposits; //track deposits per user
 
-    event ValidationInitialized(bytes32 validationHash, uint256 indexed initTime, bytes32 documentHash);
+    event ValidationInitialized(bytes32 validationHash, uint256 indexed initTime, bytes32 documentHash, string url);
     event ValidatorValidated(address validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
     event ValidationExecuted(bytes32 indexed validationHash, uint256 indexed timeExecuted, bytes32 documentHash);
     event additionalValidatorAdded(address indexed validator);
@@ -152,7 +158,7 @@ contract Cohort is AccessControl {
      * @dev to be called by Enterprise to initiate new validation
      * @param documentHash - hash of unique identifier of validated transaction
      */
-    function initializeValidation(bytes32 documentHash) public {
+    function initializeValidation(bytes32 documentHash, string memory url) public {
         // div(1e4) account for precision up to 4 decimal points
         require(checkIfEnterpriseHasFunds(msg.sender), "Cohort:initializeValidation - Not sufficient funds. Deposit additional funds.");
         require(documentHash.length > 0, "Cohort:initializeValidation - Document hash value can't be 0");
@@ -161,9 +167,14 @@ contract Cohort is AccessControl {
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
 
         outstandingValidations++;
-        Validation storage newValidation = validations[validationHash];
-        newValidation.validationTime = block.timestamp;
-        emit ValidationInitialized(validationHash, validationTime, documentHash);
+        // Validation storage newValidation = validations[validationHash];
+        // newValidation.validationTime = block.timestamp;
+        // newValidation.url= url;
+
+        validations[validationHash].validationTime = block.timestamp;
+        validations[validationHash].url = url;
+
+        emit ValidationInitialized(validationHash, validationTime, documentHash, url);
     }
 
     /**
@@ -253,7 +264,7 @@ contract Cohort is AccessControl {
     ) public {
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
-        require(members.validatorMap(msg.sender),"Cohort:validate - Validator is not authorized.");
+        require(members.userMap(msg.sender, Members.UserType(1)), "Cohort:validate - Validator is not authorized.");
         require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
         require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Cohort:validate - This document has been validated already.");
         validation.validatorChoice[msg.sender] = decision;
