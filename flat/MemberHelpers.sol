@@ -2007,7 +2007,7 @@ contract Members is  AccessControl {
     }
 
      // Audit types to be used. Two types added for future expansion 
-    enum UserType {Enterprise, Validator, DataSubscriber}
+    enum UserType {Enterprise, Validator, DataSubscriber, RuleCreator}
 
     // Structure to store address and name of the registered
     struct User {  
@@ -2017,7 +2017,11 @@ contract Members is  AccessControl {
 
     User[] public enterprises;
     mapping(address => bool) public enterpriseMap;
-    mapping(address => uint256) public enterpriseNameMap;
+    // mapping(address => uint256) public enterpriseNameMap;
+
+    User[] public ruleCreators;
+    mapping(address => bool) public ruleCreatorMap;
+    // mapping(address => uint256) public ruleCreatorNameMap;
 
     User[] public validators;
     mapping(address => bool) public validatorMap;
@@ -2025,7 +2029,7 @@ contract Members is  AccessControl {
 
     User[] public dataSubscribers;
     mapping(address => bool) public dataSubscriberMap;
-    mapping(address => uint256) public dataSubscriberNameMap;
+    // mapping(address => uint256) public dataSubscriberNameMap;
    
     
     event EnterpriseUserAdded(address indexed user, string name);
@@ -2282,19 +2286,25 @@ contract Members is  AccessControl {
             require(!dataSubscriberMap[user], "Members:addUser - This Data Subscriber already exist.");
             dataSubscribers.push(newUser);
             dataSubscriberMap[user]= true;
-            dataSubscriberNameMap[user] = dataSubscribers.length - 1;
+            // dataSubscriberNameMap[user] = dataSubscribers.length - 1;
         }
         else if (userType == UserType.Validator){            
             require(!validatorMap[user], "Members:addUser - This Validator already exist.");
             validators.push(newUser);
             validatorMap[user]= true;
-            validatorNameMap[user] = validators.length - 1;
+            // validatorNameMap[user] = validators.length - 1;
         }
         else if (userType == UserType.Enterprise){
             require(!enterpriseMap[user], "Members:addUser - This Enterprise already exist.");
             enterprises.push(newUser);
             enterpriseMap[user]= true;
-            enterpriseNameMap[user] = enterprises.length - 1;
+            // enterpriseNameMap[user] = enterprises.length - 1;
+        }
+        else if (userType == UserType.RuleCreator){
+            require(!enterpriseMap[user], "Members:addUser - This Rule Creator already exist.");
+            ruleCreators.push(newUser);
+            ruleCreatorMap[user]= true;
+            // ruleCreatorNameMap[user] = enterprises.length - 1;
         }
 
         emit UserAdded(user, name, userType);
@@ -2316,10 +2326,18 @@ contract Members is  AccessControl {
         return validators.length;
     }
 
-      /*
+    /*
     * @dev return data subscribers count
     */
     function returnDataSubscriberCount() public view returns (uint256) {
+
+        return dataSubscribers.length;
+    }
+
+     /*
+    * @dev return data rule creators count
+    */
+    function returnRuleCreatorsCount() public view returns (uint256) {
 
         return dataSubscribers.length;
     }

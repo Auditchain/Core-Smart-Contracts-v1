@@ -2007,7 +2007,7 @@ contract Members is  AccessControl {
     }
 
      // Audit types to be used. Two types added for future expansion 
-    enum UserType {Enterprise, Validator, DataSubscriber}
+    enum UserType {Enterprise, Validator, DataSubscriber, RuleCreator}
 
     // Structure to store address and name of the registered
     struct User {  
@@ -2017,7 +2017,11 @@ contract Members is  AccessControl {
 
     User[] public enterprises;
     mapping(address => bool) public enterpriseMap;
-    mapping(address => uint256) public enterpriseNameMap;
+    // mapping(address => uint256) public enterpriseNameMap;
+
+    User[] public ruleCreators;
+    mapping(address => bool) public ruleCreatorMap;
+    // mapping(address => uint256) public ruleCreatorNameMap;
 
     User[] public validators;
     mapping(address => bool) public validatorMap;
@@ -2025,7 +2029,7 @@ contract Members is  AccessControl {
 
     User[] public dataSubscribers;
     mapping(address => bool) public dataSubscriberMap;
-    mapping(address => uint256) public dataSubscriberNameMap;
+    // mapping(address => uint256) public dataSubscriberNameMap;
    
     
     event EnterpriseUserAdded(address indexed user, string name);
@@ -2282,19 +2286,25 @@ contract Members is  AccessControl {
             require(!dataSubscriberMap[user], "Members:addUser - This Data Subscriber already exist.");
             dataSubscribers.push(newUser);
             dataSubscriberMap[user]= true;
-            dataSubscriberNameMap[user] = dataSubscribers.length - 1;
+            // dataSubscriberNameMap[user] = dataSubscribers.length - 1;
         }
         else if (userType == UserType.Validator){            
             require(!validatorMap[user], "Members:addUser - This Validator already exist.");
             validators.push(newUser);
             validatorMap[user]= true;
-            validatorNameMap[user] = validators.length - 1;
+            // validatorNameMap[user] = validators.length - 1;
         }
         else if (userType == UserType.Enterprise){
             require(!enterpriseMap[user], "Members:addUser - This Enterprise already exist.");
             enterprises.push(newUser);
             enterpriseMap[user]= true;
-            enterpriseNameMap[user] = enterprises.length - 1;
+            // enterpriseNameMap[user] = enterprises.length - 1;
+        }
+        else if (userType == UserType.RuleCreator){
+            require(!enterpriseMap[user], "Members:addUser - This Rule Creator already exist.");
+            ruleCreators.push(newUser);
+            ruleCreatorMap[user]= true;
+            // ruleCreatorNameMap[user] = enterprises.length - 1;
         }
 
         emit UserAdded(user, name, userType);
@@ -2316,10 +2326,18 @@ contract Members is  AccessControl {
         return validators.length;
     }
 
-      /*
+    /*
     * @dev return data subscribers count
     */
     function returnDataSubscriberCount() public view returns (uint256) {
+
+        return dataSubscribers.length;
+    }
+
+     /*
+    * @dev return data rule creators count
+    */
+    function returnRuleCreatorsCount() public view returns (uint256) {
 
         return dataSubscribers.length;
     }
@@ -2757,12 +2775,13 @@ contract CohortFactory is  AccessControl {
     /**
     * @dev to be called by Governance contract to update new value for min validators per cohort
     * @param _minValidatorPerCohort new value 
+    * @param audits type of validations
     */
-    function updateMinValidatorsPerCohort(uint256 _minValidatorPerCohort, uint256 audits) public isSetter() {
+    function updateMinValidatorsPerCohort(uint256 _minValidatorPerCohort, uint256 audits) public  {
 
         require(_minValidatorPerCohort != 0, "CreateCohort:updateMinValidatorsPerCohort - New value for the  min validator per cohort can't be 0");
         require(audits <= 5 && audits >=0 , "Cohort Factory:updateMinValidatorsPerCohort - Audit type has to be <= 5 and >=0");
-        minValidatorPerCohort[uint256(audits)] = _minValidatorPerCohort;
+        minValidatorPerCohort[audits] = _minValidatorPerCohort;
         emit UpdateMinValidatorsPerCohort(_minValidatorPerCohort, AuditTypes(audits));
     }
 
@@ -2841,6 +2860,17 @@ contract CohortFactory is  AccessControl {
                 require(ICohort(cohort).removeValidator(validator, msg.sender), 
                         "CohortFactory:clearInvitationValidator - Problem removing validator in Cohort contract");
                 emit ValidatorCleared(validator, audit, cohort, msg.sender);
+            }
+        }
+    }
+
+    function clearInvitationRemoveValidator(address validator, AuditTypes audit) public {
+
+        for (uint256 i = 0; i < invitations[msg.sender].length; i++){
+            if (invitations[msg.sender][i].audits == audit && 
+                invitations[msg.sender][i].validator ==  validator){
+                invitations[msg.sender][i].deleted = true;                
+                emit ValidatorCleared(validator, audit, address(0x0), msg.sender);
             }
         }
     }
