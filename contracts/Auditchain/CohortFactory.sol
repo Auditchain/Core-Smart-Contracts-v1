@@ -87,12 +87,12 @@ contract CohortFactory is  AccessControl {
     function inviteValidator(address validator, AuditTypes audit, address cohort) public {
 
         Invitation memory newInvitation;
-        bool approvedValidator = members.validatorMap(validator);
-        bool isEnterprise = members.enterpriseMap(msg.sender);
+        bool isValidator = members.userMap(validator, Members.UserType(1));
+        bool isEnterprise = members.userMap(msg.sender, Members.UserType(0));
         (bool invited, ) = isValidatorInvited(msg.sender, validator, audit);
         require( !invited , "CohortFactory:inviteValidator - This validator has been already invited for this validation type." );
         require( isEnterprise, "CohortFactory:inviteValidator - Only Enterprise user can invite Validators.");
-        require( approvedValidator, "CohortFactory:inviteValidator - Only Approved Validators can be invited.");
+        require( isValidator, "CohortFactory:inviteValidator - Only Approved Validators can be invited.");
         require( members.deposits(validator) > 0,"CohortFactory:inviteValidator - This validator has not staked any tokens yet.");
         newInvitation.validator = validator;
         newInvitation.invitationDate = block.timestamp;     
@@ -154,6 +154,17 @@ contract CohortFactory is  AccessControl {
                 require(ICohort(cohort).removeValidator(validator, msg.sender), 
                         "CohortFactory:clearInvitationValidator - Problem removing validator in Cohort contract");
                 emit ValidatorCleared(validator, audit, cohort, msg.sender);
+            }
+        }
+    }
+
+    function clearInvitationRemoveValidator(address validator, AuditTypes audit) public {
+
+        for (uint256 i = 0; i < invitations[msg.sender].length; i++){
+            if (invitations[msg.sender][i].audits == audit && 
+                invitations[msg.sender][i].validator ==  validator){
+                invitations[msg.sender][i].deleted = true;                
+                emit ValidatorCleared(validator, audit, address(0x0), msg.sender);
             }
         }
     }
