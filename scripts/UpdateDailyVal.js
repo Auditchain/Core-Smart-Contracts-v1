@@ -225,18 +225,18 @@ async function processValidations(cohortAddress) {
         let CONTROLLER_ROLE = web3.utils.keccak256("CONTROLLER_ROLE");
 
         // assign controller roles if needed
-        const hasControlerRoleInMmebers = await members.methods.hasRole(CONTROLLER_ROLE, owner).call();
+        const hasControllerRoleInMembers = await members.methods.hasRole(CONTROLLER_ROLE, owner).call();
 
-        if (!hasControlerRoleInMmebers)
+        if (!hasControllerRoleInMembers)
             await members.methods.grantRole(CONTROLLER_ROLE, owner).send({ from: owner });
 
-        const hasControlerRoleInToken = await auditToken.methods.hasRole(CONTROLLER_ROLE, membersAddress).call();
-        if (!hasControlerRoleInToken)
+        const hasControllerRoleInToken = await auditToken.methods.hasRole(CONTROLLER_ROLE, membersAddress).call();
+        if (!hasControllerRoleInToken)
             await auditToken.methods.grantRole(CONTROLLER_ROLE, membersAddress).send({ from: owner });
 
-        const hasControlerRoleInCohort = await cohortInstance.methods.hasRole(CONTROLLER_ROLE, membersAddress).call();
+        const hasControllerRoleInCohort = await cohortInstance.methods.hasRole(CONTROLLER_ROLE, membersAddress).call();
 
-        if (!hasControlerRoleInCohort)
+        if (!hasControllerRoleInCohort)
             await cohortInstance.methods.grantRole(CONTROLLER_ROLE, membersAddress).send({ from: owner });
 
         let result = await members.methods.updateDailyEarningsTransferFunds(validators, tokens, cohortAddress).send({ from: owner, gas: 2000000 });

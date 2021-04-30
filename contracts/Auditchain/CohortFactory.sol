@@ -16,7 +16,7 @@ contract CohortFactory is  AccessControl {
 
     // Audit types to be used. Two types added for future expansion 
     enum AuditTypes {
-        Financial, System, Contract, NFT, Type5, Type6
+        Financial, System, Rules, NFT, Type5, Type6
     }
 
     uint256[] public minValidatorPerCohort = [3,3,3,3,3,3];

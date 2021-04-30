@@ -58,6 +58,7 @@ contract Cohort is AccessControl {
         uint256 validationTime;
         uint256 executionTime;
         string url;
+        uint256 consensus;
         mapping(address => ValidationStatus) validatorChoice;
     }
 
@@ -68,7 +69,7 @@ contract Cohort is AccessControl {
 
     mapping(address => uint256) public deposits; //track deposits per user
 
-    event ValidationInitialized(bytes32 validationHash, uint256 indexed initTime, bytes32 documentHash, string url);
+    event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url);
     event ValidatorValidated(address validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
     event ValidationExecuted(bytes32 indexed validationHash, uint256 indexed timeExecuted, bytes32 documentHash);
     event additionalValidatorAdded(address indexed validator);
@@ -174,7 +175,7 @@ contract Cohort is AccessControl {
         validations[validationHash].validationTime = block.timestamp;
         validations[validationHash].url = url;
 
-        emit ValidationInitialized(validationHash, validationTime, documentHash, url);
+        emit ValidationInitialized(msg.sender, validationHash, validationTime, documentHash, url);
     }
 
     /**
@@ -239,6 +240,28 @@ contract Cohort is AccessControl {
         return (currentlyVoted * 100) / totalStaked;
     }
 
+    function determineConsensus(ValidationStatus[] memory validation) public pure returns(uint256 ) {
+
+        // const validatorsValues = validation[2];
+        uint256 yes;
+        uint256 no;
+
+        for (uint256 i=0; i< validation.length; i++) {
+
+            if (validation[i] == ValidationStatus.Yes)
+                yes++;
+            else
+                no++;
+        }
+
+        if (yes > no)
+            return 1; // consensus is to approve
+        else if (no > yes)
+            return 2; // consensus is to disapprove
+        else
+            return 0; // consensus is tie - should not happen
+}
+
     /**
      * @dev to mark validation as executed. This happens when participation level reached "requiredQuorum"
      * @param validationHash - consist of hash of hashed document and timestamp
@@ -247,6 +270,10 @@ contract Cohort is AccessControl {
         if (calculateVoteQuorum(validationHash) >= requiredQuorum) {
             Validation storage validation = validations[validationHash];
             validation.executionTime = block.timestamp;
+
+            (,, ValidationStatus[] memory results) = collectValidationResults(validationHash);
+
+            validation.consensus = determineConsensus(results);
             emit ValidationExecuted(validationHash, block.timestamp, documentHash);
         }
     }
