@@ -314,63 +314,63 @@
     "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/MemberHelpers.sol",
     "exportedSymbols": {
       "AccessControl": [
-        4978
+        4974
       ],
       "Address": [
-        6482
+        6478
       ],
       "AuditToken": [
         1027
       ],
       "Context": [
-        6505
+        6501
       ],
       "ERC20": [
-        5836
+        5832
       ],
       "ERC20Burnable": [
-        5895
+        5891
       ],
       "EnumerableSet": [
-        6997
+        6993
       ],
       "ICohort": [
-        3200
+        3196
       ],
       "ICohortFactory": [
-        3219
+        3215
       ],
       "IERC20": [
-        5973
+        5969
       ],
       "Locked": [
-        4684
+        4680
       ],
       "MemberHelpers": [
-        3307
+        3303
       ],
       "Members": [
-        4504
+        4500
       ],
       "MigrationAgent": [
-        4695
+        4691
       ],
       "Pausable": [
-        7089
+        7085
       ],
       "SafeERC20": [
-        6186
+        6182
       ],
       "SafeMath": [
-        5333
+        5329
       ]
     },
-    "id": 3308,
+    "id": 3304,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3221,
+        "id": 3217,
         "literals": [
           "solidity",
           "=",
@@ -383,10 +383,10 @@
       {
         "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/Members.sol",
         "file": "./Members.sol",
-        "id": 3222,
+        "id": 3218,
         "nodeType": "ImportDirective",
-        "scope": 3308,
-        "sourceUnit": 4505,
+        "scope": 3304,
+        "sourceUnit": 4501,
         "src": "58:23:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -394,10 +394,10 @@
       {
         "absolutePath": "@openzeppelin/contracts/access/AccessControl.sol",
         "file": "@openzeppelin/contracts/access/AccessControl.sol",
-        "id": 3223,
+        "id": 3219,
         "nodeType": "ImportDirective",
-        "scope": 3308,
-        "sourceUnit": 4979,
+        "scope": 3304,
+        "sourceUnit": 4975,
         "src": "83:58:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -407,38 +407,38 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 3225,
+              "id": 3221,
               "name": "AccessControl",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4978,
+              "referencedDeclaration": 4974,
               "src": "244:13:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_AccessControl_$4978",
+                "typeIdentifier": "t_contract$_AccessControl_$4974",
                 "typeString": "contract AccessControl"
               }
             },
-            "id": 3226,
+            "id": 3222,
             "nodeType": "InheritanceSpecifier",
             "src": "244:13:6"
           }
         ],
         "contractDependencies": [
-          4978,
-          6505
+          4974,
+          6501
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 3224,
+          "id": 3220,
           "nodeType": "StructuredDocumentation",
           "src": "145:70:6",
           "text": " @title MemberHelpers\n Additional function for Members "
         },
         "fullyImplemented": true,
-        "id": 3307,
+        "id": 3303,
         "linearizedBaseContracts": [
-          3307,
-          4978,
-          6505
+          3303,
+          4974,
+          6501
         ],
         "name": "MemberHelpers",
         "nodeType": "ContractDefinition",
@@ -446,11 +446,11 @@
           {
             "constant": true,
             "functionSelector": "a2011b3f",
-            "id": 3231,
+            "id": 3227,
             "mutability": "constant",
             "name": "SETTER_ROLE",
             "nodeType": "VariableDeclaration",
-            "scope": 3307,
+            "scope": 3303,
             "src": "267:63:6",
             "stateVariable": true,
             "storageLocation": "default",
@@ -459,7 +459,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 3227,
+              "id": 3223,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "267:7:6",
@@ -472,7 +472,7 @@
               "arguments": [
                 {
                   "hexValue": "5345545445525f524f4c45",
-                  "id": 3229,
+                  "id": 3225,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -494,7 +494,7 @@
                     "typeString": "literal_string \"SETTER_ROLE\""
                   }
                 ],
-                "id": 3228,
+                "id": 3224,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -505,7 +505,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 3230,
+              "id": 3226,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -525,11 +525,11 @@
           {
             "constant": false,
             "functionSelector": "5659ae58",
-            "id": 3234,
+            "id": 3230,
             "mutability": "mutable",
             "name": "minDepositDays",
             "nodeType": "VariableDeclaration",
-            "scope": 3307,
+            "scope": 3303,
             "src": "337:34:6",
             "stateVariable": true,
             "storageLocation": "default",
@@ -538,7 +538,7 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 3232,
+              "id": 3228,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
               "src": "337:7:6",
@@ -549,7 +549,7 @@
             },
             "value": {
               "hexValue": "3330",
-              "id": 3233,
+              "id": 3229,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -567,21 +567,21 @@
           },
           {
             "anonymous": false,
-            "id": 3238,
+            "id": 3234,
             "name": "LogUpdateMinDepositDays",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 3237,
+              "id": 3233,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3236,
+                  "id": 3232,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "minDepositDays",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3238,
+                  "scope": 3234,
                   "src": "415:22:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -590,7 +590,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3235,
+                    "id": 3231,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "415:7:6",
@@ -608,26 +608,26 @@
           },
           {
             "constant": false,
-            "id": 3240,
+            "id": 3236,
             "mutability": "mutable",
             "name": "members",
             "nodeType": "VariableDeclaration",
-            "scope": 3307,
+            "scope": 3303,
             "src": "447:15:6",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_Members_$4504",
+              "typeIdentifier": "t_contract$_Members_$4500",
               "typeString": "contract Members"
             },
             "typeName": {
-              "id": 3239,
+              "id": 3235,
               "name": "Members",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4504,
+              "referencedDeclaration": 4500,
               "src": "447:7:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Members_$4504",
+                "typeIdentifier": "t_contract$_Members_$4500",
                 "typeString": "contract Members"
               }
             },
@@ -635,7 +635,7 @@
           },
           {
             "body": {
-              "id": 3267,
+              "id": 3263,
               "nodeType": "Block",
               "src": "503:198:6",
               "statements": [
@@ -647,17 +647,17 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 3251,
+                        "id": 3247,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
-                          "id": 3246,
+                          "id": 3242,
                           "name": "_members",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 3242,
+                          "referencedDeclaration": 3238,
                           "src": "522:8:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -670,7 +670,7 @@
                           "arguments": [
                             {
                               "hexValue": "30",
-                              "id": 3249,
+                              "id": 3245,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
@@ -692,7 +692,7 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 3248,
+                            "id": 3244,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -704,14 +704,14 @@
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 3247,
+                              "id": 3243,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
                               "src": "534:7:6",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 3250,
+                          "id": 3246,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -734,7 +734,7 @@
                       },
                       {
                         "hexValue": "4d656d62657248656c706572733a636f6e7374727563746f72202d204d656d62657220616464726573732063616e27742062652030",
-                        "id": 3252,
+                        "id": 3248,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -760,7 +760,7 @@
                           "typeString": "literal_string \"MemberHelpers:constructor - Member address can't be 0\""
                         }
                       ],
-                      "id": 3245,
+                      "id": 3241,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -774,7 +774,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 3253,
+                    "id": 3249,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -789,26 +789,26 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3254,
+                  "id": 3250,
                   "nodeType": "ExpressionStatement",
                   "src": "514:88:6"
                 },
                 {
                   "expression": {
-                    "id": 3259,
+                    "id": 3255,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 3255,
+                      "id": 3251,
                       "name": "members",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3240,
+                      "referencedDeclaration": 3236,
                       "src": "613:7:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Members_$4504",
+                        "typeIdentifier": "t_contract$_Members_$4500",
                         "typeString": "contract Members"
                       }
                     },
@@ -817,11 +817,11 @@
                     "rightHandSide": {
                       "arguments": [
                         {
-                          "id": 3257,
+                          "id": 3253,
                           "name": "_members",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 3242,
+                          "referencedDeclaration": 3238,
                           "src": "631:8:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -836,18 +836,18 @@
                             "typeString": "address"
                           }
                         ],
-                        "id": 3256,
+                        "id": 3252,
                         "name": "Members",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4504,
+                        "referencedDeclaration": 4500,
                         "src": "623:7:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Members_$4504_$",
+                          "typeIdentifier": "t_type$_t_contract$_Members_$4500_$",
                           "typeString": "type(contract Members)"
                         }
                       },
-                      "id": 3258,
+                      "id": 3254,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -858,17 +858,17 @@
                       "src": "623:17:6",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Members_$4504",
+                        "typeIdentifier": "t_contract$_Members_$4500",
                         "typeString": "contract Members"
                       }
                     },
                     "src": "613:27:6",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_Members_$4504",
+                      "typeIdentifier": "t_contract$_Members_$4500",
                       "typeString": "contract Members"
                     }
                   },
-                  "id": 3260,
+                  "id": 3256,
                   "nodeType": "ExpressionStatement",
                   "src": "613:27:6"
                 },
@@ -876,11 +876,11 @@
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3262,
+                        "id": 3258,
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4721,
+                        "referencedDeclaration": 4717,
                         "src": "662:18:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -889,7 +889,7 @@
                       },
                       {
                         "expression": {
-                          "id": 3263,
+                          "id": 3259,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -900,7 +900,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 3264,
+                        "id": 3260,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -925,18 +925,18 @@
                           "typeString": "address payable"
                         }
                       ],
-                      "id": 3261,
+                      "id": 3257,
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 4904,
+                      "referencedDeclaration": 4900,
                       "src": "651:10:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
                         "typeString": "function (bytes32,address)"
                       }
                     },
-                    "id": 3265,
+                    "id": 3261,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -951,29 +951,29 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3266,
+                  "id": 3262,
                   "nodeType": "ExpressionStatement",
                   "src": "651:42:6"
                 }
               ]
             },
-            "id": 3268,
+            "id": 3264,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3243,
+              "id": 3239,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3242,
+                  "id": 3238,
                   "mutability": "mutable",
                   "name": "_members",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3268,
+                  "scope": 3264,
                   "src": "483:17:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -982,7 +982,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3241,
+                    "id": 3237,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "483:7:6",
@@ -998,12 +998,12 @@
               "src": "482:20:6"
             },
             "returnParameters": {
-              "id": 3244,
+              "id": 3240,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "503:0:6"
             },
-            "scope": 3307,
+            "scope": 3303,
             "src": "471:230:6",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -1011,7 +1011,7 @@
           },
           {
             "body": {
-              "id": 3281,
+              "id": 3277,
               "nodeType": "Block",
               "src": "775:119:6",
               "statements": [
@@ -1021,11 +1021,11 @@
                       {
                         "arguments": [
                           {
-                            "id": 3273,
+                            "id": 3269,
                             "name": "SETTER_ROLE",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 3231,
+                            "referencedDeclaration": 3227,
                             "src": "802:11:6",
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
@@ -1034,7 +1034,7 @@
                           },
                           {
                             "expression": {
-                              "id": 3274,
+                              "id": 3270,
                               "name": "msg",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
@@ -1045,7 +1045,7 @@
                                 "typeString": "msg"
                               }
                             },
-                            "id": 3275,
+                            "id": 3271,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -1070,18 +1070,18 @@
                               "typeString": "address payable"
                             }
                           ],
-                          "id": 3272,
+                          "id": 3268,
                           "name": "hasRole",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 4767,
+                          "referencedDeclaration": 4763,
                           "src": "794:7:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_bytes32_$_t_address_$returns$_t_bool_$",
                             "typeString": "function (bytes32,address) view returns (bool)"
                           }
                         },
-                        "id": 3276,
+                        "id": 3272,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1098,7 +1098,7 @@
                       },
                       {
                         "hexValue": "4d656d626572733a6973536574746572202d2043616c6c6572206973206e6f74206120736574746572",
-                        "id": 3277,
+                        "id": 3273,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -1124,7 +1124,7 @@
                           "typeString": "literal_string \"Members:isSetter - Caller is not a setter\""
                         }
                       ],
-                      "id": 3271,
+                      "id": 3267,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -1138,7 +1138,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 3278,
+                    "id": 3274,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1153,28 +1153,28 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3279,
+                  "id": 3275,
                   "nodeType": "ExpressionStatement",
                   "src": "786:86:6"
                 },
                 {
-                  "id": 3280,
+                  "id": 3276,
                   "nodeType": "PlaceholderStatement",
                   "src": "885:1:6"
                 }
               ]
             },
             "documentation": {
-              "id": 3269,
+              "id": 3265,
               "nodeType": "StructuredDocumentation",
               "src": "710:41:6",
               "text": "@dev check if caller is a setter     "
             },
-            "id": 3282,
+            "id": 3278,
             "name": "isSetter",
             "nodeType": "ModifierDefinition",
             "parameters": {
-              "id": 3270,
+              "id": 3266,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "775:0:6"
@@ -1185,7 +1185,7 @@
           },
           {
             "body": {
-              "id": 3305,
+              "id": 3301,
               "nodeType": "Block",
               "src": "2700:229:6",
               "statements": [
@@ -1197,17 +1197,17 @@
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         },
-                        "id": 3293,
+                        "id": 3289,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
-                          "id": 3291,
+                          "id": 3287,
                           "name": "_minDepositDays",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 3285,
+                          "referencedDeclaration": 3281,
                           "src": "2721:15:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
@@ -1218,7 +1218,7 @@
                         "operator": "!=",
                         "rightExpression": {
                           "hexValue": "30",
-                          "id": 3292,
+                          "id": 3288,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -1240,7 +1240,7 @@
                       },
                       {
                         "hexValue": "4d656d626572733a7570646174654d696e4465706f73697444617973202d204e65772076616c756520666f7220746865206d696e206465706f73697420646179732063616e27742062652030",
-                        "id": 3294,
+                        "id": 3290,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -1266,7 +1266,7 @@
                           "typeString": "literal_string \"Members:updateMinDepositDays - New value for the min deposit days can't be 0\""
                         }
                       ],
-                      "id": 3290,
+                      "id": 3286,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -1280,7 +1280,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 3295,
+                    "id": 3291,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1295,23 +1295,23 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3296,
+                  "id": 3292,
                   "nodeType": "ExpressionStatement",
                   "src": "2713:109:6"
                 },
                 {
                   "expression": {
-                    "id": 3299,
+                    "id": 3295,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 3297,
+                      "id": 3293,
                       "name": "minDepositDays",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3234,
+                      "referencedDeclaration": 3230,
                       "src": "2833:14:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -1321,11 +1321,11 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 3298,
+                      "id": 3294,
                       "name": "_minDepositDays",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3285,
+                      "referencedDeclaration": 3281,
                       "src": "2850:15:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -1338,7 +1338,7 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 3300,
+                  "id": 3296,
                   "nodeType": "ExpressionStatement",
                   "src": "2833:32:6"
                 },
@@ -1346,11 +1346,11 @@
                   "eventCall": {
                     "arguments": [
                       {
-                        "id": 3302,
+                        "id": 3298,
                         "name": "_minDepositDays",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3285,
+                        "referencedDeclaration": 3281,
                         "src": "2905:15:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -1365,18 +1365,18 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 3301,
+                      "id": 3297,
                       "name": "LogUpdateMinDepositDays",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3238,
+                      "referencedDeclaration": 3234,
                       "src": "2881:23:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 3303,
+                    "id": 3299,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1391,32 +1391,32 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3304,
+                  "id": 3300,
                   "nodeType": "EmitStatement",
                   "src": "2876:45:6"
                 }
               ]
             },
             "documentation": {
-              "id": 3283,
+              "id": 3279,
               "nodeType": "StructuredDocumentation",
               "src": "2437:183:6",
               "text": " @dev to be called by Governance contract to update days to calculate enterprise min deposit requirements\n @param _minDepositDays new value of min deposit days"
             },
             "functionSelector": "74eb9cdb",
-            "id": 3306,
+            "id": 3302,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
                 "arguments": [],
-                "id": 3288,
+                "id": 3284,
                 "modifierName": {
-                  "id": 3287,
+                  "id": 3283,
                   "name": "isSetter",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 3282,
+                  "referencedDeclaration": 3278,
                   "src": "2688:8:6",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -1430,16 +1430,16 @@
             "name": "updateMinDepositDays",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3286,
+              "id": 3282,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3285,
+                  "id": 3281,
                   "mutability": "mutable",
                   "name": "_minDepositDays",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3306,
+                  "scope": 3302,
                   "src": "2656:23:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1448,7 +1448,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3284,
+                    "id": 3280,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "2656:7:6",
@@ -1463,19 +1463,19 @@
               "src": "2655:25:6"
             },
             "returnParameters": {
-              "id": 3289,
+              "id": 3285,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "2700:0:6"
             },
-            "scope": 3307,
+            "scope": 3303,
             "src": "2626:303:6",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 3308,
+        "scope": 3304,
         "src": "217:2723:6"
       }
     ],
@@ -1486,55 +1486,55 @@
       "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/MemberHelpers.sol",
       "exportedSymbols": {
         "AccessControl": [
-          4978
+          4974
         ],
         "Address": [
-          6482
+          6478
         ],
         "AuditToken": [
           1027
         ],
         "Context": [
-          6505
+          6501
         ],
         "ERC20": [
-          5836
+          5832
         ],
         "ERC20Burnable": [
-          5895
+          5891
         ],
         "EnumerableSet": [
-          6997
+          6993
         ],
         "ICohort": [
-          3200
+          3196
         ],
         "ICohortFactory": [
-          3219
+          3215
         ],
         "IERC20": [
-          5973
+          5969
         ],
         "Locked": [
-          4684
+          4680
         ],
         "MemberHelpers": [
-          3307
+          3303
         ],
         "Members": [
-          4504
+          4500
         ],
         "MigrationAgent": [
-          4695
+          4691
         ],
         "Pausable": [
-          7089
+          7085
         ],
         "SafeERC20": [
-          6186
+          6182
         ],
         "SafeMath": [
-          5333
+          5329
         ]
       },
       "license": "MIT"
@@ -1549,37 +1549,37 @@
             ".6"
           ]
         },
-        "id": 3221,
+        "id": 3217,
         "name": "PragmaDirective",
         "src": "33:23:6"
       },
       {
         "attributes": {
-          "SourceUnit": 4505,
+          "SourceUnit": 4501,
           "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/Members.sol",
           "file": "./Members.sol",
-          "scope": 3308,
+          "scope": 3304,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 3222,
+        "id": 3218,
         "name": "ImportDirective",
         "src": "58:23:6"
       },
       {
         "attributes": {
-          "SourceUnit": 4979,
+          "SourceUnit": 4975,
           "absolutePath": "@openzeppelin/contracts/access/AccessControl.sol",
           "file": "@openzeppelin/contracts/access/AccessControl.sol",
-          "scope": 3308,
+          "scope": 3304,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 3223,
+        "id": 3219,
         "name": "ImportDirective",
         "src": "83:58:6"
       },
@@ -1587,25 +1587,25 @@
         "attributes": {
           "abstract": false,
           "contractDependencies": [
-            4978,
-            6505
+            4974,
+            6501
           ],
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            3307,
-            4978,
-            6505
+            3303,
+            4974,
+            6501
           ],
           "name": "MemberHelpers",
-          "scope": 3308
+          "scope": 3304
         },
         "children": [
           {
             "attributes": {
               "text": " @title MemberHelpers\n Additional function for Members "
             },
-            "id": 3224,
+            "id": 3220,
             "name": "StructuredDocumentation",
             "src": "145:70:6"
           },
@@ -1615,15 +1615,15 @@
               {
                 "attributes": {
                   "name": "AccessControl",
-                  "referencedDeclaration": 4978,
+                  "referencedDeclaration": 4974,
                   "type": "contract AccessControl"
                 },
-                "id": 3225,
+                "id": 3221,
                 "name": "UserDefinedTypeName",
                 "src": "244:13:6"
               }
             ],
-            "id": 3226,
+            "id": 3222,
             "name": "InheritanceSpecifier",
             "src": "244:13:6"
           },
@@ -1633,7 +1633,7 @@
               "functionSelector": "a2011b3f",
               "mutability": "constant",
               "name": "SETTER_ROLE",
-              "scope": 3307,
+              "scope": 3303,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "bytes32",
@@ -1645,7 +1645,7 @@
                   "name": "bytes32",
                   "type": "bytes32"
                 },
-                "id": 3227,
+                "id": 3223,
                 "name": "ElementaryTypeName",
                 "src": "267:7:6"
               },
@@ -1679,7 +1679,7 @@
                       "type": "function (bytes memory) pure returns (bytes32)",
                       "value": "keccak256"
                     },
-                    "id": 3228,
+                    "id": 3224,
                     "name": "Identifier",
                     "src": "306:9:6"
                   },
@@ -1694,17 +1694,17 @@
                       "type": "literal_string \"SETTER_ROLE\"",
                       "value": "SETTER_ROLE"
                     },
-                    "id": 3229,
+                    "id": 3225,
                     "name": "Literal",
                     "src": "316:13:6"
                   }
                 ],
-                "id": 3230,
+                "id": 3226,
                 "name": "FunctionCall",
                 "src": "306:24:6"
               }
             ],
-            "id": 3231,
+            "id": 3227,
             "name": "VariableDeclaration",
             "src": "267:63:6"
           },
@@ -1714,7 +1714,7 @@
               "functionSelector": "5659ae58",
               "mutability": "mutable",
               "name": "minDepositDays",
-              "scope": 3307,
+              "scope": 3303,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -1726,7 +1726,7 @@
                   "name": "uint256",
                   "type": "uint256"
                 },
-                "id": 3232,
+                "id": 3228,
                 "name": "ElementaryTypeName",
                 "src": "337:7:6"
               },
@@ -1741,12 +1741,12 @@
                   "type": "int_const 30",
                   "value": "30"
                 },
-                "id": 3233,
+                "id": 3229,
                 "name": "Literal",
                 "src": "369:2:6"
               }
             ],
-            "id": 3234,
+            "id": 3230,
             "name": "VariableDeclaration",
             "src": "337:34:6"
           },
@@ -1764,7 +1764,7 @@
                       "indexed": false,
                       "mutability": "mutable",
                       "name": "minDepositDays",
-                      "scope": 3238,
+                      "scope": 3234,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -1776,22 +1776,22 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 3235,
+                        "id": 3231,
                         "name": "ElementaryTypeName",
                         "src": "415:7:6"
                       }
                     ],
-                    "id": 3236,
+                    "id": 3232,
                     "name": "VariableDeclaration",
                     "src": "415:22:6"
                   }
                 ],
-                "id": 3237,
+                "id": 3233,
                 "name": "ParameterList",
                 "src": "414:24:6"
               }
             ],
-            "id": 3238,
+            "id": 3234,
             "name": "EventDefinition",
             "src": "385:54:6"
           },
@@ -1800,7 +1800,7 @@
               "constant": false,
               "mutability": "mutable",
               "name": "members",
-              "scope": 3307,
+              "scope": 3303,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "contract Members",
@@ -1810,15 +1810,15 @@
               {
                 "attributes": {
                   "name": "Members",
-                  "referencedDeclaration": 4504,
+                  "referencedDeclaration": 4500,
                   "type": "contract Members"
                 },
-                "id": 3239,
+                "id": 3235,
                 "name": "UserDefinedTypeName",
                 "src": "447:7:6"
               }
             ],
-            "id": 3240,
+            "id": 3236,
             "name": "VariableDeclaration",
             "src": "447:15:6"
           },
@@ -1831,7 +1831,7 @@
                 null
               ],
               "name": "",
-              "scope": 3307,
+              "scope": 3303,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "public"
@@ -1844,7 +1844,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_members",
-                      "scope": 3268,
+                      "scope": 3264,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1857,17 +1857,17 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 3241,
+                        "id": 3237,
                         "name": "ElementaryTypeName",
                         "src": "483:7:6"
                       }
                     ],
-                    "id": 3242,
+                    "id": 3238,
                     "name": "VariableDeclaration",
                     "src": "483:17:6"
                   }
                 ],
-                "id": 3243,
+                "id": 3239,
                 "name": "ParameterList",
                 "src": "482:20:6"
               },
@@ -1878,7 +1878,7 @@
                   ]
                 },
                 "children": [],
-                "id": 3244,
+                "id": 3240,
                 "name": "ParameterList",
                 "src": "503:0:6"
               },
@@ -1921,7 +1921,7 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 3245,
+                            "id": 3241,
                             "name": "Identifier",
                             "src": "514:7:6"
                           },
@@ -1944,11 +1944,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 3242,
+                                  "referencedDeclaration": 3238,
                                   "type": "address",
                                   "value": "_members"
                                 },
-                                "id": 3246,
+                                "id": 3242,
                                 "name": "Identifier",
                                 "src": "522:8:6"
                               },
@@ -1986,12 +1986,12 @@
                                         "attributes": {
                                           "name": "address"
                                         },
-                                        "id": 3247,
+                                        "id": 3243,
                                         "name": "ElementaryTypeName",
                                         "src": "534:7:6"
                                       }
                                     ],
-                                    "id": 3248,
+                                    "id": 3244,
                                     "name": "ElementaryTypeNameExpression",
                                     "src": "534:7:6"
                                   },
@@ -2006,17 +2006,17 @@
                                       "type": "int_const 0",
                                       "value": "0"
                                     },
-                                    "id": 3249,
+                                    "id": 3245,
                                     "name": "Literal",
                                     "src": "542:1:6"
                                   }
                                 ],
-                                "id": 3250,
+                                "id": 3246,
                                 "name": "FunctionCall",
                                 "src": "534:10:6"
                               }
                             ],
-                            "id": 3251,
+                            "id": 3247,
                             "name": "BinaryOperation",
                             "src": "522:22:6"
                           },
@@ -2031,17 +2031,17 @@
                               "type": "literal_string \"MemberHelpers:constructor - Member address can't be 0\"",
                               "value": "MemberHelpers:constructor - Member address can't be 0"
                             },
-                            "id": 3252,
+                            "id": 3248,
                             "name": "Literal",
                             "src": "546:55:6"
                           }
                         ],
-                        "id": 3253,
+                        "id": 3249,
                         "name": "FunctionCall",
                         "src": "514:88:6"
                       }
                     ],
-                    "id": 3254,
+                    "id": 3250,
                     "name": "ExpressionStatement",
                     "src": "514:88:6"
                   },
@@ -2062,11 +2062,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3240,
+                              "referencedDeclaration": 3236,
                               "type": "contract Members",
                               "value": "members"
                             },
-                            "id": 3255,
+                            "id": 3251,
                             "name": "Identifier",
                             "src": "613:7:6"
                           },
@@ -2096,11 +2096,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 4504,
+                                  "referencedDeclaration": 4500,
                                   "type": "type(contract Members)",
                                   "value": "Members"
                                 },
-                                "id": 3256,
+                                "id": 3252,
                                 "name": "Identifier",
                                 "src": "623:7:6"
                               },
@@ -2109,26 +2109,26 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 3242,
+                                  "referencedDeclaration": 3238,
                                   "type": "address",
                                   "value": "_members"
                                 },
-                                "id": 3257,
+                                "id": 3253,
                                 "name": "Identifier",
                                 "src": "631:8:6"
                               }
                             ],
-                            "id": 3258,
+                            "id": 3254,
                             "name": "FunctionCall",
                             "src": "623:17:6"
                           }
                         ],
-                        "id": 3259,
+                        "id": 3255,
                         "name": "Assignment",
                         "src": "613:27:6"
                       }
                     ],
-                    "id": 3260,
+                    "id": 3256,
                     "name": "ExpressionStatement",
                     "src": "613:27:6"
                   },
@@ -2164,11 +2164,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 4904,
+                              "referencedDeclaration": 4900,
                               "type": "function (bytes32,address)",
                               "value": "_setupRole"
                             },
-                            "id": 3261,
+                            "id": 3257,
                             "name": "Identifier",
                             "src": "651:10:6"
                           },
@@ -2177,11 +2177,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 4721,
+                              "referencedDeclaration": 4717,
                               "type": "bytes32",
                               "value": "DEFAULT_ADMIN_ROLE"
                             },
-                            "id": 3262,
+                            "id": 3258,
                             "name": "Identifier",
                             "src": "662:18:6"
                           },
@@ -2204,32 +2204,32 @@
                                   "type": "msg",
                                   "value": "msg"
                                 },
-                                "id": 3263,
+                                "id": 3259,
                                 "name": "Identifier",
                                 "src": "682:3:6"
                               }
                             ],
-                            "id": 3264,
+                            "id": 3260,
                             "name": "MemberAccess",
                             "src": "682:10:6"
                           }
                         ],
-                        "id": 3265,
+                        "id": 3261,
                         "name": "FunctionCall",
                         "src": "651:42:6"
                       }
                     ],
-                    "id": 3266,
+                    "id": 3262,
                     "name": "ExpressionStatement",
                     "src": "651:42:6"
                   }
                 ],
-                "id": 3267,
+                "id": 3263,
                 "name": "Block",
                 "src": "503:198:6"
               }
             ],
-            "id": 3268,
+            "id": 3264,
             "name": "FunctionDefinition",
             "src": "471:230:6"
           },
@@ -2244,7 +2244,7 @@
                 "attributes": {
                   "text": "@dev check if caller is a setter     "
                 },
-                "id": 3269,
+                "id": 3265,
                 "name": "StructuredDocumentation",
                 "src": "710:41:6"
               },
@@ -2255,7 +2255,7 @@
                   ]
                 },
                 "children": [],
-                "id": 3270,
+                "id": 3266,
                 "name": "ParameterList",
                 "src": "775:0:6"
               },
@@ -2298,7 +2298,7 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 3271,
+                            "id": 3267,
                             "name": "Identifier",
                             "src": "786:7:6"
                           },
@@ -2332,11 +2332,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 4767,
+                                  "referencedDeclaration": 4763,
                                   "type": "function (bytes32,address) view returns (bool)",
                                   "value": "hasRole"
                                 },
-                                "id": 3272,
+                                "id": 3268,
                                 "name": "Identifier",
                                 "src": "794:7:6"
                               },
@@ -2345,11 +2345,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 3231,
+                                  "referencedDeclaration": 3227,
                                   "type": "bytes32",
                                   "value": "SETTER_ROLE"
                                 },
-                                "id": 3273,
+                                "id": 3269,
                                 "name": "Identifier",
                                 "src": "802:11:6"
                               },
@@ -2372,17 +2372,17 @@
                                       "type": "msg",
                                       "value": "msg"
                                     },
-                                    "id": 3274,
+                                    "id": 3270,
                                     "name": "Identifier",
                                     "src": "815:3:6"
                                   }
                                 ],
-                                "id": 3275,
+                                "id": 3271,
                                 "name": "MemberAccess",
                                 "src": "815:10:6"
                               }
                             ],
-                            "id": 3276,
+                            "id": 3272,
                             "name": "FunctionCall",
                             "src": "794:32:6"
                           },
@@ -2397,32 +2397,32 @@
                               "type": "literal_string \"Members:isSetter - Caller is not a setter\"",
                               "value": "Members:isSetter - Caller is not a setter"
                             },
-                            "id": 3277,
+                            "id": 3273,
                             "name": "Literal",
                             "src": "828:43:6"
                           }
                         ],
-                        "id": 3278,
+                        "id": 3274,
                         "name": "FunctionCall",
                         "src": "786:86:6"
                       }
                     ],
-                    "id": 3279,
+                    "id": 3275,
                     "name": "ExpressionStatement",
                     "src": "786:86:6"
                   },
                   {
-                    "id": 3280,
+                    "id": 3276,
                     "name": "PlaceholderStatement",
                     "src": "885:1:6"
                   }
                 ],
-                "id": 3281,
+                "id": 3277,
                 "name": "Block",
                 "src": "775:119:6"
               }
             ],
-            "id": 3282,
+            "id": 3278,
             "name": "ModifierDefinition",
             "src": "757:137:6"
           },
@@ -2433,7 +2433,7 @@
               "isConstructor": false,
               "kind": "function",
               "name": "updateMinDepositDays",
-              "scope": 3307,
+              "scope": 3303,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "public"
@@ -2443,7 +2443,7 @@
                 "attributes": {
                   "text": " @dev to be called by Governance contract to update days to calculate enterprise min deposit requirements\n @param _minDepositDays new value of min deposit days"
                 },
-                "id": 3283,
+                "id": 3279,
                 "name": "StructuredDocumentation",
                 "src": "2437:183:6"
               },
@@ -2454,7 +2454,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_minDepositDays",
-                      "scope": 3306,
+                      "scope": 3302,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2466,17 +2466,17 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 3284,
+                        "id": 3280,
                         "name": "ElementaryTypeName",
                         "src": "2656:7:6"
                       }
                     ],
-                    "id": 3285,
+                    "id": 3281,
                     "name": "VariableDeclaration",
                     "src": "2656:23:6"
                   }
                 ],
-                "id": 3286,
+                "id": 3282,
                 "name": "ParameterList",
                 "src": "2655:25:6"
               },
@@ -2487,7 +2487,7 @@
                   ]
                 },
                 "children": [],
-                "id": 3289,
+                "id": 3285,
                 "name": "ParameterList",
                 "src": "2700:0:6"
               },
@@ -2503,16 +2503,16 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 3282,
+                      "referencedDeclaration": 3278,
                       "type": "modifier ()",
                       "value": "isSetter"
                     },
-                    "id": 3287,
+                    "id": 3283,
                     "name": "Identifier",
                     "src": "2688:8:6"
                   }
                 ],
-                "id": 3288,
+                "id": 3284,
                 "name": "ModifierInvocation",
                 "src": "2688:10:6"
               },
@@ -2555,7 +2555,7 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 3290,
+                            "id": 3286,
                             "name": "Identifier",
                             "src": "2713:7:6"
                           },
@@ -2578,11 +2578,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 3285,
+                                  "referencedDeclaration": 3281,
                                   "type": "uint256",
                                   "value": "_minDepositDays"
                                 },
-                                "id": 3291,
+                                "id": 3287,
                                 "name": "Identifier",
                                 "src": "2721:15:6"
                               },
@@ -2597,12 +2597,12 @@
                                   "type": "int_const 0",
                                   "value": "0"
                                 },
-                                "id": 3292,
+                                "id": 3288,
                                 "name": "Literal",
                                 "src": "2740:1:6"
                               }
                             ],
-                            "id": 3293,
+                            "id": 3289,
                             "name": "BinaryOperation",
                             "src": "2721:20:6"
                           },
@@ -2617,17 +2617,17 @@
                               "type": "literal_string \"Members:updateMinDepositDays - New value for the min deposit days can't be 0\"",
                               "value": "Members:updateMinDepositDays - New value for the min deposit days can't be 0"
                             },
-                            "id": 3294,
+                            "id": 3290,
                             "name": "Literal",
                             "src": "2743:78:6"
                           }
                         ],
-                        "id": 3295,
+                        "id": 3291,
                         "name": "FunctionCall",
                         "src": "2713:109:6"
                       }
                     ],
-                    "id": 3296,
+                    "id": 3292,
                     "name": "ExpressionStatement",
                     "src": "2713:109:6"
                   },
@@ -2648,11 +2648,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3234,
+                              "referencedDeclaration": 3230,
                               "type": "uint256",
                               "value": "minDepositDays"
                             },
-                            "id": 3297,
+                            "id": 3293,
                             "name": "Identifier",
                             "src": "2833:14:6"
                           },
@@ -2661,21 +2661,21 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3285,
+                              "referencedDeclaration": 3281,
                               "type": "uint256",
                               "value": "_minDepositDays"
                             },
-                            "id": 3298,
+                            "id": 3294,
                             "name": "Identifier",
                             "src": "2850:15:6"
                           }
                         ],
-                        "id": 3299,
+                        "id": 3295,
                         "name": "Assignment",
                         "src": "2833:32:6"
                       }
                     ],
-                    "id": 3300,
+                    "id": 3296,
                     "name": "ExpressionStatement",
                     "src": "2833:32:6"
                   },
@@ -2707,11 +2707,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3238,
+                              "referencedDeclaration": 3234,
                               "type": "function (uint256)",
                               "value": "LogUpdateMinDepositDays"
                             },
-                            "id": 3301,
+                            "id": 3297,
                             "name": "Identifier",
                             "src": "2881:23:6"
                           },
@@ -2720,41 +2720,41 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3285,
+                              "referencedDeclaration": 3281,
                               "type": "uint256",
                               "value": "_minDepositDays"
                             },
-                            "id": 3302,
+                            "id": 3298,
                             "name": "Identifier",
                             "src": "2905:15:6"
                           }
                         ],
-                        "id": 3303,
+                        "id": 3299,
                         "name": "FunctionCall",
                         "src": "2881:40:6"
                       }
                     ],
-                    "id": 3304,
+                    "id": 3300,
                     "name": "EmitStatement",
                     "src": "2876:45:6"
                   }
                 ],
-                "id": 3305,
+                "id": 3301,
                 "name": "Block",
                 "src": "2700:229:6"
               }
             ],
-            "id": 3306,
+            "id": 3302,
             "name": "FunctionDefinition",
             "src": "2626:303:6"
           }
         ],
-        "id": 3307,
+        "id": 3303,
         "name": "ContractDefinition",
         "src": "217:2723:6"
       }
     ],
-    "id": 3308,
+    "id": 3304,
     "name": "SourceUnit",
     "src": "33:2907:6"
   },
@@ -4058,14 +4058,103 @@
       "transactionHash": "0x1de82d89878fdd5faed08b1083c9d058276227b2075d69743cae64a20daa9c38"
     },
     "1619746154884": {
-      "events": {},
+      "events": {
+        "0x3ef37ec580f71948d160049e31c67ac1e6fc9711038f837710cdfaf9074d7b85": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "minDepositDays",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogUpdateMinDepositDays",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        }
+      },
       "links": {},
-      "address": "0x6f05Fa2FA6f21A2a004AAe7215d6173A0646B0a2",
-      "transactionHash": "0x14ee114d6032d162edcdd5def830973ef5202b2328e8a31fa59e143cedefe9fe"
+      "address": "0x24ec29744aF8E20cb855A064869c4B12b03666c0",
+      "transactionHash": "0xef926e5d6d1be66ea0a19ffce7ce6f9cdc14550b51f82339edadd88f0747d89b"
     }
   },
   "schemaVersion": "3.4.0",
-  "updatedAt": "2021-04-30T01:31:53.123Z",
+  "updatedAt": "2021-04-30T20:40:15.988Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

@@ -245,121 +245,121 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await members.dataSubscriberPayment(cohortAddress, 1, { from: dataSubscriber });
 
 
-  // // Governance data
-  // await token.delegate(accounts[1], { from: accounts[1] });
-  // await token.delegate(accounts[2], { from: accounts[2] });
-  // await token.delegate(accounts[4], { from: accounts[4] });
-  // await token.delegate(accounts[3], { from: accounts[3] });
-  // await token.delegate(accounts[4], { from: accounts[5] });
-  // await token.delegate(accounts[1], { from: accounts[0] });
-  // await token.delegate(accounts[6], { from: accounts[6] });
-  // await token.delegate(accounts[7], { from: accounts[7] });
-  // await token.delegate(accounts[8], { from: accounts[8] });
+  // Governance data
+  await token.delegate(accounts[1], { from: accounts[1] });
+  await token.delegate(accounts[2], { from: accounts[2] });
+  await token.delegate(accounts[4], { from: accounts[4] });
+  await token.delegate(accounts[3], { from: accounts[3] });
+  await token.delegate(accounts[4], { from: accounts[5] });
+  await token.delegate(accounts[1], { from: accounts[0] });
+  await token.delegate(accounts[6], { from: accounts[6] });
+  await token.delegate(accounts[7], { from: accounts[7] });
+  await token.delegate(accounts[8], { from: accounts[8] });
 
-  // values = ["0"];
-  // signatures = ["getBalanceOf(address)", "approve(address)"];
+  values = ["0"];
+  signatures = ["getBalanceOf(address)", "approve(address)"];
 
-  // let description1 = "# Changing SAI collateral factor to 55%\n" +
-  //   "First proposal that intent to slowly close the SAI market.\n" +
-  //   "The [first](https://compound.finance/governance/proposals/3) proposal in this topic has been successfully executed, continuing with recent analysis of accounts.\n" +
-  //   "**Collateral Factor**\n" +
-  //   "Going from 65% to 55% with the current market prices **would cause** two liquidations on the analyzed accounts.\n" +
-  //   "![Analysis](https://i.imgur.com/KIuG5E2.png)\n" +
-  //   "(The list does not contain accounts that hold less than 50 SAI)\n" +
-  //   "[Analyzed accounts](https://i.imgur.com/KIuG5E2.png)\n" +
-  //   "[Forum discussion!](https://compound.comradery.io/post/1600)\n"
+  let description1 = "# Changing SAI collateral factor to 55%\n" +
+    "First proposal that intent to slowly close the SAI market.\n" +
+    "The [first](https://compound.finance/governance/proposals/3) proposal in this topic has been successfully executed, continuing with recent analysis of accounts.\n" +
+    "**Collateral Factor**\n" +
+    "Going from 65% to 55% with the current market prices **would cause** two liquidations on the analyzed accounts.\n" +
+    "![Analysis](https://i.imgur.com/KIuG5E2.png)\n" +
+    "(The list does not contain accounts that hold less than 50 SAI)\n" +
+    "[Analyzed accounts](https://i.imgur.com/KIuG5E2.png)\n" +
+    "[Forum discussion!](https://compound.comradery.io/post/1600)\n"
 
-  // let description2 = "# Adjusting Reserve Factors%\n" +
-  //   "Second proposal that intent to slowly close the SAI market.\n"
+  let description2 = "# Adjusting Reserve Factors%\n" +
+    "Second proposal that intent to slowly close the SAI market.\n"
 
-  // let description3 = "# Uniswap Improvement Strategy\n" +
-  //   "Third proposal that intent to slowly close the SAI market.\n"
+  let description3 = "# Uniswap Improvement Strategy\n" +
+    "Third proposal that intent to slowly close the SAI market.\n"
 
 
-  // let description4 = "# Upgrade cUSDT Interest Rate Model\n" +
-  //   "Recently, Dharma led the community to release a new upgradable\n" +
-  //   "interest rate model contract for cDAI based on the new JumpRateModelV2.\n" +
-  //   "This proposal updates the cUSDT interest rate model to a recently deployed\n" +
-  //   "JumpRateModelV2 with the same parameters as the current cDAI interest rate model:\n"
+  let description4 = "# Upgrade cUSDT Interest Rate Model\n" +
+    "Recently, Dharma led the community to release a new upgradable\n" +
+    "interest rate model contract for cDAI based on the new JumpRateModelV2.\n" +
+    "This proposal updates the cUSDT interest rate model to a recently deployed\n" +
+    "JumpRateModelV2 with the same parameters as the current cDAI interest rate model:\n"
 
-  // // let calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
-  // let calldata = [abi.encode(['uint256', 'uint256'], [(5e18).toString(), 0])];
+  // let calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
+  let calldata = [abi.encode(['uint256', 'uint256'], [(5e18).toString(), 0])];
 
-  // let signature = ['updateMinValidatorsPerCohort(uint256,uint256)'];
+  let signature = ['updateMinValidatorsPerCohort(uint256,uint256)'];
 
-  // result = await gov.propose([cohortFactory.address], values, signature, calldata, description1, { from: accounts[2] });
+  result = await gov.propose([cohortFactory.address], values, signature, calldata, description1, { from: accounts[2] });
 
-  // let test = await gov.getPastEvents('ProposalCreated');
+  let test = await gov.getPastEvents('ProposalCreated');
 
-  // event = result.logs[0];
+  event = result.logs[0];
 
   
-  // values = ["0", "0"];
-  // calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
-  // result = await gov.propose([accounts[1], accounts[3]], values, signatures, calldata, description2, { from: accounts[1] });
+  values = ["0", "0"];
+  calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
+  result = await gov.propose([accounts[1], accounts[3]], values, signatures, calldata, description2, { from: accounts[1] });
 
-  // result = await gov.propose([accounts[4], accounts[5]], values, signatures, calldata, description3, { from: accounts[4] });
+  result = await gov.propose([accounts[4], accounts[5]], values, signatures, calldata, description3, { from: accounts[4] });
 
-  // result = await gov.castVote(1, 1, { from: accounts[1] });
+  result = await gov.castVote(1, 1, { from: accounts[1] });
 
-  // await gov.castVote(1, 1, { from: accounts[2] });
-  // await gov.castVote(1, 1, { from: accounts[3] });
-  // await gov.castVote(1, 1, { from: accounts[4] });
-  // await gov.castVote(1, 1, { from: accounts[6] });
-  // await gov.castVote(1, 1, { from: accounts[7] });
-
-
-
-  // let receipt = await gov.getReceipt(1, accounts[1]);
-  // blockNumber = await web3.eth.getBlockNumber();
-
-  // let state = await gov.state(1)
-
-  // console.log("state before:", state.toString());
-
-  // for (x = 1; x <= 300; ++x) {
-  //   timeMachine.advanceBlock();
-  // }
-
-  // blockNumber = await web3.eth.getBlockNumber();
-  // console.log("block Number after:" + blockNumber);
-  // state = await gov.state(1)
-  // console.log("state after:", state.toString());
-  // await gov.queue(1, { from: accounts[0] });
-  // timeMachine.advanceTimeAndBlock(60 * 60 * 6);
-  // await gov.execute(1, { from: accounts[0] });
-  // blockNumber = await web3.eth.getBlockNumber();
+  await gov.castVote(1, 1, { from: accounts[2] });
+  await gov.castVote(1, 1, { from: accounts[3] });
+  await gov.castVote(1, 1, { from: accounts[4] });
+  await gov.castVote(1, 1, { from: accounts[6] });
+  await gov.castVote(1, 1, { from: accounts[7] });
 
 
 
-  // let newUpdateRewards = await members.amountTokensPerValidation();
+  let receipt = await gov.getReceipt(1, accounts[1]);
+  blockNumber = await web3.eth.getBlockNumber();
 
-  // console.log("updateRewards", newUpdateRewards.toString());
+  let state = await gov.state(1)
 
-  // values = ["0", "0"];
-  // calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
+  console.log("state before:", state.toString());
 
-  // calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
-  // result = await gov.propose([accounts[3], accounts[1]], values, signatures, calldata, description4, { from: accounts[3] });
-  // event = result.logs[0];
+  for (x = 1; x <= 300; ++x) {
+    timeMachine.advanceBlock();
+  }
 
-  // // state = await gov.state(4);
-  // //  console.log("state:" + state);
-
-  // timeMachine.advanceBlock();
-
-  // await gov.castVote(4, 0, { from: accounts[1] });
-  // await gov.castVote(4, 0, { from: accounts[2] });
-  // await gov.castVote(4, 1, { from: accounts[3] });
-  // await gov.castVote(4, 1, { from: accounts[4] });
-  // await gov.castVote(4, 1, { from: accounts[6] });
-  // await gov.castVote(4, 0, { from: accounts[7] });
+  blockNumber = await web3.eth.getBlockNumber();
+  console.log("block Number after:" + blockNumber);
+  state = await gov.state(1)
+  console.log("state after:", state.toString());
+  await gov.queue(1, { from: accounts[0] });
+  timeMachine.advanceTimeAndBlock(60 * 60 * 6);
+  await gov.execute(1, { from: accounts[0] });
+  blockNumber = await web3.eth.getBlockNumber();
 
 
-  // await gov.cancel(2, { from: accounts[0] });
 
-  // result = await gov.propose([accounts[1], accounts[2]], values, signatures, calldata, "Test to cancel", { from: accounts[1] });
-  // await gov.cancel(5, { from: accounts[0] });
+  let newUpdateRewards = await members.amountTokensPerValidation();
+
+  console.log("updateRewards", newUpdateRewards.toString());
+
+  values = ["0", "0"];
+  calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
+
+  calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
+  result = await gov.propose([accounts[3], accounts[1]], values, signatures, calldata, description4, { from: accounts[3] });
+  event = result.logs[0];
+
+  // state = await gov.state(4);
+  //  console.log("state:" + state);
+
+  timeMachine.advanceBlock();
+
+  await gov.castVote(4, 0, { from: accounts[1] });
+  await gov.castVote(4, 0, { from: accounts[2] });
+  await gov.castVote(4, 1, { from: accounts[3] });
+  await gov.castVote(4, 1, { from: accounts[4] });
+  await gov.castVote(4, 1, { from: accounts[6] });
+  await gov.castVote(4, 0, { from: accounts[7] });
+
+
+  await gov.cancel(2, { from: accounts[0] });
+
+  result = await gov.propose([accounts[1], accounts[2]], values, signatures, calldata, "Test to cancel", { from: accounts[1] });
+  await gov.cancel(5, { from: accounts[0] });
 
   
 
