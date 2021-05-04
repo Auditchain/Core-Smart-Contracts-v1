@@ -34,15 +34,15 @@
     "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol",
     "exportedSymbols": {
       "MigrationAgent": [
-        5094
+        6530
       ]
     },
-    "id": 5095,
+    "id": 6531,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5085,
+        "id": 6521,
         "literals": [
           "solidity",
           "=",
@@ -50,7 +50,7 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:11"
+        "src": "33:23:12"
       },
       {
         "abstract": true,
@@ -58,39 +58,39 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 5086,
+          "id": 6522,
           "nodeType": "StructuredDocumentation",
-          "src": "60:38:11",
+          "src": "60:38:12",
           "text": "@title Migration Agent interface"
         },
         "fullyImplemented": false,
-        "id": 5094,
+        "id": 6530,
         "linearizedBaseContracts": [
-          5094
+          6530
         ],
         "name": "MigrationAgent",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "7a3130e3",
-            "id": 5093,
+            "id": 6529,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "migrateFrom",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5091,
+              "id": 6527,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5088,
+                  "id": 6524,
                   "mutability": "mutable",
                   "name": "_from",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5093,
-                  "src": "161:13:11",
+                  "scope": 6529,
+                  "src": "161:13:12",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -98,10 +98,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5087,
+                    "id": 6523,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "161:7:11",
+                    "src": "161:7:12",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -112,12 +112,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5090,
+                  "id": 6526,
                   "mutability": "mutable",
                   "name": "_value",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5093,
-                  "src": "176:14:11",
+                  "scope": 6529,
+                  "src": "176:14:12",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -125,10 +125,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5089,
+                    "id": 6525,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "176:7:11",
+                    "src": "176:7:12",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -137,33 +137,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "160:31:11"
+              "src": "160:31:12"
             },
             "returnParameters": {
-              "id": 5092,
+              "id": 6528,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "206:0:11"
+              "src": "206:0:12"
             },
-            "scope": 5094,
-            "src": "140:67:11",
+            "scope": 6530,
+            "src": "140:67:12",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "public"
           }
         ],
-        "scope": 5095,
-        "src": "98:112:11"
+        "scope": 6531,
+        "src": "98:112:12"
       }
     ],
-    "src": "33:177:11"
+    "src": "33:177:12"
   },
   "legacyAST": {
     "attributes": {
       "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol",
       "exportedSymbols": {
         "MigrationAgent": [
-          5094
+          6530
         ]
       },
       "license": "MIT"
@@ -178,9 +178,9 @@
             ".6"
           ]
         },
-        "id": 5085,
+        "id": 6521,
         "name": "PragmaDirective",
-        "src": "33:23:11"
+        "src": "33:23:12"
       },
       {
         "attributes": {
@@ -194,19 +194,19 @@
           "contractKind": "contract",
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            5094
+            6530
           ],
           "name": "MigrationAgent",
-          "scope": 5095
+          "scope": 6531
         },
         "children": [
           {
             "attributes": {
               "text": "@title Migration Agent interface"
             },
-            "id": 5086,
+            "id": 6522,
             "name": "StructuredDocumentation",
-            "src": "60:38:11"
+            "src": "60:38:12"
           },
           {
             "attributes": {
@@ -218,7 +218,7 @@
                 null
               ],
               "name": "migrateFrom",
-              "scope": 5094,
+              "scope": 6530,
               "stateMutability": "nonpayable",
               "virtual": true,
               "visibility": "public"
@@ -231,7 +231,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_from",
-                      "scope": 5093,
+                      "scope": 6529,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -244,21 +244,21 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 5087,
+                        "id": 6523,
                         "name": "ElementaryTypeName",
-                        "src": "161:7:11"
+                        "src": "161:7:12"
                       }
                     ],
-                    "id": 5088,
+                    "id": 6524,
                     "name": "VariableDeclaration",
-                    "src": "161:13:11"
+                    "src": "161:13:12"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_value",
-                      "scope": 5093,
+                      "scope": 6529,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -270,19 +270,19 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 5089,
+                        "id": 6525,
                         "name": "ElementaryTypeName",
-                        "src": "176:7:11"
+                        "src": "176:7:12"
                       }
                     ],
-                    "id": 5090,
+                    "id": 6526,
                     "name": "VariableDeclaration",
-                    "src": "176:14:11"
+                    "src": "176:14:12"
                   }
                 ],
-                "id": 5091,
+                "id": 6527,
                 "name": "ParameterList",
-                "src": "160:31:11"
+                "src": "160:31:12"
               },
               {
                 "attributes": {
@@ -291,24 +291,24 @@
                   ]
                 },
                 "children": [],
-                "id": 5092,
+                "id": 6528,
                 "name": "ParameterList",
-                "src": "206:0:11"
+                "src": "206:0:12"
               }
             ],
-            "id": 5093,
+            "id": 6529,
             "name": "FunctionDefinition",
-            "src": "140:67:11"
+            "src": "140:67:12"
           }
         ],
-        "id": 5094,
+        "id": 6530,
         "name": "ContractDefinition",
-        "src": "98:112:11"
+        "src": "98:112:12"
       }
     ],
-    "id": 5095,
+    "id": 6531,
     "name": "SourceUnit",
-    "src": "33:177:11"
+    "src": "33:177:12"
   },
   "compiler": {
     "name": "solc",
@@ -316,7 +316,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.0",
-  "updatedAt": "2021-04-29T21:03:55.349Z",
+  "updatedAt": "2021-05-04T13:52:45.184Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

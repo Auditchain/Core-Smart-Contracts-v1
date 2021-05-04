@@ -145,7 +145,7 @@ contract("Cohort contract", (accounts) => {
             await token.transfer(enterprise1, auditTokenMin, { from: owner });
             await token.approve(members.address, auditTokenMin, { from: enterprise1 });
             await members.stake(auditTokenMin, { from: enterprise1 });
-            let result = await cohortContract.methods.initializeValidation(documentHash).send({ from: enterprise1 });
+            let result = await cohortContract.methods.initializeValidation(documentHash, "url").send({ from: enterprise1, gas: 200000 });
 
             let validationTime = result.events.ValidationInitialized.returnValues.initTime;
             let validationHash = web3.utils.soliditySha3(documentHash, validationTime);
@@ -159,7 +159,7 @@ contract("Cohort contract", (accounts) => {
 
             let documentHash = web3.utils.soliditySha3("2+2=4");
             try {
-                let result = await cohortContract.methods.initializeValidation(documentHash).send({ from: enterprise1 });
+                let result = await cohortContract.methods.initializeValidation(documentHash, "url").send({ from: enterprise1, gas: 200000 });
             }
             catch (error) {
                 ensureException(error);
@@ -172,7 +172,7 @@ contract("Cohort contract", (accounts) => {
             let documentHash = web3.utils.soliditySha3("2+2=4");
 
             try {
-                let result = await cohortContract.methods.initializeValidation(documentHash).send({ from: owner });
+                let result = await cohortContract.methods.initializeValidation(documentHash, "url").send({ from: owner, gas: 200000 });
             }
             catch (error) {
                 ensureException(error);
@@ -190,7 +190,7 @@ contract("Cohort contract", (accounts) => {
             await token.approve(members.address, auditTokenMin, { from: enterprise1 });
             await members.stake(auditTokenMin, { from: enterprise1 });
             documentHash = web3.utils.soliditySha3("2+2=4");
-            let result = await cohortContract.methods.initializeValidation(documentHash).send({ from: enterprise1 });
+            let result = await cohortContract.methods.initializeValidation(documentHash, "url").send({ from: enterprise1, gas: 200000 });
             validationInitTime = result.events.ValidationInitialized.returnValues.initTime;
 
         })
@@ -243,7 +243,7 @@ contract("Cohort contract", (accounts) => {
             await token.approve(members.address, auditTokenMin, { from: enterprise1 });
             await members.stake(auditTokenMin, { from: enterprise1 });
             documentHash = web3.utils.soliditySha3("2+2=4");
-            let result = await cohortContract.methods.initializeValidation(documentHash).send({ from: enterprise1 });
+            let result = await cohortContract.methods.initializeValidation(documentHash, "url").send({ from: enterprise1, gas: 200000 });
             validationInitTime = result.events.ValidationInitialized.returnValues.initTime;
             validationHash = web3.utils.soliditySha3(documentHash, validationInitTime);
 
@@ -275,7 +275,7 @@ contract("Cohort contract", (accounts) => {
             await token.approve(members.address, auditTokenMin, { from: enterprise1 });
             await members.stake(auditTokenMin, { from: enterprise1 });
             documentHash = web3.utils.soliditySha3("2+2=4");
-            let result = await cohortContract.methods.initializeValidation(documentHash).send({ from: enterprise1 });
+            let result = await cohortContract.methods.initializeValidation(documentHash, "url").send({ from: enterprise1, gas: 200000 });
             validationInitTime = result.events.ValidationInitialized.returnValues.initTime;
             validationHash = web3.utils.soliditySha3(documentHash, validationInitTime);
 
@@ -314,7 +314,7 @@ contract("Cohort contract", (accounts) => {
             await token.approve(members.address, auditTokenMin, { from: enterprise1 });
             await members.stake(auditTokenMin, { from: enterprise1 });
             documentHash = web3.utils.soliditySha3("2+2=4");
-            let result = await cohortContract.methods.initializeValidation(documentHash).send({ from: enterprise1 });
+            let result = await cohortContract.methods.initializeValidation(documentHash, "url").send({ from: enterprise1, gas: 200000 });
             validationInitTime = result.events.ValidationInitialized.returnValues.initTime;
             validationHash = web3.utils.soliditySha3(documentHash, validationInitTime);
 
