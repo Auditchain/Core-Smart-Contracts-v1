@@ -82,6 +82,7 @@ async function getEnterprises() {
     const enterpriseList= [];
 
     for (let i=0; i< enterprises.length; i++){
+        if (enterprises[i].returnValues.userType == 0)
         enterpriseList.push({address: enterprises[i].returnValues.user, name: enterprises[i].returnValues.name });
     }
     return enterpriseList;
