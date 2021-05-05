@@ -4,7 +4,8 @@ const Cohort = require('../build/contracts/Cohort.json');
 const CohortFactory = artifacts.require('..build/contracts/CohortFactory.sol');
 const CreateCohort = artifacts.require('..build/contracts/CreateCohort.sol');
 const GovernorAlpha = artifacts.require('../build/contracts/GovernorAlpha.sol')
-const MemberHelpers = artifacts.require('../build/contracts/MemberHelpers.sol')
+const MemberHelpers = artifacts.require('../build/contracts/MemberHelpers.sol');
+const NFT = artifacts.require('./RulesERC721Token.sol');
 
 
 const Timelock = artifacts.require('./Governance/Timelock.sol');
@@ -76,6 +77,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   await deployer.deploy(MemberHelpers, members.address);
   let memberHelper = await MemberHelpers.deployed();
+
+  await deployer.deploy(NFT, "Test", "Test");
+  let nft = await NFT.deployed();
 
   await timelock.setPendingAdmin(gov.address, { from: admin });
   await timelock.acceptAdmin({ from: admin });
@@ -218,7 +222,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   cohortContract = new web3.eth.Contract(Cohort["abi"], cohortAddress);
   await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
 
-  
+
 
   documentHash = web3.utils.soliditySha3("test5");
   result = await cohortContract.methods.initializeValidation(documentHash, "QmfZ63DeUzc6843Q5Nnj2YJqj89DkagEsUMYAA7Miegyqn/Auditchain").send({ from: enterprise1, gas: 6000000 });
@@ -293,7 +297,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   event = result.logs[0];
 
-  
+
   values = ["0", "0"];
   calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
   result = await gov.propose([accounts[1], accounts[3]], values, signatures, calldata, description2, { from: accounts[1] });
@@ -361,7 +365,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   result = await gov.propose([accounts[1], accounts[2]], values, signatures, calldata, "Test to cancel", { from: accounts[1] });
   await gov.cancel(5, { from: accounts[0] });
 
-  
+
 
 
   console.log("\n\n" + '"AUDT_TOKEN_ADDRESS":"' + token.address + '",');
@@ -370,7 +374,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('"CREATE_COHORT_ADDRESS":"' + createCohort.address + '",');
   console.log('"COHORT_FACTORY_ADDRESS":"' + cohortFactory.address + '",');
   console.log('"GOVERNOR_ALPHA_ADDRESS":"' + gov.address + '",');
-  console.log('"TIMELOCK_ADDRESS":"' + timelock.address + '"' + "\n\n");
+  console.log('"TIMELOCK_ADDRESS":"' + timelock.address + '",');
+  console.log('"NFT":"' + nft.address + '"' + "\n\n");
+
 
 
   console.log('COHORT_FACTORY_ADDRESS=' + cohortFactory.address);
@@ -379,6 +385,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('MEMBER_HELPERS_ADDRESS=' + memberHelper.address);
   console.log('GOVERNOR_ALPHA_ADDRESS=' + gov.address);
   console.log('TIMELOCK_ADDRESS=' + timelock.address);
+  console.log('RULES_NFT_ADDRESS=' + nft.address);
+
 
   console.log("React format:" + "\n\n");
 
@@ -389,7 +397,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('createCohortAddress:"' + createCohort.address + '",');
   console.log('cohortFactoryAddress:"' + cohortFactory.address + '",');
   console.log('governorAlphaAddress:"' + gov.address + '",');
-  console.log('timelockAddress:"' + timelock.address + '",' + "\n\n");
+  console.log('timelockAddress:"' + timelock.address + '",');
+  console.log('rulesNFTAddress:"' + nft.address + '",' + "\n\n");
+
 
 
 
