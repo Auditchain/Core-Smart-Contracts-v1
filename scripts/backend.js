@@ -7,10 +7,11 @@ let Web3 = require('web3');
 let HDWalletProvider = require('@truffle/hdwallet-provider');
 // let dotenv = require('dotenv');
 // dotenv.config();
-let dotenv  = require('dotenv').config({path:'./.env'})
+let dotenv = require('dotenv').config({ path: './.env' })
 
 const AUDITTOKEN = require('../build/contracts/AuditToken.json');
 const MEMBERS = require('../build/contracts/Members.json');
+const NFT = require('../build/contracts/RulesERC721Token.json')
 
 // import ethereum connection strings. 
 const ropsten_infura_server = process.env.ROPSTEN_INFURA_SERVER;
@@ -22,6 +23,7 @@ const mnemonic = process.env.MNEMONIC;
 // Address for smart contracts
 const auditTokenAddress = process.env.AUDT_TOKEN_ADDRESS;
 const membersAddress = process.env.MEMBER_ADDRESS;
+const rulesNFTAddress = process.env.RULES_NFT_ADDRESS
 
 const provider = new HDWalletProvider(mnemonic, local_host); // change to main_infura_server or another testnet. 
 const web3 = new Web3(provider);
@@ -29,6 +31,7 @@ const owner = provider.addresses[0];
 
 let token = new web3.eth.Contract(AUDITTOKEN["abi"], auditTokenAddress);
 let members = new web3.eth.Contract(MEMBERS["abi"], membersAddress);
+let nft = new web3.eth.Contract(NFT["abi"], rulesNFTAddress);
 
 
 
@@ -79,15 +82,28 @@ async function getEnterprises() {
         toBlock: 'latest'
     });
 
-    const enterpriseList= [];
+    const enterpriseList = [];
 
-    for (let i=0; i< enterprises.length; i++){
+    for (let i = 0; i < enterprises.length; i++) {
         if (enterprises[i].returnValues.userType == 0)
-        enterpriseList.push({address: enterprises[i].returnValues.user, name: enterprises[i].returnValues.name });
+            enterpriseList.push({ address: enterprises[i].returnValues.user, name: enterprises[i].returnValues.name });
     }
     return enterpriseList;
 }
 
+
+async function getNFTS() {
+
+    const tokenList = [];
+    let tokenCount = Number(await nft.methods.totalSupply().call());
+
+    for (let i = 0; i < tokenCount; i++) {
+        let tokenByIndex = await nft.methods.tokenByIndex(i).call();
+        let nftURI = await nft.methods.tokenURI(tokenByIndex).call();
+        tokenList.push({ nftId: i + 1, nftURI: nftURI })
+    }
+    return tokenList;
+}
 
 
 
@@ -129,7 +145,7 @@ app.get('/index.htm', function (req, res) {
     res.sendFile(__dirname + "/" + "index.htm");
 })
 
-app.get('/get_enterprises', function(req,res){
+app.get('/get_enterprises', function (req, res) {
 
     getEnterprises().then(async function (returnedData) {
         res.end(JSON.stringify(returnedData));
@@ -138,6 +154,17 @@ app.get('/get_enterprises', function(req,res){
     })
 
 })
+
+app.get('/get_nfts', function (req, res) {
+
+    getNFTS().then(async function (returnedData) {
+        res.end(JSON.stringify(returnedData));
+    }).catch(function (err) {
+        console.log(err);
+    })
+
+})
+
 
 
 var server = app.listen(8181, function () {

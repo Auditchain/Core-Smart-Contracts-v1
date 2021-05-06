@@ -225,7 +225,22 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
   documentHash = web3.utils.soliditySha3("test5");
-  result = await cohortContract.methods.initializeValidation(documentHash, "QmfZ63DeUzc6843Q5Nnj2YJqj89DkagEsUMYAA7Miegyqn/Auditchain").send({ from: enterprise1, gas: 6000000 });
+  result = await cohortContract.methods.initializeValidation(documentHash, "QmNhaANyYwWmfrRBfMbXyogPhBSTQdzFL8TiWbqjBmNuoc/Auditchain.json").send({ from: enterprise1, gas: 6000000 });
+  values = result.events.ValidationInitialized.returnValues;
+  validationHash = values.validationHash;
+  validationTime = values.initTime;
+
+  await cohortContract.methods.grantRole(CONTROLLER_ROLE, admin).send({ from: admin });
+  await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
+
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 900000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 900000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator3, gas: 900000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 900000 });
+
+
+  documentHash = web3.utils.soliditySha3("test56");
+  result = await cohortContract.methods.initializeValidation(documentHash, "QmeS86JjFut8ttA3NWutB4qkum3gQTnD4CtgMBQVvi3b3N/Auditchain.json").send({ from: enterprise1, gas: 6000000 });
   values = result.events.ValidationInitialized.returnValues;
   validationHash = values.validationHash;
   validationTime = values.initTime;
