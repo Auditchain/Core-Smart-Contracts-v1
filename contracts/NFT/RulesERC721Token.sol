@@ -41,9 +41,9 @@ contract RulesERC721Token is ERC721
         require(consensus == 1,  "RulesERC721Token:mintTo - This rule hasn't received sufficient quorum yet");
         require(!NFTCompleted[_hash], "RulesERC721Token:mintTo  - This token has been already claimed");
         uint256 newTokenId = _getNextTokenId();
-        _safeMint(enterprise, newTokenId);
-        _setTokenURI(newTokenId, url);
         NFTCompleted[_hash] = true;
+        _setTokenURI(newTokenId, url);
+        _safeMint(enterprise, newTokenId);
         emit Mint(newTokenId, enterprise);
         return newTokenId;
     }
