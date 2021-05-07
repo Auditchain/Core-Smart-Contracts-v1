@@ -42,8 +42,8 @@ contract RulesERC721Token is ERC721
         require(!NFTCompleted[_hash], "RulesERC721Token:mintTo  - This token has been already claimed");
         uint256 newTokenId = _getNextTokenId();
         NFTCompleted[_hash] = true;
-        _setTokenURI(newTokenId, url);
         _safeMint(enterprise, newTokenId);
+        _setTokenURI(newTokenId, url);
         emit Mint(newTokenId, enterprise);
         return newTokenId;
     }
