@@ -37,7 +37,7 @@ module.exports = {
         );
       },
       network_id: "*",
-      gas: 4000000
+      gas: 0x989680
     },
     ropsten: {
       provider: function () {
@@ -58,7 +58,7 @@ module.exports = {
         );
       },
       network_id: "*",
-      gas: 4000000
+      gas: 10000000
 
 
     },

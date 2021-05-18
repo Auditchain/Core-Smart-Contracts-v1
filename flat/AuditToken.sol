@@ -1565,7 +1565,6 @@ pragma experimental ABIEncoderV2;
 
 
 
-
 contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
       
     /// @notice A record of each accounts delegate
@@ -1605,9 +1604,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
     uint256 public totalMigrated;
     
     event Migrate(address indexed from, address indexed to, uint256 value);
-    event MigrationAgentSet(address indexed migrationAgent);
-    event LogControllerSet(address indexed controller);
-    event LogControllerRevoked(address indexed controller);
+    event MigrationAgentSet(address indexed migrationAgent);   
 
     /// @dev Constructor that gives an account all initial tokens.
     constructor(address account) ERC20("Auditchain", "AUDT") {

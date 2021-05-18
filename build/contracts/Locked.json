@@ -360,16 +360,16 @@
     "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Locked.sol",
     "exportedSymbols": {
       "AccessControl": [
-        7010
+        6988
       ],
       "Address": [
-        9719
+        9697
       ],
       "Context": [
-        9742
+        9720
       ],
       "EnumerableSet": [
-        10794
+        10772
       ],
       "Locked": [
         6519
@@ -396,7 +396,7 @@
         "id": 6342,
         "nodeType": "ImportDirective",
         "scope": 6520,
-        "sourceUnit": 7011,
+        "sourceUnit": 6989,
         "src": "60:58:11",
         "symbolAliases": [],
         "unitAlias": ""
@@ -409,10 +409,10 @@
               "id": 6344,
               "name": "AccessControl",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 7010,
+              "referencedDeclaration": 6988,
               "src": "236:13:11",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_AccessControl_$7010",
+                "typeIdentifier": "t_contract$_AccessControl_$6988",
                 "typeString": "contract AccessControl"
               }
             },
@@ -422,8 +422,8 @@
           }
         ],
         "contractDependencies": [
-          7010,
-          9742
+          6988,
+          9720
         ],
         "contractKind": "contract",
         "documentation": {
@@ -436,8 +436,8 @@
         "id": 6519,
         "linearizedBaseContracts": [
           6519,
-          7010,
-          9742
+          6988,
+          9720
         ],
         "name": "Locked",
         "nodeType": "ContractDefinition",
@@ -716,7 +716,7 @@
                           "name": "hasRole",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6799,
+                          "referencedDeclaration": 6777,
                           "src": "575:7:11",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_bytes32_$_t_address_$returns$_t_bool_$",
@@ -833,7 +833,7 @@
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 6753,
+                        "referencedDeclaration": 6731,
                         "src": "940:18:11",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -868,7 +868,7 @@
                       "name": "hasRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 6799,
+                      "referencedDeclaration": 6777,
                       "src": "932:7:11",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$_t_bytes32_$_t_address_$returns$_t_bool_$",
@@ -2500,16 +2500,16 @@
       "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Locked.sol",
       "exportedSymbols": {
         "AccessControl": [
-          7010
+          6988
         ],
         "Address": [
-          9719
+          9697
         ],
         "Context": [
-          9742
+          9720
         ],
         "EnumerableSet": [
-          10794
+          10772
         ],
         "Locked": [
           6519
@@ -2533,7 +2533,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 7011,
+          "SourceUnit": 6989,
           "absolutePath": "@openzeppelin/contracts/access/AccessControl.sol",
           "file": "@openzeppelin/contracts/access/AccessControl.sol",
           "scope": 6520,
@@ -2550,15 +2550,15 @@
         "attributes": {
           "abstract": false,
           "contractDependencies": [
-            7010,
-            9742
+            6988,
+            9720
           ],
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             6519,
-            7010,
-            9742
+            6988,
+            9720
           ],
           "name": "Locked",
           "scope": 6520
@@ -2578,7 +2578,7 @@
               {
                 "attributes": {
                   "name": "AccessControl",
-                  "referencedDeclaration": 7010,
+                  "referencedDeclaration": 6988,
                   "type": "contract AccessControl"
                 },
                 "id": 6344,
@@ -2900,7 +2900,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 6799,
+                                  "referencedDeclaration": 6777,
                                   "type": "function (bytes32,address) view returns (bool)",
                                   "value": "hasRole"
                                 },
@@ -3105,7 +3105,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6799,
+                              "referencedDeclaration": 6777,
                               "type": "function (bytes32,address) view returns (bool)",
                               "value": "hasRole"
                             },
@@ -3118,7 +3118,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6753,
+                              "referencedDeclaration": 6731,
                               "type": "bytes32",
                               "value": "DEFAULT_ADMIN_ROLE"
                             },
@@ -4858,7 +4858,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.0",
-  "updatedAt": "2021-05-04T13:52:45.181Z",
+  "updatedAt": "2021-05-07T19:53:16.737Z",
   "devdoc": {
     "details": "Smart contract to enable locking and unlocking of token holders. ",
     "kind": "dev",

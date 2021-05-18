@@ -96,7 +96,7 @@ async function getNFTS() {
 
     const tokenList = [];
     let tokenCount = Number(await nft.methods.totalSupply().call());
-
+  
     for (let i = 0; i < tokenCount; i++) {
         let tokenByIndex = await nft.methods.tokenByIndex(i).call();
         let nftURI = await nft.methods.tokenURI(tokenByIndex).call();

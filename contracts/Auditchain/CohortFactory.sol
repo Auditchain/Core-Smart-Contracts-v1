@@ -23,7 +23,7 @@ contract CohortFactory is  AccessControl {
 
     // Invitation structure to hold info about its status
     struct Invitation {
-        address enterprise;
+        // address enterprise;
         address validator;
         uint256 invitationDate;      
         uint256 acceptanceDate;
@@ -212,7 +212,7 @@ contract CohortFactory is  AccessControl {
     function isValidatorInvited(address enterprise, address validator, AuditTypes audits) public view returns (bool, bool) {
 
         for (uint i=0; i < invitations[enterprise].length; ++i ){
-            if (invitations[enterprise][i]. audits == audits && 
+            if (invitations[enterprise][i].audits == audits && 
                 invitations[enterprise][i].validator == validator &&
                 !invitations[enterprise][i].deleted){
                 if (invitations[enterprise][i].acceptanceDate > 0)

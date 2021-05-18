@@ -86,7 +86,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   await members.grantRole(CONTROLLER_ROLE, controller, { from: admin });
   await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
-  await token.grantRole(CONTROLLER_ROLE, admin, { from: admin });
+  // await token.grantRole(CONTROLLER_ROLE, admin, { from: admin });
 
   await cohortFactory.grantRole(SETTER_ROLE, timelock.address, { from: admin });
   await members.grantRole(SETTER_ROLE, timelock.address, { from: admin });
@@ -98,6 +98,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
   await members.setCohortFactory(cohortFactory.address, { from: admin });
+  await token.grantRole(CONTROLLER_ROLE, members.address, { from: admin });
 
 
   // await members.addUser(admin, "Admin 1", 0, { from: controller });
@@ -173,6 +174,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   let enterprise = await cohortContract.methods.enterprise().call();
   let validators = await cohortContract.methods.validators(0).call();
   let documentHash = web3.utils.soliditySha3("2+3=4");
+  await members.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
+  // await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
 
   result = await cohortFactory.createCohort(0, { from: enterprise1 });
 
@@ -182,7 +185,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   documentHash = web3.utils.soliditySha3("2+3=4");
 
   await cohortContract.methods.grantRole(CONTROLLER_ROLE, admin).send({ from: admin });
-  await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
+  // await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
+  await members.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
 
   result = await cohortContract.methods.initializeValidation(documentHash, "234").send({ from: enterprise1, gas: 6000000 });
 
@@ -191,10 +195,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationHash = values.validationHash;
   validationTime = values.initTime;
 
-  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 200000 });
-  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 200000 });
-  await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator3, gas: 200000 });
-  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 200000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 500000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 500000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator3, gas: 500000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 500000 });
 
   timeMachine.advanceTimeAndBlock(10);
 
@@ -207,10 +211,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationHash = values.validationHash;
   validationTime = values.initTime;
 
-  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 200000 });
-  await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator2, gas: 200000 });
-  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator3, gas: 200000 });
-  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 200000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 500000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator2, gas: 500000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator3, gas: 500000 });
+  await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 500000 });
 
   timeMachine.advanceTimeAndBlock(10);
   result = await cohortFactory.createCohort(2, { from: enterprise1 });
@@ -220,8 +224,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   event = result.logs[1];
   cohortAddress = event.args.cohort;
   cohortContract = new web3.eth.Contract(Cohort["abi"], cohortAddress);
-  await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
 
+
+  await members.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
 
 
   documentHash = web3.utils.soliditySha3("test5");
@@ -231,7 +236,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationTime = values.initTime;
 
   await cohortContract.methods.grantRole(CONTROLLER_ROLE, admin).send({ from: admin });
-  await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
+  // await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
 
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 900000 });
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 900000 });
@@ -246,7 +251,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationTime = values.initTime;
 
   await cohortContract.methods.grantRole(CONTROLLER_ROLE, admin).send({ from: admin });
-  await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
+  // await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
 
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 900000 });
   await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 900000 });

@@ -6,7 +6,6 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import "./MigrationAgent.sol";
 import "./Locked.sol";
 
@@ -49,9 +48,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
     uint256 public totalMigrated;
     
     event Migrate(address indexed from, address indexed to, uint256 value);
-    event MigrationAgentSet(address indexed migrationAgent);
-    event LogControllerSet(address indexed controller);
-    event LogControllerRevoked(address indexed controller);
+    event MigrationAgentSet(address indexed migrationAgent);   
 
     /// @dev Constructor that gives an account all initial tokens.
     constructor(address account) ERC20("Auditchain", "AUDT") {

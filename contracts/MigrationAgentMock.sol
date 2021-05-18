@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.8.0;
 
-import "../../../contracts/MigrationAgent.sol";
+import "./MigrationAgent.sol";
 
 /// @title Migration Agent interface
 contract MigrationAgentMock {

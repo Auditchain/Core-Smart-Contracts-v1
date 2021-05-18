@@ -300,77 +300,77 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_members\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"minDepositDays\",\"type\":\"uint256\"}],\"name\":\"LogUpdateMinDepositDays\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"previousAdminRole\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"newAdminRole\",\"type\":\"bytes32\"}],\"name\":\"RoleAdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleRevoked\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"DEFAULT_ADMIN_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"SETTER_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleAdmin\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"getRoleMember\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleMemberCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"minDepositDays\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"renounceRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minDepositDays\",\"type\":\"uint256\"}],\"name\":\"updateMinDepositDays\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getRoleAdmin(bytes32)\":{\"details\":\"Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}.\"},\"getRoleMember(bytes32,uint256)\":{\"details\":\"Returns one of the accounts that have `role`. `index` must be a value between 0 and {getRoleMemberCount}, non-inclusive. Role bearers are not sorted in any particular way, and their ordering may change at any point. WARNING: When using {getRoleMember} and {getRoleMemberCount}, make sure you perform all queries on the same block. See the following https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum post] for more information.\"},\"getRoleMemberCount(bytes32)\":{\"details\":\"Returns the number of accounts that have `role`. Can be used together with {getRoleMember} to enumerate all bearers of a role.\"},\"grantRole(bytes32,address)\":{\"details\":\"Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role.\"},\"hasRole(bytes32,address)\":{\"details\":\"Returns `true` if `account` has been granted `role`.\"},\"renounceRole(bytes32,address)\":{\"details\":\"Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`.\"},\"revokeRole(bytes32,address)\":{\"details\":\"Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role.\"},\"updateMinDepositDays(uint256)\":{\"details\":\"to be called by Governance contract to update days to calculate enterprise min deposit requirements\",\"params\":{\"_minDepositDays\":\"new value of min deposit days\"}}},\"title\":\"MemberHelpers Additional function for Members \",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/MemberHelpers.sol\":\"MemberHelpers\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/AuditToken.sol\":{\"keccak256\":\"0x696162121dd11353f7738aa112832e40fdaa4ed10d72e34491321d70c2e2e205\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f9b0eb7a20a381bf58bfe27a4b9eab5ae362ab668554b63f619da6efa3f8b870\",\"dweb:/ipfs/QmVVfQzHL6MbtAHd8McLtvQZZXexK9dka5PyhU4T3RE1ts\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/ICohort.sol\":{\"keccak256\":\"0xe5d7f7521248a1fabefc084f60ea919232ec25199b2a66b4a979e03e21a9b6d4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://69a90ce24ff024b0af569c34448130e4ff4d46984f69af480beb87d739559d56\",\"dweb:/ipfs/QmXM1fNPMvoo5upEFuCB7LyZXh3g1A7aPFSk8MTJT8F43U\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/ICohortFactory.sol\":{\"keccak256\":\"0x99f74493b9c93afaf116a0e090de2cb4b286a5d8c5a709616519b49bb15d80c7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c2a7bb1eab24b36529185fb4e97ed3577d27012e58fef2a138a17553320286e9\",\"dweb:/ipfs/QmTJB11UqtQPnCduB5R7R9kAkJLT2GVykACz8uTwmS1x7x\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/MemberHelpers.sol\":{\"keccak256\":\"0x366419882686356e09ab093f11408482592bb17969bc654ec867b176802ac6c9\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4c1723169f5f57bc7c0c790366b8af5958240db2563376f0032f2c4859269728\",\"dweb:/ipfs/QmVFXSJHojrcqvHDtCM3iV1etaJT5KLbXADo1kSSeTbjXH\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/Members.sol\":{\"keccak256\":\"0xe5152dd5fb345e7a53dff3a399dd8459f2de4b191a72b703e9c6c40974d1e345\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ac4b6d215cb42f286495a8b5ebd23ab046f754f9bdb8d0949f9219280b5f7165\",\"dweb:/ipfs/QmXeu2kCJ63eSeXBEx9FPTUqoust4vKFuCKxCaHw2YJfT4\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Locked.sol\":{\"keccak256\":\"0xdfe2425eaffb36a83dc925a0d36fcb9ccef40bf953c211dab59d6a11edc8a49e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c815cbb104415f53d3505aa653898f616b955b279e550d369b19f0aa4a5a9d16\",\"dweb:/ipfs/QmbmPLkNF32H4sQLvVzUPAYNxKT5iypw3HqYThC4NTDVpD\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol\":{\"keccak256\":\"0xa2f21acb7cf6d87a46651b24e29d8697dcfad63bc96769ce23cbd1e5437cdc07\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://64491b91d4ab2d735244f4f36f3aca2522a5b4e72fb3d9129ca62e29e0eab1d9\",\"dweb:/ipfs/QmYbiu3iUD26N7iv8MYuEB2V5Zs2drWTHDmPZdhcFV5CAc\"]},\"@openzeppelin/contracts/access/AccessControl.sol\":{\"keccak256\":\"0x4fc155a2f7837603d69a13cfa481eb5e7f5e02cb77e2ec9edbac30986db37988\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0855147e38b5e36288a8df73b8da49132f14ec7abb19041b0c98872263643aaa\",\"dweb:/ipfs/QmSrSysyFUYQq7hbJaJXG7EyZW6ezDBzEJx3SABp6eiJSS\"]},\"@openzeppelin/contracts/math/SafeMath.sol\":{\"keccak256\":\"0xcc78a17dd88fa5a2edc60c8489e2f405c0913b377216a5b26b35656b2d0dab52\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://526dc85e1f9b9b45830e202568d267d93dde7a4fcccf4ad7798dadcd92304d3c\",\"dweb:/ipfs/QmaoXMB972J3cSDLtBq3xBo4jLwqD2uzXTwujtSPqkYVhR\"]},\"@openzeppelin/contracts/token/ERC20/ERC20.sol\":{\"keccak256\":\"0xca0c2396dbeb3503b51abf4248ebf77a1461edad513c01529df51850a012bee3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://991b44ff44e0496e8554a90f4c0512c28faed45104d40430019f3c67ea67740e\",\"dweb:/ipfs/Qmc3nRapVbcctELoZS5qe17zLkFB3bETBfwzCTMF1CSuGE\"]},\"@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol\":{\"keccak256\":\"0x9c0eb3b0e11d2480d49991dc384f1e5f9c9b9967cc81944d50916a9b9c6c4984\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://99e4033d778624992e86f0b6d801a4f6d7b5c0cd5c79c1296be90a051ad5f5af\",\"dweb:/ipfs/QmShYmkUqh6pDEeoWadZ24icmCr4C2Xys1uE5boivPmbwf\"]},\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0x5f02220344881ce43204ae4a6281145a67bc52c2bb1290a791857df3d19d78f5\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://24427744bd3e6cb73c17010119af12a318289c0253a4d9acb8576c9fb3797b08\",\"dweb:/ipfs/QmTLDqpKRBuxGxRAmjgXt9AkXyACW3MtKzi7PYjm5iMfGC\"]},\"@openzeppelin/contracts/token/ERC20/SafeERC20.sol\":{\"keccak256\":\"0xf12dfbe97e6276980b83d2830bb0eb75e0cf4f3e626c2471137f82158ae6a0fc\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b3a849c2d95e85463909e5b5c920b13e7a11216ca14127085e16d22b9379d52a\",\"dweb:/ipfs/QmUg3CZDbCCcQdroEpexBy5ZFd5vD1UWijWQq9qHZjtJNQ\"]},\"@openzeppelin/contracts/utils/Address.sol\":{\"keccak256\":\"0x28911e614500ae7c607a432a709d35da25f3bc5ddc8bd12b278b66358070c0ea\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://256c8c8af5eb072bc473226ab2b2187149b8fc04f5f4a4820db22527f5ce8e3c\",\"dweb:/ipfs/QmRvi5BhnL7Rxf85KrJhwM6RRhukm4tzoctRdgQEheNyiN\"]},\"@openzeppelin/contracts/utils/Context.sol\":{\"keccak256\":\"0x8d3cb350f04ff49cfb10aef08d87f19dcbaecc8027b0bed12f3275cd12f38cf0\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ded47ec7c96750f9bd04bbbc84f659992d4ba901cb7b532a52cd468272cf378f\",\"dweb:/ipfs/QmfBrGtQP7rZEqEg6Wz6jh2N2Kukpj1z5v3CGWmAqrzm96\"]},\"@openzeppelin/contracts/utils/EnumerableSet.sol\":{\"keccak256\":\"0x1562cd9922fbf739edfb979f506809e2743789cbde3177515542161c3d04b164\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4580d57781513d98870d9738c7d39094336e0a70cdb90d68dad549c6ced466ec\",\"dweb:/ipfs/Qmf9YZzzRFuvMnav9dgmeRUpdYMMECiZX8w25sHWVbA18V\"]},\"@openzeppelin/contracts/utils/Pausable.sol\":{\"keccak256\":\"0x212fb1b1d4beaf74354dad9bc329f44ee3c5375ef1c32acff76b4ecefc10f1d8\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d21c68cb321d1c8d0fa39fd9ecb6bbe3b2f26623b0f38af280a010c916c85f23\",\"dweb:/ipfs/Qmf2P51HRC4ekDHLYfbXu5SXR33gXrWtq6oKSmfyWqVRuC\"]}},\"version\":1}",
-  "bytecode": "0x6080604052601e60015534801561001557600080fd5b5060405162000f5738038062000f578339818101604052602081101561003a57600080fd5b8101908080519060200190929190505050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100d2576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603581526020018062000f226035913960400191505060405180910390fd5b80600260006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506101266000801b3361012c60201b60201c565b506102b4565b61013c828261014060201b60201c565b5050565b61016b816000808581526020019081526020016000206000016101dd60201b6107071790919060201c565b156101d95761017e61021360201b60201c565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45b5050565b600061020b836000018373ffffffffffffffffffffffffffffffffffffffff1660001b61021b60201b60201c565b905092915050565b600033905090565b600061022d838361029160201b60201c565b61028657826000018290806001815401808255809150506001900390600052602060002001600090919091909150558260000180549050836001016000848152602001908152602001600020819055506001905061028b565b600090505b92915050565b600080836001016000848152602001908152602001600020541415905092915050565b610c5e80620002c46000396000f3fe608060405234801561001057600080fd5b50600436106100a95760003560e01c80639010d07c116100715780639010d07c146101d857806391d148541461023a578063a2011b3f1461029e578063a217fddf146102bc578063ca15c873146102da578063d547741f1461031c576100a9565b8063248a9ca3146100ae5780632f2ff15d146100f057806336568abe1461013e5780635659ae581461018c57806374eb9cdb146101aa575b600080fd5b6100da600480360360208110156100c457600080fd5b810190808035906020019092919050505061036a565b6040518082815260200191505060405180910390f35b61013c6004803603604081101561010657600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610389565b005b61018a6004803603604081101561015457600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610412565b005b6101946104ab565b6040518082815260200191505060405180910390f35b6101d6600480360360208110156101c057600080fd5b81019080803590602001909291905050506104b1565b005b61020e600480360360408110156101ee57600080fd5b8101908080359060200190929190803590602001909291905050506105cb565b604051808273ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6102866004803603604081101561025057600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506105fc565b60405180821515815260200191505060405180910390f35b6102a661062d565b6040518082815260200191505060405180910390f35b6102c4610651565b6040518082815260200191505060405180910390f35b610306600480360360208110156102f057600080fd5b8101908080359060200190929190505050610658565b6040518082815260200191505060405180910390f35b6103686004803603604081101561033257600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061067e565b005b6000806000838152602001908152602001600020600201549050919050565b6103af600080848152602001908152602001600020600201546103aa610737565b6105fc565b610404576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602f815260200180610b26602f913960400191505060405180910390fd5b61040e828261073f565b5050565b61041a610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161461049d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602f815260200180610bfa602f913960400191505060405180910390fd5b6104a782826107d2565b5050565b60015481565b6104db7f61c92169ef077349011ff0b1383c894d86c5f0b41d986366b58a6cf31e93beda336105fc565b610530576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526029815260200180610b856029913960400191505060405180910390fd5b600081141561058a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252604c815260200180610bae604c913960600191505060405180910390fd5b806001819055507f3ef37ec580f71948d160049e31c67ac1e6fc9711038f837710cdfaf9074d7b85816040518082815260200191505060405180910390a150565b60006105f48260008086815260200190815260200160002060000161086590919063ffffffff16565b905092915050565b60006106258260008086815260200190815260200160002060000161087f90919063ffffffff16565b905092915050565b7f61c92169ef077349011ff0b1383c894d86c5f0b41d986366b58a6cf31e93beda81565b6000801b81565b60006106776000808481526020019081526020016000206000016108af565b9050919050565b6106a46000808481526020019081526020016000206002015461069f610737565b6105fc565b6106f9576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526030815260200180610b556030913960400191505060405180910390fd5b61070382826107d2565b5050565b600061072f836000018373ffffffffffffffffffffffffffffffffffffffff1660001b6108c4565b905092915050565b600033905090565b6107668160008085815260200190815260200160002060000161070790919063ffffffff16565b156107ce57610773610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45b5050565b6107f98160008085815260200190815260200160002060000161093490919063ffffffff16565b1561086157610806610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b60405160405180910390a45b5050565b60006108748360000183610964565b60001c905092915050565b60006108a7836000018373ffffffffffffffffffffffffffffffffffffffff1660001b6109e7565b905092915050565b60006108bd82600001610a0a565b9050919050565b60006108d083836109e7565b61092957826000018290806001815401808255809150506001900390600052602060002001600090919091909150558260000180549050836001016000848152602001908152602001600020819055506001905061092e565b600090505b92915050565b600061095c836000018373ffffffffffffffffffffffffffffffffffffffff1660001b610a1b565b905092915050565b6000818360000180549050116109c5576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526022815260200180610b046022913960400191505060405180910390fd5b8260000182815481106109d457fe5b9060005260206000200154905092915050565b600080836001016000848152602001908152602001600020541415905092915050565b600081600001805490509050919050565b60008083600101600084815260200190815260200160002054905060008114610af75760006001820390506000600186600001805490500390506000866000018281548110610a6657fe5b9060005260206000200154905080876000018481548110610a8357fe5b9060005260206000200181905550600183018760010160008381526020019081526020016000208190555086600001805480610abb57fe5b60019003818190600052602060002001600090559055866001016000878152602001908152602001600020600090556001945050505050610afd565b60009150505b9291505056fe456e756d657261626c655365743a20696e646578206f7574206f6620626f756e6473416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f206772616e74416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f207265766f6b654d656d626572733a6973536574746572202d2043616c6c6572206973206e6f742061207365747465724d656d626572733a7570646174654d696e4465706f73697444617973202d204e65772076616c756520666f7220746865206d696e206465706f73697420646179732063616e27742062652030416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636520726f6c657320666f722073656c66a2646970667358221220179caabc7e79fcaeebcc1f83bddbe0a8fc349c38b47713fe7124c97eee21476364736f6c634300070600334d656d62657248656c706572733a636f6e7374727563746f72202d204d656d62657220616464726573732063616e27742062652030",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100a95760003560e01c80639010d07c116100715780639010d07c146101d857806391d148541461023a578063a2011b3f1461029e578063a217fddf146102bc578063ca15c873146102da578063d547741f1461031c576100a9565b8063248a9ca3146100ae5780632f2ff15d146100f057806336568abe1461013e5780635659ae581461018c57806374eb9cdb146101aa575b600080fd5b6100da600480360360208110156100c457600080fd5b810190808035906020019092919050505061036a565b6040518082815260200191505060405180910390f35b61013c6004803603604081101561010657600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610389565b005b61018a6004803603604081101561015457600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610412565b005b6101946104ab565b6040518082815260200191505060405180910390f35b6101d6600480360360208110156101c057600080fd5b81019080803590602001909291905050506104b1565b005b61020e600480360360408110156101ee57600080fd5b8101908080359060200190929190803590602001909291905050506105cb565b604051808273ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6102866004803603604081101561025057600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506105fc565b60405180821515815260200191505060405180910390f35b6102a661062d565b6040518082815260200191505060405180910390f35b6102c4610651565b6040518082815260200191505060405180910390f35b610306600480360360208110156102f057600080fd5b8101908080359060200190929190505050610658565b6040518082815260200191505060405180910390f35b6103686004803603604081101561033257600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061067e565b005b6000806000838152602001908152602001600020600201549050919050565b6103af600080848152602001908152602001600020600201546103aa610737565b6105fc565b610404576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602f815260200180610b26602f913960400191505060405180910390fd5b61040e828261073f565b5050565b61041a610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161461049d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602f815260200180610bfa602f913960400191505060405180910390fd5b6104a782826107d2565b5050565b60015481565b6104db7f61c92169ef077349011ff0b1383c894d86c5f0b41d986366b58a6cf31e93beda336105fc565b610530576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526029815260200180610b856029913960400191505060405180910390fd5b600081141561058a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252604c815260200180610bae604c913960600191505060405180910390fd5b806001819055507f3ef37ec580f71948d160049e31c67ac1e6fc9711038f837710cdfaf9074d7b85816040518082815260200191505060405180910390a150565b60006105f48260008086815260200190815260200160002060000161086590919063ffffffff16565b905092915050565b60006106258260008086815260200190815260200160002060000161087f90919063ffffffff16565b905092915050565b7f61c92169ef077349011ff0b1383c894d86c5f0b41d986366b58a6cf31e93beda81565b6000801b81565b60006106776000808481526020019081526020016000206000016108af565b9050919050565b6106a46000808481526020019081526020016000206002015461069f610737565b6105fc565b6106f9576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526030815260200180610b556030913960400191505060405180910390fd5b61070382826107d2565b5050565b600061072f836000018373ffffffffffffffffffffffffffffffffffffffff1660001b6108c4565b905092915050565b600033905090565b6107668160008085815260200190815260200160002060000161070790919063ffffffff16565b156107ce57610773610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45b5050565b6107f98160008085815260200190815260200160002060000161093490919063ffffffff16565b1561086157610806610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b60405160405180910390a45b5050565b60006108748360000183610964565b60001c905092915050565b60006108a7836000018373ffffffffffffffffffffffffffffffffffffffff1660001b6109e7565b905092915050565b60006108bd82600001610a0a565b9050919050565b60006108d083836109e7565b61092957826000018290806001815401808255809150506001900390600052602060002001600090919091909150558260000180549050836001016000848152602001908152602001600020819055506001905061092e565b600090505b92915050565b600061095c836000018373ffffffffffffffffffffffffffffffffffffffff1660001b610a1b565b905092915050565b6000818360000180549050116109c5576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526022815260200180610b046022913960400191505060405180910390fd5b8260000182815481106109d457fe5b9060005260206000200154905092915050565b600080836001016000848152602001908152602001600020541415905092915050565b600081600001805490509050919050565b60008083600101600084815260200190815260200160002054905060008114610af75760006001820390506000600186600001805490500390506000866000018281548110610a6657fe5b9060005260206000200154905080876000018481548110610a8357fe5b9060005260206000200181905550600183018760010160008381526020019081526020016000208190555086600001805480610abb57fe5b60019003818190600052602060002001600090559055866001016000878152602001908152602001600020600090556001945050505050610afd565b60009150505b9291505056fe456e756d657261626c655365743a20696e646578206f7574206f6620626f756e6473416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f206772616e74416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f207265766f6b654d656d626572733a6973536574746572202d2043616c6c6572206973206e6f742061207365747465724d656d626572733a7570646174654d696e4465706f73697444617973202d204e65772076616c756520666f7220746865206d696e206465706f73697420646179732063616e27742062652030416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636520726f6c657320666f722073656c66a2646970667358221220179caabc7e79fcaeebcc1f83bddbe0a8fc349c38b47713fe7124c97eee21476364736f6c63430007060033",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_members\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"minDepositDays\",\"type\":\"uint256\"}],\"name\":\"LogUpdateMinDepositDays\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"previousAdminRole\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"newAdminRole\",\"type\":\"bytes32\"}],\"name\":\"RoleAdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleRevoked\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"DEFAULT_ADMIN_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"SETTER_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleAdmin\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"getRoleMember\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleMemberCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"minDepositDays\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"renounceRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_minDepositDays\",\"type\":\"uint256\"}],\"name\":\"updateMinDepositDays\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getRoleAdmin(bytes32)\":{\"details\":\"Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}.\"},\"getRoleMember(bytes32,uint256)\":{\"details\":\"Returns one of the accounts that have `role`. `index` must be a value between 0 and {getRoleMemberCount}, non-inclusive. Role bearers are not sorted in any particular way, and their ordering may change at any point. WARNING: When using {getRoleMember} and {getRoleMemberCount}, make sure you perform all queries on the same block. See the following https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum post] for more information.\"},\"getRoleMemberCount(bytes32)\":{\"details\":\"Returns the number of accounts that have `role`. Can be used together with {getRoleMember} to enumerate all bearers of a role.\"},\"grantRole(bytes32,address)\":{\"details\":\"Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role.\"},\"hasRole(bytes32,address)\":{\"details\":\"Returns `true` if `account` has been granted `role`.\"},\"renounceRole(bytes32,address)\":{\"details\":\"Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`.\"},\"revokeRole(bytes32,address)\":{\"details\":\"Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role.\"},\"updateMinDepositDays(uint256)\":{\"details\":\"to be called by Governance contract to update days to calculate enterprise min deposit requirements\",\"params\":{\"_minDepositDays\":\"new value of min deposit days\"}}},\"title\":\"MemberHelpers Additional function for Members \",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/MemberHelpers.sol\":\"MemberHelpers\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/AuditToken.sol\":{\"keccak256\":\"0x6fba90f8e922ba388b850e623a1281622ef893ab1f8de6cc86a53280c551ecdf\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e9fb43d7ccf5f5b7c7457c379307db0a771339781d646f7bd1d5d2b545c0065f\",\"dweb:/ipfs/QmZfigCvXLAKE7HmQCUmsUTmn12uZu16hhHFu7fkrSZZGX\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/ICohort.sol\":{\"keccak256\":\"0xe5d7f7521248a1fabefc084f60ea919232ec25199b2a66b4a979e03e21a9b6d4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://69a90ce24ff024b0af569c34448130e4ff4d46984f69af480beb87d739559d56\",\"dweb:/ipfs/QmXM1fNPMvoo5upEFuCB7LyZXh3g1A7aPFSk8MTJT8F43U\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/ICohortFactory.sol\":{\"keccak256\":\"0x99f74493b9c93afaf116a0e090de2cb4b286a5d8c5a709616519b49bb15d80c7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c2a7bb1eab24b36529185fb4e97ed3577d27012e58fef2a138a17553320286e9\",\"dweb:/ipfs/QmTJB11UqtQPnCduB5R7R9kAkJLT2GVykACz8uTwmS1x7x\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/MemberHelpers.sol\":{\"keccak256\":\"0x366419882686356e09ab093f11408482592bb17969bc654ec867b176802ac6c9\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4c1723169f5f57bc7c0c790366b8af5958240db2563376f0032f2c4859269728\",\"dweb:/ipfs/QmVFXSJHojrcqvHDtCM3iV1etaJT5KLbXADo1kSSeTbjXH\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/Members.sol\":{\"keccak256\":\"0xc2df9232322b5afae50bd66c99847565891cfb1294dffb03114756b10edeef44\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d59983cab8ab731a7dd71d1c347a82fbde0166ab5c99a74f5074f31f36c3e446\",\"dweb:/ipfs/QmPWexEghq78M7AbZ8FhCfDBbZcWEUKDgrVaVc4JyTuAjW\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Locked.sol\":{\"keccak256\":\"0xdfe2425eaffb36a83dc925a0d36fcb9ccef40bf953c211dab59d6a11edc8a49e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c815cbb104415f53d3505aa653898f616b955b279e550d369b19f0aa4a5a9d16\",\"dweb:/ipfs/QmbmPLkNF32H4sQLvVzUPAYNxKT5iypw3HqYThC4NTDVpD\"]},\"/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/MigrationAgent.sol\":{\"keccak256\":\"0xa2f21acb7cf6d87a46651b24e29d8697dcfad63bc96769ce23cbd1e5437cdc07\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://64491b91d4ab2d735244f4f36f3aca2522a5b4e72fb3d9129ca62e29e0eab1d9\",\"dweb:/ipfs/QmYbiu3iUD26N7iv8MYuEB2V5Zs2drWTHDmPZdhcFV5CAc\"]},\"@openzeppelin/contracts/access/AccessControl.sol\":{\"keccak256\":\"0x4fc155a2f7837603d69a13cfa481eb5e7f5e02cb77e2ec9edbac30986db37988\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0855147e38b5e36288a8df73b8da49132f14ec7abb19041b0c98872263643aaa\",\"dweb:/ipfs/QmSrSysyFUYQq7hbJaJXG7EyZW6ezDBzEJx3SABp6eiJSS\"]},\"@openzeppelin/contracts/math/SafeMath.sol\":{\"keccak256\":\"0xcc78a17dd88fa5a2edc60c8489e2f405c0913b377216a5b26b35656b2d0dab52\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://526dc85e1f9b9b45830e202568d267d93dde7a4fcccf4ad7798dadcd92304d3c\",\"dweb:/ipfs/QmaoXMB972J3cSDLtBq3xBo4jLwqD2uzXTwujtSPqkYVhR\"]},\"@openzeppelin/contracts/token/ERC20/ERC20.sol\":{\"keccak256\":\"0xca0c2396dbeb3503b51abf4248ebf77a1461edad513c01529df51850a012bee3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://991b44ff44e0496e8554a90f4c0512c28faed45104d40430019f3c67ea67740e\",\"dweb:/ipfs/Qmc3nRapVbcctELoZS5qe17zLkFB3bETBfwzCTMF1CSuGE\"]},\"@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol\":{\"keccak256\":\"0x9c0eb3b0e11d2480d49991dc384f1e5f9c9b9967cc81944d50916a9b9c6c4984\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://99e4033d778624992e86f0b6d801a4f6d7b5c0cd5c79c1296be90a051ad5f5af\",\"dweb:/ipfs/QmShYmkUqh6pDEeoWadZ24icmCr4C2Xys1uE5boivPmbwf\"]},\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0x5f02220344881ce43204ae4a6281145a67bc52c2bb1290a791857df3d19d78f5\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://24427744bd3e6cb73c17010119af12a318289c0253a4d9acb8576c9fb3797b08\",\"dweb:/ipfs/QmTLDqpKRBuxGxRAmjgXt9AkXyACW3MtKzi7PYjm5iMfGC\"]},\"@openzeppelin/contracts/token/ERC20/SafeERC20.sol\":{\"keccak256\":\"0xf12dfbe97e6276980b83d2830bb0eb75e0cf4f3e626c2471137f82158ae6a0fc\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b3a849c2d95e85463909e5b5c920b13e7a11216ca14127085e16d22b9379d52a\",\"dweb:/ipfs/QmUg3CZDbCCcQdroEpexBy5ZFd5vD1UWijWQq9qHZjtJNQ\"]},\"@openzeppelin/contracts/utils/Address.sol\":{\"keccak256\":\"0x28911e614500ae7c607a432a709d35da25f3bc5ddc8bd12b278b66358070c0ea\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://256c8c8af5eb072bc473226ab2b2187149b8fc04f5f4a4820db22527f5ce8e3c\",\"dweb:/ipfs/QmRvi5BhnL7Rxf85KrJhwM6RRhukm4tzoctRdgQEheNyiN\"]},\"@openzeppelin/contracts/utils/Context.sol\":{\"keccak256\":\"0x8d3cb350f04ff49cfb10aef08d87f19dcbaecc8027b0bed12f3275cd12f38cf0\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ded47ec7c96750f9bd04bbbc84f659992d4ba901cb7b532a52cd468272cf378f\",\"dweb:/ipfs/QmfBrGtQP7rZEqEg6Wz6jh2N2Kukpj1z5v3CGWmAqrzm96\"]},\"@openzeppelin/contracts/utils/EnumerableSet.sol\":{\"keccak256\":\"0x1562cd9922fbf739edfb979f506809e2743789cbde3177515542161c3d04b164\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4580d57781513d98870d9738c7d39094336e0a70cdb90d68dad549c6ced466ec\",\"dweb:/ipfs/Qmf9YZzzRFuvMnav9dgmeRUpdYMMECiZX8w25sHWVbA18V\"]},\"@openzeppelin/contracts/utils/Pausable.sol\":{\"keccak256\":\"0x212fb1b1d4beaf74354dad9bc329f44ee3c5375ef1c32acff76b4ecefc10f1d8\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d21c68cb321d1c8d0fa39fd9ecb6bbe3b2f26623b0f38af280a010c916c85f23\",\"dweb:/ipfs/Qmf2P51HRC4ekDHLYfbXu5SXR33gXrWtq6oKSmfyWqVRuC\"]}},\"version\":1}",
+  "bytecode": "0x6080604052601e60015534801561001557600080fd5b5060405162000f5738038062000f578339818101604052602081101561003a57600080fd5b8101908080519060200190929190505050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100d2576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603581526020018062000f226035913960400191505060405180910390fd5b80600260006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506101266000801b3361012c60201b60201c565b506102b4565b61013c828261014060201b60201c565b5050565b61016b816000808581526020019081526020016000206000016101dd60201b6107071790919060201c565b156101d95761017e61021360201b60201c565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45b5050565b600061020b836000018373ffffffffffffffffffffffffffffffffffffffff1660001b61021b60201b60201c565b905092915050565b600033905090565b600061022d838361029160201b60201c565b61028657826000018290806001815401808255809150506001900390600052602060002001600090919091909150558260000180549050836001016000848152602001908152602001600020819055506001905061028b565b600090505b92915050565b600080836001016000848152602001908152602001600020541415905092915050565b610c5e80620002c46000396000f3fe608060405234801561001057600080fd5b50600436106100a95760003560e01c80639010d07c116100715780639010d07c146101d857806391d148541461023a578063a2011b3f1461029e578063a217fddf146102bc578063ca15c873146102da578063d547741f1461031c576100a9565b8063248a9ca3146100ae5780632f2ff15d146100f057806336568abe1461013e5780635659ae581461018c57806374eb9cdb146101aa575b600080fd5b6100da600480360360208110156100c457600080fd5b810190808035906020019092919050505061036a565b6040518082815260200191505060405180910390f35b61013c6004803603604081101561010657600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610389565b005b61018a6004803603604081101561015457600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610412565b005b6101946104ab565b6040518082815260200191505060405180910390f35b6101d6600480360360208110156101c057600080fd5b81019080803590602001909291905050506104b1565b005b61020e600480360360408110156101ee57600080fd5b8101908080359060200190929190803590602001909291905050506105cb565b604051808273ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6102866004803603604081101561025057600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506105fc565b60405180821515815260200191505060405180910390f35b6102a661062d565b6040518082815260200191505060405180910390f35b6102c4610651565b6040518082815260200191505060405180910390f35b610306600480360360208110156102f057600080fd5b8101908080359060200190929190505050610658565b6040518082815260200191505060405180910390f35b6103686004803603604081101561033257600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061067e565b005b6000806000838152602001908152602001600020600201549050919050565b6103af600080848152602001908152602001600020600201546103aa610737565b6105fc565b610404576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602f815260200180610b26602f913960400191505060405180910390fd5b61040e828261073f565b5050565b61041a610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161461049d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602f815260200180610bfa602f913960400191505060405180910390fd5b6104a782826107d2565b5050565b60015481565b6104db7f61c92169ef077349011ff0b1383c894d86c5f0b41d986366b58a6cf31e93beda336105fc565b610530576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526029815260200180610b856029913960400191505060405180910390fd5b600081141561058a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252604c815260200180610bae604c913960600191505060405180910390fd5b806001819055507f3ef37ec580f71948d160049e31c67ac1e6fc9711038f837710cdfaf9074d7b85816040518082815260200191505060405180910390a150565b60006105f48260008086815260200190815260200160002060000161086590919063ffffffff16565b905092915050565b60006106258260008086815260200190815260200160002060000161087f90919063ffffffff16565b905092915050565b7f61c92169ef077349011ff0b1383c894d86c5f0b41d986366b58a6cf31e93beda81565b6000801b81565b60006106776000808481526020019081526020016000206000016108af565b9050919050565b6106a46000808481526020019081526020016000206002015461069f610737565b6105fc565b6106f9576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526030815260200180610b556030913960400191505060405180910390fd5b61070382826107d2565b5050565b600061072f836000018373ffffffffffffffffffffffffffffffffffffffff1660001b6108c4565b905092915050565b600033905090565b6107668160008085815260200190815260200160002060000161070790919063ffffffff16565b156107ce57610773610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45b5050565b6107f98160008085815260200190815260200160002060000161093490919063ffffffff16565b1561086157610806610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b60405160405180910390a45b5050565b60006108748360000183610964565b60001c905092915050565b60006108a7836000018373ffffffffffffffffffffffffffffffffffffffff1660001b6109e7565b905092915050565b60006108bd82600001610a0a565b9050919050565b60006108d083836109e7565b61092957826000018290806001815401808255809150506001900390600052602060002001600090919091909150558260000180549050836001016000848152602001908152602001600020819055506001905061092e565b600090505b92915050565b600061095c836000018373ffffffffffffffffffffffffffffffffffffffff1660001b610a1b565b905092915050565b6000818360000180549050116109c5576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526022815260200180610b046022913960400191505060405180910390fd5b8260000182815481106109d457fe5b9060005260206000200154905092915050565b600080836001016000848152602001908152602001600020541415905092915050565b600081600001805490509050919050565b60008083600101600084815260200190815260200160002054905060008114610af75760006001820390506000600186600001805490500390506000866000018281548110610a6657fe5b9060005260206000200154905080876000018481548110610a8357fe5b9060005260206000200181905550600183018760010160008381526020019081526020016000208190555086600001805480610abb57fe5b60019003818190600052602060002001600090559055866001016000878152602001908152602001600020600090556001945050505050610afd565b60009150505b9291505056fe456e756d657261626c655365743a20696e646578206f7574206f6620626f756e6473416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f206772616e74416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f207265766f6b654d656d626572733a6973536574746572202d2043616c6c6572206973206e6f742061207365747465724d656d626572733a7570646174654d696e4465706f73697444617973202d204e65772076616c756520666f7220746865206d696e206465706f73697420646179732063616e27742062652030416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636520726f6c657320666f722073656c66a26469706673582212201e54e75b6d58f40e050759c482725663231d175eed012b0891575972987d467564736f6c634300070600334d656d62657248656c706572733a636f6e7374727563746f72202d204d656d62657220616464726573732063616e27742062652030",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100a95760003560e01c80639010d07c116100715780639010d07c146101d857806391d148541461023a578063a2011b3f1461029e578063a217fddf146102bc578063ca15c873146102da578063d547741f1461031c576100a9565b8063248a9ca3146100ae5780632f2ff15d146100f057806336568abe1461013e5780635659ae581461018c57806374eb9cdb146101aa575b600080fd5b6100da600480360360208110156100c457600080fd5b810190808035906020019092919050505061036a565b6040518082815260200191505060405180910390f35b61013c6004803603604081101561010657600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610389565b005b61018a6004803603604081101561015457600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610412565b005b6101946104ab565b6040518082815260200191505060405180910390f35b6101d6600480360360208110156101c057600080fd5b81019080803590602001909291905050506104b1565b005b61020e600480360360408110156101ee57600080fd5b8101908080359060200190929190803590602001909291905050506105cb565b604051808273ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6102866004803603604081101561025057600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506105fc565b60405180821515815260200191505060405180910390f35b6102a661062d565b6040518082815260200191505060405180910390f35b6102c4610651565b6040518082815260200191505060405180910390f35b610306600480360360208110156102f057600080fd5b8101908080359060200190929190505050610658565b6040518082815260200191505060405180910390f35b6103686004803603604081101561033257600080fd5b8101908080359060200190929190803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061067e565b005b6000806000838152602001908152602001600020600201549050919050565b6103af600080848152602001908152602001600020600201546103aa610737565b6105fc565b610404576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602f815260200180610b26602f913960400191505060405180910390fd5b61040e828261073f565b5050565b61041a610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff161461049d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252602f815260200180610bfa602f913960400191505060405180910390fd5b6104a782826107d2565b5050565b60015481565b6104db7f61c92169ef077349011ff0b1383c894d86c5f0b41d986366b58a6cf31e93beda336105fc565b610530576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526029815260200180610b856029913960400191505060405180910390fd5b600081141561058a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252604c815260200180610bae604c913960600191505060405180910390fd5b806001819055507f3ef37ec580f71948d160049e31c67ac1e6fc9711038f837710cdfaf9074d7b85816040518082815260200191505060405180910390a150565b60006105f48260008086815260200190815260200160002060000161086590919063ffffffff16565b905092915050565b60006106258260008086815260200190815260200160002060000161087f90919063ffffffff16565b905092915050565b7f61c92169ef077349011ff0b1383c894d86c5f0b41d986366b58a6cf31e93beda81565b6000801b81565b60006106776000808481526020019081526020016000206000016108af565b9050919050565b6106a46000808481526020019081526020016000206002015461069f610737565b6105fc565b6106f9576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526030815260200180610b556030913960400191505060405180910390fd5b61070382826107d2565b5050565b600061072f836000018373ffffffffffffffffffffffffffffffffffffffff1660001b6108c4565b905092915050565b600033905090565b6107668160008085815260200190815260200160002060000161070790919063ffffffff16565b156107ce57610773610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45b5050565b6107f98160008085815260200190815260200160002060000161093490919063ffffffff16565b1561086157610806610737565b73ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16837ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b60405160405180910390a45b5050565b60006108748360000183610964565b60001c905092915050565b60006108a7836000018373ffffffffffffffffffffffffffffffffffffffff1660001b6109e7565b905092915050565b60006108bd82600001610a0a565b9050919050565b60006108d083836109e7565b61092957826000018290806001815401808255809150506001900390600052602060002001600090919091909150558260000180549050836001016000848152602001908152602001600020819055506001905061092e565b600090505b92915050565b600061095c836000018373ffffffffffffffffffffffffffffffffffffffff1660001b610a1b565b905092915050565b6000818360000180549050116109c5576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401808060200182810382526022815260200180610b046022913960400191505060405180910390fd5b8260000182815481106109d457fe5b9060005260206000200154905092915050565b600080836001016000848152602001908152602001600020541415905092915050565b600081600001805490509050919050565b60008083600101600084815260200190815260200160002054905060008114610af75760006001820390506000600186600001805490500390506000866000018281548110610a6657fe5b9060005260206000200154905080876000018481548110610a8357fe5b9060005260206000200181905550600183018760010160008381526020019081526020016000208190555086600001805480610abb57fe5b60019003818190600052602060002001600090559055866001016000878152602001908152602001600020600090556001945050505050610afd565b60009150505b9291505056fe456e756d657261626c655365743a20696e646578206f7574206f6620626f756e6473416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f206772616e74416363657373436f6e74726f6c3a2073656e646572206d75737420626520616e2061646d696e20746f207265766f6b654d656d626572733a6973536574746572202d2043616c6c6572206973206e6f742061207365747465724d656d626572733a7570646174654d696e4465706f73697444617973202d204e65772076616c756520666f7220746865206d696e206465706f73697420646179732063616e27742062652030416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636520726f6c657320666f722073656c66a26469706673582212201e54e75b6d58f40e050759c482725663231d175eed012b0891575972987d467564736f6c63430007060033",
   "immutableReferences": {},
   "generatedSources": [],
   "deployedGeneratedSources": [],
-  "sourceMap": "217:2723:6:-:0;;;369:2;337:34;;471:230;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;542:1;522:22;;:8;:22;;;;514:88;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;631:8;613:7;;:27;;;;;;;;;;;;;;;;;;651:42;1772:4:15;662:18:6;;682:10;651;;;:42;;:::i;:::-;471:230;217:2723;;6588:110:15;6666:25;6677:4;6683:7;6666:10;;;:25;;:::i;:::-;6588:110;;:::o;7025:184::-;7098:33;7123:7;7098:6;:12;7105:4;7098:12;;;;;;;;;;;:20;;:24;;;;;;:33;;;;:::i;:::-;7094:109;;;7179:12;:10;;;:12;;:::i;:::-;7152:40;;7170:7;7152:40;;7164:4;7152:40;;;;;;;;;;7094:109;7025:184;;:::o;6429:150:31:-;6499:4;6522:50;6527:3;:10;;6563:5;6547:23;;6539:32;;6522:4;;;:50;;:::i;:::-;6515:57;;6429:150;;;;:::o;598:104:29:-;651:15;685:10;678:17;;598:104;:::o;1640:404:31:-;1703:4;1724:21;1734:3;1739:5;1724:9;;;:21;;:::i;:::-;1719:319;;1761:3;:11;;1778:5;1761:23;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1941:3;:11;;:18;;;;1919:3;:12;;:19;1932:5;1919:19;;;;;;;;;;;:40;;;;1980:4;1973:11;;;;1719:319;2022:5;2015:12;;1640:404;;;;;:::o;3805:127::-;3878:4;3924:1;3901:3;:12;;:19;3914:5;3901:19;;;;;;;;;;;;:24;;3894:31;;3805:127;;;;:::o;217:2723:6:-;;;;;;;",
-  "deployedSourceMap": "217:2723:6:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4282:112:15;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;4644:223;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;5818:205;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;337:34:6;;;:::i;:::-;;;;;;;;;;;;;;;;;;;2626:303;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;3965:136:15;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;2950:137;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;267:63:6;;;:::i;:::-;;;;;;;;;;;;;;;;;;;1727:49:15;;;:::i;:::-;;;;;;;;;;;;;;;;;;;3255:125;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;5101:226;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;4282:112;4339:7;4365:6;:12;4372:4;4365:12;;;;;;;;;;;:22;;;4358:29;;4282:112;;;:::o;4644:223::-;4727:45;4735:6;:12;4742:4;4735:12;;;;;;;;;;;:22;;;4759:12;:10;:12::i;:::-;4727:7;:45::i;:::-;4719:105;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4835:25;4846:4;4852:7;4835:10;:25::i;:::-;4644:223;;:::o;5818:205::-;5915:12;:10;:12::i;:::-;5904:23;;:7;:23;;;5896:83;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5990:26;6002:4;6008:7;5990:11;:26::i;:::-;5818:205;;:::o;337:34:6:-;;;;:::o;2626:303::-;794:32;306:24;815:10;794:7;:32::i;:::-;786:86;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2740:1:::1;2721:15;:20;;2713:109;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2850:15;2833:14;:32;;;;2881:40;2905:15;2881:40;;;;;;;;;;;;;;;;;;2626:303:::0;:::o;3965:136:15:-;4038:7;4064:30;4088:5;4064:6;:12;4071:4;4064:12;;;;;;;;;;;:20;;:23;;:30;;;;:::i;:::-;4057:37;;3965:136;;;;:::o;2950:137::-;3019:4;3042:38;3072:7;3042:6;:12;3049:4;3042:12;;;;;;;;;;;:20;;:29;;:38;;;;:::i;:::-;3035:45;;2950:137;;;;:::o;267:63:6:-;306:24;267:63;:::o;1727:49:15:-;1772:4;1727:49;;;:::o;3255:125::-;3318:7;3344:29;:6;:12;3351:4;3344:12;;;;;;;;;;;:20;;:27;:29::i;:::-;3337:36;;3255:125;;;:::o;5101:226::-;5185:45;5193:6;:12;5200:4;5193:12;;;;;;;;;;;:22;;;5217:12;:10;:12::i;:::-;5185:7;:45::i;:::-;5177:106;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5294:26;5306:4;5312:7;5294:11;:26::i;:::-;5101:226;;:::o;6429:150:31:-;6499:4;6522:50;6527:3;:10;;6563:5;6547:23;;6539:32;;6522:4;:50::i;:::-;6515:57;;6429:150;;;;:::o;598:104:29:-;651:15;685:10;678:17;;598:104;:::o;7025:184:15:-;7098:33;7123:7;7098:6;:12;7105:4;7098:12;;;;;;;;;;;:20;;:24;;:33;;;;:::i;:::-;7094:109;;;7179:12;:10;:12::i;:::-;7152:40;;7170:7;7152:40;;7164:4;7152:40;;;;;;;;;;7094:109;7025:184;;:::o;7215:188::-;7289:36;7317:7;7289:6;:12;7296:4;7289:12;;;;;;;;;;;:20;;:27;;:36;;;;:::i;:::-;7285:112;;;7373:12;:10;:12::i;:::-;7346:40;;7364:7;7346:40;;7358:4;7346:40;;;;;;;;;;7285:112;7215:188;;:::o;7677:156:31:-;7751:7;7801:22;7805:3;:10;;7817:5;7801:3;:22::i;:::-;7793:31;;7770:56;;7677:156;;;;:::o;6984:165::-;7064:4;7087:55;7097:3;:10;;7133:5;7117:23;;7109:32;;7087:9;:55::i;:::-;7080:62;;6984:165;;;;:::o;7230:115::-;7293:7;7319:19;7327:3;:10;;7319:7;:19::i;:::-;7312:26;;7230:115;;;:::o;1640:404::-;1703:4;1724:21;1734:3;1739:5;1724:9;:21::i;:::-;1719:319;;1761:3;:11;;1778:5;1761:23;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1941:3;:11;;:18;;;;1919:3;:12;;:19;1932:5;1919:19;;;;;;;;;;;:40;;;;1980:4;1973:11;;;;1719:319;2022:5;2015:12;;1640:404;;;;;:::o;6747:156::-;6820:4;6843:53;6851:3;:10;;6887:5;6871:23;;6863:32;;6843:7;:53::i;:::-;6836:60;;6747:156;;;;:::o;4452:201::-;4519:7;4567:5;4546:3;:11;;:18;;;;:26;4538:73;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4628:3;:11;;4640:5;4628:18;;;;;;;;;;;;;;;;4621:25;;4452:201;;;;:::o;3805:127::-;3878:4;3924:1;3901:3;:12;;:19;3914:5;3901:19;;;;;;;;;;;;:24;;3894:31;;3805:127;;;;:::o;4013:107::-;4069:7;4095:3;:11;;:18;;;;4088:25;;4013:107;;;:::o;2212:1512::-;2278:4;2394:18;2415:3;:12;;:19;2428:5;2415:19;;;;;;;;;;;;2394:40;;2463:1;2449:10;:15;2445:1273;;2806:21;2843:1;2830:10;:14;2806:38;;2858:17;2899:1;2878:3;:11;;:18;;;;:22;2858:42;;3140:17;3160:3;:11;;3172:9;3160:22;;;;;;;;;;;;;;;;3140:42;;3303:9;3274:3;:11;;3286:13;3274:26;;;;;;;;;;;;;;;:38;;;;3420:1;3404:13;:17;3378:3;:12;;:23;3391:9;3378:23;;;;;;;;;;;:43;;;;3527:3;:11;;:17;;;;;;;;;;;;;;;;;;;;;;;;3619:3;:12;;:19;3632:5;3619:19;;;;;;;;;;;3612:26;;;3660:4;3653:11;;;;;;;;2445:1273;3702:5;3695:12;;;2212:1512;;;;;:::o",
+  "sourceMap": "217:2723:6:-:0;;;369:2;337:34;;471:230;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;542:1;522:22;;:8;:22;;;;514:88;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;631:8;613:7;;:27;;;;;;;;;;;;;;;;;;651:42;1772:4:10;662:18:6;;682:10;651;;;:42;;:::i;:::-;471:230;217:2723;;6588:110:10;6666:25;6677:4;6683:7;6666:10;;;:25;;:::i;:::-;6588:110;;:::o;7025:184::-;7098:33;7123:7;7098:6;:12;7105:4;7098:12;;;;;;;;;;;:20;;:24;;;;;;:33;;;;:::i;:::-;7094:109;;;7179:12;:10;;;:12;;:::i;:::-;7152:40;;7170:7;7152:40;;7164:4;7152:40;;;;;;;;;;7094:109;7025:184;;:::o;6429:150:18:-;6499:4;6522:50;6527:3;:10;;6563:5;6547:23;;6539:32;;6522:4;;;:50;;:::i;:::-;6515:57;;6429:150;;;;:::o;598:104:17:-;651:15;685:10;678:17;;598:104;:::o;1640:404:18:-;1703:4;1724:21;1734:3;1739:5;1724:9;;;:21;;:::i;:::-;1719:319;;1761:3;:11;;1778:5;1761:23;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1941:3;:11;;:18;;;;1919:3;:12;;:19;1932:5;1919:19;;;;;;;;;;;:40;;;;1980:4;1973:11;;;;1719:319;2022:5;2015:12;;1640:404;;;;;:::o;3805:127::-;3878:4;3924:1;3901:3;:12;;:19;3914:5;3901:19;;;;;;;;;;;;:24;;3894:31;;3805:127;;;;:::o;217:2723:6:-;;;;;;;",
+  "deployedSourceMap": "217:2723:6:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4282:112:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;4644:223;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;5818:205;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;337:34:6;;;:::i;:::-;;;;;;;;;;;;;;;;;;;2626:303;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;3965:136:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;2950:137;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;267:63:6;;;:::i;:::-;;;;;;;;;;;;;;;;;;;1727:49:10;;;:::i;:::-;;;;;;;;;;;;;;;;;;;3255:125;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;5101:226;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;4282:112;4339:7;4365:6;:12;4372:4;4365:12;;;;;;;;;;;:22;;;4358:29;;4282:112;;;:::o;4644:223::-;4727:45;4735:6;:12;4742:4;4735:12;;;;;;;;;;;:22;;;4759:12;:10;:12::i;:::-;4727:7;:45::i;:::-;4719:105;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4835:25;4846:4;4852:7;4835:10;:25::i;:::-;4644:223;;:::o;5818:205::-;5915:12;:10;:12::i;:::-;5904:23;;:7;:23;;;5896:83;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5990:26;6002:4;6008:7;5990:11;:26::i;:::-;5818:205;;:::o;337:34:6:-;;;;:::o;2626:303::-;794:32;306:24;815:10;794:7;:32::i;:::-;786:86;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2740:1:::1;2721:15;:20;;2713:109;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2850:15;2833:14;:32;;;;2881:40;2905:15;2881:40;;;;;;;;;;;;;;;;;;2626:303:::0;:::o;3965:136:10:-;4038:7;4064:30;4088:5;4064:6;:12;4071:4;4064:12;;;;;;;;;;;:20;;:23;;:30;;;;:::i;:::-;4057:37;;3965:136;;;;:::o;2950:137::-;3019:4;3042:38;3072:7;3042:6;:12;3049:4;3042:12;;;;;;;;;;;:20;;:29;;:38;;;;:::i;:::-;3035:45;;2950:137;;;;:::o;267:63:6:-;306:24;267:63;:::o;1727:49:10:-;1772:4;1727:49;;;:::o;3255:125::-;3318:7;3344:29;:6;:12;3351:4;3344:12;;;;;;;;;;;:20;;:27;:29::i;:::-;3337:36;;3255:125;;;:::o;5101:226::-;5185:45;5193:6;:12;5200:4;5193:12;;;;;;;;;;;:22;;;5217:12;:10;:12::i;:::-;5185:7;:45::i;:::-;5177:106;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;5294:26;5306:4;5312:7;5294:11;:26::i;:::-;5101:226;;:::o;6429:150:18:-;6499:4;6522:50;6527:3;:10;;6563:5;6547:23;;6539:32;;6522:4;:50::i;:::-;6515:57;;6429:150;;;;:::o;598:104:17:-;651:15;685:10;678:17;;598:104;:::o;7025:184:10:-;7098:33;7123:7;7098:6;:12;7105:4;7098:12;;;;;;;;;;;:20;;:24;;:33;;;;:::i;:::-;7094:109;;;7179:12;:10;:12::i;:::-;7152:40;;7170:7;7152:40;;7164:4;7152:40;;;;;;;;;;7094:109;7025:184;;:::o;7215:188::-;7289:36;7317:7;7289:6;:12;7296:4;7289:12;;;;;;;;;;;:20;;:27;;:36;;;;:::i;:::-;7285:112;;;7373:12;:10;:12::i;:::-;7346:40;;7364:7;7346:40;;7358:4;7346:40;;;;;;;;;;7285:112;7215:188;;:::o;7677:156:18:-;7751:7;7801:22;7805:3;:10;;7817:5;7801:3;:22::i;:::-;7793:31;;7770:56;;7677:156;;;;:::o;6984:165::-;7064:4;7087:55;7097:3;:10;;7133:5;7117:23;;7109:32;;7087:9;:55::i;:::-;7080:62;;6984:165;;;;:::o;7230:115::-;7293:7;7319:19;7327:3;:10;;7319:7;:19::i;:::-;7312:26;;7230:115;;;:::o;1640:404::-;1703:4;1724:21;1734:3;1739:5;1724:9;:21::i;:::-;1719:319;;1761:3;:11;;1778:5;1761:23;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1941:3;:11;;:18;;;;1919:3;:12;;:19;1932:5;1919:19;;;;;;;;;;;:40;;;;1980:4;1973:11;;;;1719:319;2022:5;2015:12;;1640:404;;;;;:::o;6747:156::-;6820:4;6843:53;6851:3;:10;;6887:5;6871:23;;6863:32;;6843:7;:53::i;:::-;6836:60;;6747:156;;;;:::o;4452:201::-;4519:7;4567:5;4546:3;:11;;:18;;;;:26;4538:73;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4628:3;:11;;4640:5;4628:18;;;;;;;;;;;;;;;;4621:25;;4452:201;;;;:::o;3805:127::-;3878:4;3924:1;3901:3;:12;;:19;3914:5;3901:19;;;;;;;;;;;;:24;;3894:31;;3805:127;;;;:::o;4013:107::-;4069:7;4095:3;:11;;:18;;;;4088:25;;4013:107;;;:::o;2212:1512::-;2278:4;2394:18;2415:3;:12;;:19;2428:5;2415:19;;;;;;;;;;;;2394:40;;2463:1;2449:10;:15;2445:1273;;2806:21;2843:1;2830:10;:14;2806:38;;2858:17;2899:1;2878:3;:11;;:18;;;;:22;2858:42;;3140:17;3160:3;:11;;3172:9;3160:22;;;;;;;;;;;;;;;;3140:42;;3303:9;3274:3;:11;;3286:13;3274:26;;;;;;;;;;;;;;;:38;;;;3420:1;3404:13;:17;3378:3;:12;;:23;3391:9;3378:23;;;;;;;;;;;:43;;;;3527:3;:11;;:17;;;;;;;;;;;;;;;;;;;;;;;;3619:3;:12;;:19;3632:5;3619:19;;;;;;;;;;;3612:26;;;3660:4;3653:11;;;;;;;;2445:1273;3702:5;3695:12;;;2212:1512;;;;;:::o",
   "source": "// SPDX-License-Identifier: MIT\r\npragma solidity =0.7.6;\r\nimport \"./Members.sol\";\r\nimport \"@openzeppelin/contracts/access/AccessControl.sol\";\r\n\r\n/**\r\n * @title MemberHelpers\r\n * Additional function for Members \r\n */\r\ncontract MemberHelpers is  AccessControl {\r\n\r\n    bytes32 public constant SETTER_ROLE =  keccak256(\"SETTER_ROLE\");\r\n    uint256 public minDepositDays = 30;\r\n\r\n \r\n\r\n    event LogUpdateMinDepositDays(uint256 minDepositDays);\r\n\r\n    Members members;\r\n\r\n    constructor(address  _members ) {\r\n        require(_members != address(0), \"MemberHelpers:constructor - Member address can't be 0\");\r\n        members = Members(_members);\r\n        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);\r\n    }\r\n\r\n\r\n   /// @dev check if caller is a setter     \r\n    modifier isSetter {\r\n        require(hasRole(SETTER_ROLE, msg.sender), \"Members:isSetter - Caller is not a setter\");\r\n\r\n        _;\r\n    }\r\n\r\n    \r\n    // /*\r\n    // * @dev return name of the enterprise\r\n    // * @param enterprise to return the name\r\n    // */\r\n    // function returnEnterpriseName(address enterprise) public view returns (string memory) {\r\n\r\n    //     for (uint256 i = 0; i < members.enterpriseCount(); i++){\r\n    //         (address user, string memory name) = members.enterprises(i);\r\n\r\n    //         if (user == enterprise)\r\n    //             return name;\r\n    //     }\r\n    //     return \"Not Enterprise\";\r\n    // }\r\n\r\n    // /*\r\n    // * @dev return name of the validator\r\n    // * @param validator to return the name\r\n    // */\r\n    // function returnValidatorName(address validator) public view returns (string memory) {\r\n\r\n    //     for (uint256 i = 0; i < members.returnValidatorCount(); i++){\r\n\r\n    //         (address user, string memory name) = members.validators(i);\r\n    //         if (user == validator)\r\n    //             return name;\r\n    //     }\r\n    //     return \"Not Validator\";\r\n    // }\r\n    \r\n\r\n    // /*\r\n    // * @dev return name of the data subscriber\r\n    // * @param validator to return the name\r\n    // */\r\n    // function returnDataSubscriberName(address dataSubscribers) public view returns (string memory) {\r\n\r\n    //     for (uint256 i = 0; i < members.returnDataSubscriberCount(); i++){\r\n    //         (address user, string memory name) = members.dataSubscribers(i);\r\n    //         if (user == dataSubscribers)\r\n    //             return name;\r\n    //     }\r\n    //     return \"Not Data Subscriber\";\r\n    // }\r\n\r\n\r\n    /**\r\n    * @dev to be called by Governance contract to update days to calculate enterprise min deposit requirements\r\n    * @param _minDepositDays new value of min deposit days\r\n    */\r\n    function updateMinDepositDays(uint256 _minDepositDays) public isSetter()  {\r\n\r\n        require(_minDepositDays != 0, \"Members:updateMinDepositDays - New value for the min deposit days can't be 0\");\r\n        minDepositDays = _minDepositDays;\r\n        emit LogUpdateMinDepositDays(_minDepositDays);\r\n    }\r\n\r\n    \r\n}",
   "sourcePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/MemberHelpers.sol",
   "ast": {
     "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/MemberHelpers.sol",
     "exportedSymbols": {
       "AccessControl": [
-        7010
+        5184
       ],
       "Address": [
-        9719
+        6688
       ],
       "AuditToken": [
-        1027
+        1018
       ],
       "Context": [
-        9742
+        6711
       ],
       "ERC20": [
-        7937
+        6042
       ],
       "ERC20Burnable": [
-        7996
+        6101
       ],
       "EnumerableSet": [
-        10794
+        7203
       ],
       "ICohort": [
-        3209
+        3286
       ],
       "ICohortFactory": [
-        3228
+        3305
       ],
       "IERC20": [
-        8074
+        6179
       ],
       "Locked": [
-        6519
+        4890
       ],
       "MemberHelpers": [
-        3316
+        3393
       ],
       "Members": [
-        4513
+        4710
       ],
       "MigrationAgent": [
-        6530
+        4901
       ],
       "Pausable": [
-        10886
+        7295
       ],
       "SafeERC20": [
-        8287
+        6392
       ],
       "SafeMath": [
-        7434
+        5539
       ]
     },
-    "id": 3317,
+    "id": 3394,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3230,
+        "id": 3307,
         "literals": [
           "solidity",
           "=",
@@ -383,10 +383,10 @@
       {
         "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/Members.sol",
         "file": "./Members.sol",
-        "id": 3231,
+        "id": 3308,
         "nodeType": "ImportDirective",
-        "scope": 3317,
-        "sourceUnit": 4514,
+        "scope": 3394,
+        "sourceUnit": 4711,
         "src": "58:23:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -394,10 +394,10 @@
       {
         "absolutePath": "@openzeppelin/contracts/access/AccessControl.sol",
         "file": "@openzeppelin/contracts/access/AccessControl.sol",
-        "id": 3232,
+        "id": 3309,
         "nodeType": "ImportDirective",
-        "scope": 3317,
-        "sourceUnit": 7011,
+        "scope": 3394,
+        "sourceUnit": 5185,
         "src": "83:58:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -407,38 +407,38 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 3234,
+              "id": 3311,
               "name": "AccessControl",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 7010,
+              "referencedDeclaration": 5184,
               "src": "244:13:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_AccessControl_$7010",
+                "typeIdentifier": "t_contract$_AccessControl_$5184",
                 "typeString": "contract AccessControl"
               }
             },
-            "id": 3235,
+            "id": 3312,
             "nodeType": "InheritanceSpecifier",
             "src": "244:13:6"
           }
         ],
         "contractDependencies": [
-          7010,
-          9742
+          5184,
+          6711
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 3233,
+          "id": 3310,
           "nodeType": "StructuredDocumentation",
           "src": "145:70:6",
           "text": " @title MemberHelpers\n Additional function for Members "
         },
         "fullyImplemented": true,
-        "id": 3316,
+        "id": 3393,
         "linearizedBaseContracts": [
-          3316,
-          7010,
-          9742
+          3393,
+          5184,
+          6711
         ],
         "name": "MemberHelpers",
         "nodeType": "ContractDefinition",
@@ -446,11 +446,11 @@
           {
             "constant": true,
             "functionSelector": "a2011b3f",
-            "id": 3240,
+            "id": 3317,
             "mutability": "constant",
             "name": "SETTER_ROLE",
             "nodeType": "VariableDeclaration",
-            "scope": 3316,
+            "scope": 3393,
             "src": "267:63:6",
             "stateVariable": true,
             "storageLocation": "default",
@@ -459,7 +459,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 3236,
+              "id": 3313,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "267:7:6",
@@ -472,7 +472,7 @@
               "arguments": [
                 {
                   "hexValue": "5345545445525f524f4c45",
-                  "id": 3238,
+                  "id": 3315,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -494,7 +494,7 @@
                     "typeString": "literal_string \"SETTER_ROLE\""
                   }
                 ],
-                "id": 3237,
+                "id": 3314,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -505,7 +505,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 3239,
+              "id": 3316,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -525,11 +525,11 @@
           {
             "constant": false,
             "functionSelector": "5659ae58",
-            "id": 3243,
+            "id": 3320,
             "mutability": "mutable",
             "name": "minDepositDays",
             "nodeType": "VariableDeclaration",
-            "scope": 3316,
+            "scope": 3393,
             "src": "337:34:6",
             "stateVariable": true,
             "storageLocation": "default",
@@ -538,7 +538,7 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 3241,
+              "id": 3318,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
               "src": "337:7:6",
@@ -549,7 +549,7 @@
             },
             "value": {
               "hexValue": "3330",
-              "id": 3242,
+              "id": 3319,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -567,21 +567,21 @@
           },
           {
             "anonymous": false,
-            "id": 3247,
+            "id": 3324,
             "name": "LogUpdateMinDepositDays",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 3246,
+              "id": 3323,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3245,
+                  "id": 3322,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "minDepositDays",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3247,
+                  "scope": 3324,
                   "src": "415:22:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -590,7 +590,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3244,
+                    "id": 3321,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "415:7:6",
@@ -608,26 +608,26 @@
           },
           {
             "constant": false,
-            "id": 3249,
+            "id": 3326,
             "mutability": "mutable",
             "name": "members",
             "nodeType": "VariableDeclaration",
-            "scope": 3316,
+            "scope": 3393,
             "src": "447:15:6",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_Members_$4513",
+              "typeIdentifier": "t_contract$_Members_$4710",
               "typeString": "contract Members"
             },
             "typeName": {
-              "id": 3248,
+              "id": 3325,
               "name": "Members",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4513,
+              "referencedDeclaration": 4710,
               "src": "447:7:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Members_$4513",
+                "typeIdentifier": "t_contract$_Members_$4710",
                 "typeString": "contract Members"
               }
             },
@@ -635,7 +635,7 @@
           },
           {
             "body": {
-              "id": 3276,
+              "id": 3353,
               "nodeType": "Block",
               "src": "503:198:6",
               "statements": [
@@ -647,17 +647,17 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 3260,
+                        "id": 3337,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
-                          "id": 3255,
+                          "id": 3332,
                           "name": "_members",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 3251,
+                          "referencedDeclaration": 3328,
                           "src": "522:8:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -670,7 +670,7 @@
                           "arguments": [
                             {
                               "hexValue": "30",
-                              "id": 3258,
+                              "id": 3335,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
@@ -692,7 +692,7 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 3257,
+                            "id": 3334,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -704,14 +704,14 @@
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 3256,
+                              "id": 3333,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
                               "src": "534:7:6",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 3259,
+                          "id": 3336,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -734,7 +734,7 @@
                       },
                       {
                         "hexValue": "4d656d62657248656c706572733a636f6e7374727563746f72202d204d656d62657220616464726573732063616e27742062652030",
-                        "id": 3261,
+                        "id": 3338,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -760,7 +760,7 @@
                           "typeString": "literal_string \"MemberHelpers:constructor - Member address can't be 0\""
                         }
                       ],
-                      "id": 3254,
+                      "id": 3331,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -774,7 +774,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 3262,
+                    "id": 3339,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -789,26 +789,26 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3263,
+                  "id": 3340,
                   "nodeType": "ExpressionStatement",
                   "src": "514:88:6"
                 },
                 {
                   "expression": {
-                    "id": 3268,
+                    "id": 3345,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 3264,
+                      "id": 3341,
                       "name": "members",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3249,
+                      "referencedDeclaration": 3326,
                       "src": "613:7:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Members_$4513",
+                        "typeIdentifier": "t_contract$_Members_$4710",
                         "typeString": "contract Members"
                       }
                     },
@@ -817,11 +817,11 @@
                     "rightHandSide": {
                       "arguments": [
                         {
-                          "id": 3266,
+                          "id": 3343,
                           "name": "_members",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 3251,
+                          "referencedDeclaration": 3328,
                           "src": "631:8:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -836,18 +836,18 @@
                             "typeString": "address"
                           }
                         ],
-                        "id": 3265,
+                        "id": 3342,
                         "name": "Members",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 4513,
+                        "referencedDeclaration": 4710,
                         "src": "623:7:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Members_$4513_$",
+                          "typeIdentifier": "t_type$_t_contract$_Members_$4710_$",
                           "typeString": "type(contract Members)"
                         }
                       },
-                      "id": 3267,
+                      "id": 3344,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -858,17 +858,17 @@
                       "src": "623:17:6",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Members_$4513",
+                        "typeIdentifier": "t_contract$_Members_$4710",
                         "typeString": "contract Members"
                       }
                     },
                     "src": "613:27:6",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_Members_$4513",
+                      "typeIdentifier": "t_contract$_Members_$4710",
                       "typeString": "contract Members"
                     }
                   },
-                  "id": 3269,
+                  "id": 3346,
                   "nodeType": "ExpressionStatement",
                   "src": "613:27:6"
                 },
@@ -876,11 +876,11 @@
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3271,
+                        "id": 3348,
                         "name": "DEFAULT_ADMIN_ROLE",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 6753,
+                        "referencedDeclaration": 4927,
                         "src": "662:18:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
@@ -889,7 +889,7 @@
                       },
                       {
                         "expression": {
-                          "id": 3272,
+                          "id": 3349,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -900,7 +900,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 3273,
+                        "id": 3350,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -925,18 +925,18 @@
                           "typeString": "address payable"
                         }
                       ],
-                      "id": 3270,
+                      "id": 3347,
                       "name": "_setupRole",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 6936,
+                      "referencedDeclaration": 5110,
                       "src": "651:10:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_bytes32_$_t_address_$returns$__$",
                         "typeString": "function (bytes32,address)"
                       }
                     },
-                    "id": 3274,
+                    "id": 3351,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -951,29 +951,29 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3275,
+                  "id": 3352,
                   "nodeType": "ExpressionStatement",
                   "src": "651:42:6"
                 }
               ]
             },
-            "id": 3277,
+            "id": 3354,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3252,
+              "id": 3329,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3251,
+                  "id": 3328,
                   "mutability": "mutable",
                   "name": "_members",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3277,
+                  "scope": 3354,
                   "src": "483:17:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -982,7 +982,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3250,
+                    "id": 3327,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "483:7:6",
@@ -998,12 +998,12 @@
               "src": "482:20:6"
             },
             "returnParameters": {
-              "id": 3253,
+              "id": 3330,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "503:0:6"
             },
-            "scope": 3316,
+            "scope": 3393,
             "src": "471:230:6",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -1011,7 +1011,7 @@
           },
           {
             "body": {
-              "id": 3290,
+              "id": 3367,
               "nodeType": "Block",
               "src": "775:119:6",
               "statements": [
@@ -1021,11 +1021,11 @@
                       {
                         "arguments": [
                           {
-                            "id": 3282,
+                            "id": 3359,
                             "name": "SETTER_ROLE",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 3240,
+                            "referencedDeclaration": 3317,
                             "src": "802:11:6",
                             "typeDescriptions": {
                               "typeIdentifier": "t_bytes32",
@@ -1034,7 +1034,7 @@
                           },
                           {
                             "expression": {
-                              "id": 3283,
+                              "id": 3360,
                               "name": "msg",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
@@ -1045,7 +1045,7 @@
                                 "typeString": "msg"
                               }
                             },
-                            "id": 3284,
+                            "id": 3361,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -1070,18 +1070,18 @@
                               "typeString": "address payable"
                             }
                           ],
-                          "id": 3281,
+                          "id": 3358,
                           "name": "hasRole",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6799,
+                          "referencedDeclaration": 4973,
                           "src": "794:7:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$_t_bytes32_$_t_address_$returns$_t_bool_$",
                             "typeString": "function (bytes32,address) view returns (bool)"
                           }
                         },
-                        "id": 3285,
+                        "id": 3362,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1098,7 +1098,7 @@
                       },
                       {
                         "hexValue": "4d656d626572733a6973536574746572202d2043616c6c6572206973206e6f74206120736574746572",
-                        "id": 3286,
+                        "id": 3363,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -1124,7 +1124,7 @@
                           "typeString": "literal_string \"Members:isSetter - Caller is not a setter\""
                         }
                       ],
-                      "id": 3280,
+                      "id": 3357,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -1138,7 +1138,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 3287,
+                    "id": 3364,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1153,28 +1153,28 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3288,
+                  "id": 3365,
                   "nodeType": "ExpressionStatement",
                   "src": "786:86:6"
                 },
                 {
-                  "id": 3289,
+                  "id": 3366,
                   "nodeType": "PlaceholderStatement",
                   "src": "885:1:6"
                 }
               ]
             },
             "documentation": {
-              "id": 3278,
+              "id": 3355,
               "nodeType": "StructuredDocumentation",
               "src": "710:41:6",
               "text": "@dev check if caller is a setter     "
             },
-            "id": 3291,
+            "id": 3368,
             "name": "isSetter",
             "nodeType": "ModifierDefinition",
             "parameters": {
-              "id": 3279,
+              "id": 3356,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "775:0:6"
@@ -1185,7 +1185,7 @@
           },
           {
             "body": {
-              "id": 3314,
+              "id": 3391,
               "nodeType": "Block",
               "src": "2700:229:6",
               "statements": [
@@ -1197,17 +1197,17 @@
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         },
-                        "id": 3302,
+                        "id": 3379,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
-                          "id": 3300,
+                          "id": 3377,
                           "name": "_minDepositDays",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 3294,
+                          "referencedDeclaration": 3371,
                           "src": "2721:15:6",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
@@ -1218,7 +1218,7 @@
                         "operator": "!=",
                         "rightExpression": {
                           "hexValue": "30",
-                          "id": 3301,
+                          "id": 3378,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -1240,7 +1240,7 @@
                       },
                       {
                         "hexValue": "4d656d626572733a7570646174654d696e4465706f73697444617973202d204e65772076616c756520666f7220746865206d696e206465706f73697420646179732063616e27742062652030",
-                        "id": 3303,
+                        "id": 3380,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -1266,7 +1266,7 @@
                           "typeString": "literal_string \"Members:updateMinDepositDays - New value for the min deposit days can't be 0\""
                         }
                       ],
-                      "id": 3299,
+                      "id": 3376,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -1280,7 +1280,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 3304,
+                    "id": 3381,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1295,23 +1295,23 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3305,
+                  "id": 3382,
                   "nodeType": "ExpressionStatement",
                   "src": "2713:109:6"
                 },
                 {
                   "expression": {
-                    "id": 3308,
+                    "id": 3385,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 3306,
+                      "id": 3383,
                       "name": "minDepositDays",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3243,
+                      "referencedDeclaration": 3320,
                       "src": "2833:14:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -1321,11 +1321,11 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 3307,
+                      "id": 3384,
                       "name": "_minDepositDays",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3294,
+                      "referencedDeclaration": 3371,
                       "src": "2850:15:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -1338,7 +1338,7 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 3309,
+                  "id": 3386,
                   "nodeType": "ExpressionStatement",
                   "src": "2833:32:6"
                 },
@@ -1346,11 +1346,11 @@
                   "eventCall": {
                     "arguments": [
                       {
-                        "id": 3311,
+                        "id": 3388,
                         "name": "_minDepositDays",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3294,
+                        "referencedDeclaration": 3371,
                         "src": "2905:15:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -1365,18 +1365,18 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 3310,
+                      "id": 3387,
                       "name": "LogUpdateMinDepositDays",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3247,
+                      "referencedDeclaration": 3324,
                       "src": "2881:23:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 3312,
+                    "id": 3389,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1391,32 +1391,32 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3313,
+                  "id": 3390,
                   "nodeType": "EmitStatement",
                   "src": "2876:45:6"
                 }
               ]
             },
             "documentation": {
-              "id": 3292,
+              "id": 3369,
               "nodeType": "StructuredDocumentation",
               "src": "2437:183:6",
               "text": " @dev to be called by Governance contract to update days to calculate enterprise min deposit requirements\n @param _minDepositDays new value of min deposit days"
             },
             "functionSelector": "74eb9cdb",
-            "id": 3315,
+            "id": 3392,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
                 "arguments": [],
-                "id": 3297,
+                "id": 3374,
                 "modifierName": {
-                  "id": 3296,
+                  "id": 3373,
                   "name": "isSetter",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 3291,
+                  "referencedDeclaration": 3368,
                   "src": "2688:8:6",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -1430,16 +1430,16 @@
             "name": "updateMinDepositDays",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3295,
+              "id": 3372,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3294,
+                  "id": 3371,
                   "mutability": "mutable",
                   "name": "_minDepositDays",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3315,
+                  "scope": 3392,
                   "src": "2656:23:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1448,7 +1448,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3293,
+                    "id": 3370,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "2656:7:6",
@@ -1463,19 +1463,19 @@
               "src": "2655:25:6"
             },
             "returnParameters": {
-              "id": 3298,
+              "id": 3375,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "2700:0:6"
             },
-            "scope": 3316,
+            "scope": 3393,
             "src": "2626:303:6",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 3317,
+        "scope": 3394,
         "src": "217:2723:6"
       }
     ],
@@ -1486,55 +1486,55 @@
       "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/MemberHelpers.sol",
       "exportedSymbols": {
         "AccessControl": [
-          7010
+          5184
         ],
         "Address": [
-          9719
+          6688
         ],
         "AuditToken": [
-          1027
+          1018
         ],
         "Context": [
-          9742
+          6711
         ],
         "ERC20": [
-          7937
+          6042
         ],
         "ERC20Burnable": [
-          7996
+          6101
         ],
         "EnumerableSet": [
-          10794
+          7203
         ],
         "ICohort": [
-          3209
+          3286
         ],
         "ICohortFactory": [
-          3228
+          3305
         ],
         "IERC20": [
-          8074
+          6179
         ],
         "Locked": [
-          6519
+          4890
         ],
         "MemberHelpers": [
-          3316
+          3393
         ],
         "Members": [
-          4513
+          4710
         ],
         "MigrationAgent": [
-          6530
+          4901
         ],
         "Pausable": [
-          10886
+          7295
         ],
         "SafeERC20": [
-          8287
+          6392
         ],
         "SafeMath": [
-          7434
+          5539
         ]
       },
       "license": "MIT"
@@ -1549,37 +1549,37 @@
             ".6"
           ]
         },
-        "id": 3230,
+        "id": 3307,
         "name": "PragmaDirective",
         "src": "33:23:6"
       },
       {
         "attributes": {
-          "SourceUnit": 4514,
+          "SourceUnit": 4711,
           "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Auditchain/Members.sol",
           "file": "./Members.sol",
-          "scope": 3317,
+          "scope": 3394,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 3231,
+        "id": 3308,
         "name": "ImportDirective",
         "src": "58:23:6"
       },
       {
         "attributes": {
-          "SourceUnit": 7011,
+          "SourceUnit": 5185,
           "absolutePath": "@openzeppelin/contracts/access/AccessControl.sol",
           "file": "@openzeppelin/contracts/access/AccessControl.sol",
-          "scope": 3317,
+          "scope": 3394,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 3232,
+        "id": 3309,
         "name": "ImportDirective",
         "src": "83:58:6"
       },
@@ -1587,25 +1587,25 @@
         "attributes": {
           "abstract": false,
           "contractDependencies": [
-            7010,
-            9742
+            5184,
+            6711
           ],
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            3316,
-            7010,
-            9742
+            3393,
+            5184,
+            6711
           ],
           "name": "MemberHelpers",
-          "scope": 3317
+          "scope": 3394
         },
         "children": [
           {
             "attributes": {
               "text": " @title MemberHelpers\n Additional function for Members "
             },
-            "id": 3233,
+            "id": 3310,
             "name": "StructuredDocumentation",
             "src": "145:70:6"
           },
@@ -1615,15 +1615,15 @@
               {
                 "attributes": {
                   "name": "AccessControl",
-                  "referencedDeclaration": 7010,
+                  "referencedDeclaration": 5184,
                   "type": "contract AccessControl"
                 },
-                "id": 3234,
+                "id": 3311,
                 "name": "UserDefinedTypeName",
                 "src": "244:13:6"
               }
             ],
-            "id": 3235,
+            "id": 3312,
             "name": "InheritanceSpecifier",
             "src": "244:13:6"
           },
@@ -1633,7 +1633,7 @@
               "functionSelector": "a2011b3f",
               "mutability": "constant",
               "name": "SETTER_ROLE",
-              "scope": 3316,
+              "scope": 3393,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "bytes32",
@@ -1645,7 +1645,7 @@
                   "name": "bytes32",
                   "type": "bytes32"
                 },
-                "id": 3236,
+                "id": 3313,
                 "name": "ElementaryTypeName",
                 "src": "267:7:6"
               },
@@ -1679,7 +1679,7 @@
                       "type": "function (bytes memory) pure returns (bytes32)",
                       "value": "keccak256"
                     },
-                    "id": 3237,
+                    "id": 3314,
                     "name": "Identifier",
                     "src": "306:9:6"
                   },
@@ -1694,17 +1694,17 @@
                       "type": "literal_string \"SETTER_ROLE\"",
                       "value": "SETTER_ROLE"
                     },
-                    "id": 3238,
+                    "id": 3315,
                     "name": "Literal",
                     "src": "316:13:6"
                   }
                 ],
-                "id": 3239,
+                "id": 3316,
                 "name": "FunctionCall",
                 "src": "306:24:6"
               }
             ],
-            "id": 3240,
+            "id": 3317,
             "name": "VariableDeclaration",
             "src": "267:63:6"
           },
@@ -1714,7 +1714,7 @@
               "functionSelector": "5659ae58",
               "mutability": "mutable",
               "name": "minDepositDays",
-              "scope": 3316,
+              "scope": 3393,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -1726,7 +1726,7 @@
                   "name": "uint256",
                   "type": "uint256"
                 },
-                "id": 3241,
+                "id": 3318,
                 "name": "ElementaryTypeName",
                 "src": "337:7:6"
               },
@@ -1741,12 +1741,12 @@
                   "type": "int_const 30",
                   "value": "30"
                 },
-                "id": 3242,
+                "id": 3319,
                 "name": "Literal",
                 "src": "369:2:6"
               }
             ],
-            "id": 3243,
+            "id": 3320,
             "name": "VariableDeclaration",
             "src": "337:34:6"
           },
@@ -1764,7 +1764,7 @@
                       "indexed": false,
                       "mutability": "mutable",
                       "name": "minDepositDays",
-                      "scope": 3247,
+                      "scope": 3324,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -1776,22 +1776,22 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 3244,
+                        "id": 3321,
                         "name": "ElementaryTypeName",
                         "src": "415:7:6"
                       }
                     ],
-                    "id": 3245,
+                    "id": 3322,
                     "name": "VariableDeclaration",
                     "src": "415:22:6"
                   }
                 ],
-                "id": 3246,
+                "id": 3323,
                 "name": "ParameterList",
                 "src": "414:24:6"
               }
             ],
-            "id": 3247,
+            "id": 3324,
             "name": "EventDefinition",
             "src": "385:54:6"
           },
@@ -1800,7 +1800,7 @@
               "constant": false,
               "mutability": "mutable",
               "name": "members",
-              "scope": 3316,
+              "scope": 3393,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "contract Members",
@@ -1810,15 +1810,15 @@
               {
                 "attributes": {
                   "name": "Members",
-                  "referencedDeclaration": 4513,
+                  "referencedDeclaration": 4710,
                   "type": "contract Members"
                 },
-                "id": 3248,
+                "id": 3325,
                 "name": "UserDefinedTypeName",
                 "src": "447:7:6"
               }
             ],
-            "id": 3249,
+            "id": 3326,
             "name": "VariableDeclaration",
             "src": "447:15:6"
           },
@@ -1831,7 +1831,7 @@
                 null
               ],
               "name": "",
-              "scope": 3316,
+              "scope": 3393,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "public"
@@ -1844,7 +1844,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_members",
-                      "scope": 3277,
+                      "scope": 3354,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1857,17 +1857,17 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 3250,
+                        "id": 3327,
                         "name": "ElementaryTypeName",
                         "src": "483:7:6"
                       }
                     ],
-                    "id": 3251,
+                    "id": 3328,
                     "name": "VariableDeclaration",
                     "src": "483:17:6"
                   }
                 ],
-                "id": 3252,
+                "id": 3329,
                 "name": "ParameterList",
                 "src": "482:20:6"
               },
@@ -1878,7 +1878,7 @@
                   ]
                 },
                 "children": [],
-                "id": 3253,
+                "id": 3330,
                 "name": "ParameterList",
                 "src": "503:0:6"
               },
@@ -1921,7 +1921,7 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 3254,
+                            "id": 3331,
                             "name": "Identifier",
                             "src": "514:7:6"
                           },
@@ -1944,11 +1944,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 3251,
+                                  "referencedDeclaration": 3328,
                                   "type": "address",
                                   "value": "_members"
                                 },
-                                "id": 3255,
+                                "id": 3332,
                                 "name": "Identifier",
                                 "src": "522:8:6"
                               },
@@ -1986,12 +1986,12 @@
                                         "attributes": {
                                           "name": "address"
                                         },
-                                        "id": 3256,
+                                        "id": 3333,
                                         "name": "ElementaryTypeName",
                                         "src": "534:7:6"
                                       }
                                     ],
-                                    "id": 3257,
+                                    "id": 3334,
                                     "name": "ElementaryTypeNameExpression",
                                     "src": "534:7:6"
                                   },
@@ -2006,17 +2006,17 @@
                                       "type": "int_const 0",
                                       "value": "0"
                                     },
-                                    "id": 3258,
+                                    "id": 3335,
                                     "name": "Literal",
                                     "src": "542:1:6"
                                   }
                                 ],
-                                "id": 3259,
+                                "id": 3336,
                                 "name": "FunctionCall",
                                 "src": "534:10:6"
                               }
                             ],
-                            "id": 3260,
+                            "id": 3337,
                             "name": "BinaryOperation",
                             "src": "522:22:6"
                           },
@@ -2031,17 +2031,17 @@
                               "type": "literal_string \"MemberHelpers:constructor - Member address can't be 0\"",
                               "value": "MemberHelpers:constructor - Member address can't be 0"
                             },
-                            "id": 3261,
+                            "id": 3338,
                             "name": "Literal",
                             "src": "546:55:6"
                           }
                         ],
-                        "id": 3262,
+                        "id": 3339,
                         "name": "FunctionCall",
                         "src": "514:88:6"
                       }
                     ],
-                    "id": 3263,
+                    "id": 3340,
                     "name": "ExpressionStatement",
                     "src": "514:88:6"
                   },
@@ -2062,11 +2062,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3249,
+                              "referencedDeclaration": 3326,
                               "type": "contract Members",
                               "value": "members"
                             },
-                            "id": 3264,
+                            "id": 3341,
                             "name": "Identifier",
                             "src": "613:7:6"
                           },
@@ -2096,11 +2096,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 4513,
+                                  "referencedDeclaration": 4710,
                                   "type": "type(contract Members)",
                                   "value": "Members"
                                 },
-                                "id": 3265,
+                                "id": 3342,
                                 "name": "Identifier",
                                 "src": "623:7:6"
                               },
@@ -2109,26 +2109,26 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 3251,
+                                  "referencedDeclaration": 3328,
                                   "type": "address",
                                   "value": "_members"
                                 },
-                                "id": 3266,
+                                "id": 3343,
                                 "name": "Identifier",
                                 "src": "631:8:6"
                               }
                             ],
-                            "id": 3267,
+                            "id": 3344,
                             "name": "FunctionCall",
                             "src": "623:17:6"
                           }
                         ],
-                        "id": 3268,
+                        "id": 3345,
                         "name": "Assignment",
                         "src": "613:27:6"
                       }
                     ],
-                    "id": 3269,
+                    "id": 3346,
                     "name": "ExpressionStatement",
                     "src": "613:27:6"
                   },
@@ -2164,11 +2164,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6936,
+                              "referencedDeclaration": 5110,
                               "type": "function (bytes32,address)",
                               "value": "_setupRole"
                             },
-                            "id": 3270,
+                            "id": 3347,
                             "name": "Identifier",
                             "src": "651:10:6"
                           },
@@ -2177,11 +2177,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6753,
+                              "referencedDeclaration": 4927,
                               "type": "bytes32",
                               "value": "DEFAULT_ADMIN_ROLE"
                             },
-                            "id": 3271,
+                            "id": 3348,
                             "name": "Identifier",
                             "src": "662:18:6"
                           },
@@ -2204,32 +2204,32 @@
                                   "type": "msg",
                                   "value": "msg"
                                 },
-                                "id": 3272,
+                                "id": 3349,
                                 "name": "Identifier",
                                 "src": "682:3:6"
                               }
                             ],
-                            "id": 3273,
+                            "id": 3350,
                             "name": "MemberAccess",
                             "src": "682:10:6"
                           }
                         ],
-                        "id": 3274,
+                        "id": 3351,
                         "name": "FunctionCall",
                         "src": "651:42:6"
                       }
                     ],
-                    "id": 3275,
+                    "id": 3352,
                     "name": "ExpressionStatement",
                     "src": "651:42:6"
                   }
                 ],
-                "id": 3276,
+                "id": 3353,
                 "name": "Block",
                 "src": "503:198:6"
               }
             ],
-            "id": 3277,
+            "id": 3354,
             "name": "FunctionDefinition",
             "src": "471:230:6"
           },
@@ -2244,7 +2244,7 @@
                 "attributes": {
                   "text": "@dev check if caller is a setter     "
                 },
-                "id": 3278,
+                "id": 3355,
                 "name": "StructuredDocumentation",
                 "src": "710:41:6"
               },
@@ -2255,7 +2255,7 @@
                   ]
                 },
                 "children": [],
-                "id": 3279,
+                "id": 3356,
                 "name": "ParameterList",
                 "src": "775:0:6"
               },
@@ -2298,7 +2298,7 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 3280,
+                            "id": 3357,
                             "name": "Identifier",
                             "src": "786:7:6"
                           },
@@ -2332,11 +2332,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 6799,
+                                  "referencedDeclaration": 4973,
                                   "type": "function (bytes32,address) view returns (bool)",
                                   "value": "hasRole"
                                 },
-                                "id": 3281,
+                                "id": 3358,
                                 "name": "Identifier",
                                 "src": "794:7:6"
                               },
@@ -2345,11 +2345,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 3240,
+                                  "referencedDeclaration": 3317,
                                   "type": "bytes32",
                                   "value": "SETTER_ROLE"
                                 },
-                                "id": 3282,
+                                "id": 3359,
                                 "name": "Identifier",
                                 "src": "802:11:6"
                               },
@@ -2372,17 +2372,17 @@
                                       "type": "msg",
                                       "value": "msg"
                                     },
-                                    "id": 3283,
+                                    "id": 3360,
                                     "name": "Identifier",
                                     "src": "815:3:6"
                                   }
                                 ],
-                                "id": 3284,
+                                "id": 3361,
                                 "name": "MemberAccess",
                                 "src": "815:10:6"
                               }
                             ],
-                            "id": 3285,
+                            "id": 3362,
                             "name": "FunctionCall",
                             "src": "794:32:6"
                           },
@@ -2397,32 +2397,32 @@
                               "type": "literal_string \"Members:isSetter - Caller is not a setter\"",
                               "value": "Members:isSetter - Caller is not a setter"
                             },
-                            "id": 3286,
+                            "id": 3363,
                             "name": "Literal",
                             "src": "828:43:6"
                           }
                         ],
-                        "id": 3287,
+                        "id": 3364,
                         "name": "FunctionCall",
                         "src": "786:86:6"
                       }
                     ],
-                    "id": 3288,
+                    "id": 3365,
                     "name": "ExpressionStatement",
                     "src": "786:86:6"
                   },
                   {
-                    "id": 3289,
+                    "id": 3366,
                     "name": "PlaceholderStatement",
                     "src": "885:1:6"
                   }
                 ],
-                "id": 3290,
+                "id": 3367,
                 "name": "Block",
                 "src": "775:119:6"
               }
             ],
-            "id": 3291,
+            "id": 3368,
             "name": "ModifierDefinition",
             "src": "757:137:6"
           },
@@ -2433,7 +2433,7 @@
               "isConstructor": false,
               "kind": "function",
               "name": "updateMinDepositDays",
-              "scope": 3316,
+              "scope": 3393,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "public"
@@ -2443,7 +2443,7 @@
                 "attributes": {
                   "text": " @dev to be called by Governance contract to update days to calculate enterprise min deposit requirements\n @param _minDepositDays new value of min deposit days"
                 },
-                "id": 3292,
+                "id": 3369,
                 "name": "StructuredDocumentation",
                 "src": "2437:183:6"
               },
@@ -2454,7 +2454,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_minDepositDays",
-                      "scope": 3315,
+                      "scope": 3392,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -2466,17 +2466,17 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 3293,
+                        "id": 3370,
                         "name": "ElementaryTypeName",
                         "src": "2656:7:6"
                       }
                     ],
-                    "id": 3294,
+                    "id": 3371,
                     "name": "VariableDeclaration",
                     "src": "2656:23:6"
                   }
                 ],
-                "id": 3295,
+                "id": 3372,
                 "name": "ParameterList",
                 "src": "2655:25:6"
               },
@@ -2487,7 +2487,7 @@
                   ]
                 },
                 "children": [],
-                "id": 3298,
+                "id": 3375,
                 "name": "ParameterList",
                 "src": "2700:0:6"
               },
@@ -2503,16 +2503,16 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 3291,
+                      "referencedDeclaration": 3368,
                       "type": "modifier ()",
                       "value": "isSetter"
                     },
-                    "id": 3296,
+                    "id": 3373,
                     "name": "Identifier",
                     "src": "2688:8:6"
                   }
                 ],
-                "id": 3297,
+                "id": 3374,
                 "name": "ModifierInvocation",
                 "src": "2688:10:6"
               },
@@ -2555,7 +2555,7 @@
                               "type": "function (bool,string memory) pure",
                               "value": "require"
                             },
-                            "id": 3299,
+                            "id": 3376,
                             "name": "Identifier",
                             "src": "2713:7:6"
                           },
@@ -2578,11 +2578,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 3294,
+                                  "referencedDeclaration": 3371,
                                   "type": "uint256",
                                   "value": "_minDepositDays"
                                 },
-                                "id": 3300,
+                                "id": 3377,
                                 "name": "Identifier",
                                 "src": "2721:15:6"
                               },
@@ -2597,12 +2597,12 @@
                                   "type": "int_const 0",
                                   "value": "0"
                                 },
-                                "id": 3301,
+                                "id": 3378,
                                 "name": "Literal",
                                 "src": "2740:1:6"
                               }
                             ],
-                            "id": 3302,
+                            "id": 3379,
                             "name": "BinaryOperation",
                             "src": "2721:20:6"
                           },
@@ -2617,17 +2617,17 @@
                               "type": "literal_string \"Members:updateMinDepositDays - New value for the min deposit days can't be 0\"",
                               "value": "Members:updateMinDepositDays - New value for the min deposit days can't be 0"
                             },
-                            "id": 3303,
+                            "id": 3380,
                             "name": "Literal",
                             "src": "2743:78:6"
                           }
                         ],
-                        "id": 3304,
+                        "id": 3381,
                         "name": "FunctionCall",
                         "src": "2713:109:6"
                       }
                     ],
-                    "id": 3305,
+                    "id": 3382,
                     "name": "ExpressionStatement",
                     "src": "2713:109:6"
                   },
@@ -2648,11 +2648,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3243,
+                              "referencedDeclaration": 3320,
                               "type": "uint256",
                               "value": "minDepositDays"
                             },
-                            "id": 3306,
+                            "id": 3383,
                             "name": "Identifier",
                             "src": "2833:14:6"
                           },
@@ -2661,21 +2661,21 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3294,
+                              "referencedDeclaration": 3371,
                               "type": "uint256",
                               "value": "_minDepositDays"
                             },
-                            "id": 3307,
+                            "id": 3384,
                             "name": "Identifier",
                             "src": "2850:15:6"
                           }
                         ],
-                        "id": 3308,
+                        "id": 3385,
                         "name": "Assignment",
                         "src": "2833:32:6"
                       }
                     ],
-                    "id": 3309,
+                    "id": 3386,
                     "name": "ExpressionStatement",
                     "src": "2833:32:6"
                   },
@@ -2707,11 +2707,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3247,
+                              "referencedDeclaration": 3324,
                               "type": "function (uint256)",
                               "value": "LogUpdateMinDepositDays"
                             },
-                            "id": 3310,
+                            "id": 3387,
                             "name": "Identifier",
                             "src": "2881:23:6"
                           },
@@ -2720,41 +2720,41 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 3294,
+                              "referencedDeclaration": 3371,
                               "type": "uint256",
                               "value": "_minDepositDays"
                             },
-                            "id": 3311,
+                            "id": 3388,
                             "name": "Identifier",
                             "src": "2905:15:6"
                           }
                         ],
-                        "id": 3312,
+                        "id": 3389,
                         "name": "FunctionCall",
                         "src": "2881:40:6"
                       }
                     ],
-                    "id": 3313,
+                    "id": 3390,
                     "name": "EmitStatement",
                     "src": "2876:45:6"
                   }
                 ],
-                "id": 3314,
+                "id": 3391,
                 "name": "Block",
                 "src": "2700:229:6"
               }
             ],
-            "id": 3315,
+            "id": 3392,
             "name": "FunctionDefinition",
             "src": "2626:303:6"
           }
         ],
-        "id": 3316,
+        "id": 3393,
         "name": "ContractDefinition",
         "src": "217:2723:6"
       }
     ],
-    "id": 3317,
+    "id": 3394,
     "name": "SourceUnit",
     "src": "33:2907:6"
   },
@@ -2763,7 +2763,7 @@
     "version": "0.7.6+commit.7338295f.Emscripten.clang"
   },
   "networks": {
-    "1620057135418": {
+    "1620416757604": {
       "events": {
         "0x3ef37ec580f71948d160049e31c67ac1e6fc9711038f837710cdfaf9074d7b85": {
           "anonymous": false,
@@ -2855,12 +2855,309 @@
         }
       },
       "links": {},
-      "address": "0x5518f244a0A87D8BA72b98C15709cbC80c0174E6",
-      "transactionHash": "0x336e88fce36cded7374a0d7e7a4594f5569ca2c138a7c95fd4bdf647b0eec34d"
+      "address": "0xB38d8054c9d1c3802D499A24f42eCeF7191ee044",
+      "transactionHash": "0x54eb1667f96d22e7108f13b36663abeb551d1a05e55ec9b87bfdfcd300363c2c"
+    },
+    "1620579762335": {
+      "events": {
+        "0x3ef37ec580f71948d160049e31c67ac1e6fc9711038f837710cdfaf9074d7b85": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "minDepositDays",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogUpdateMinDepositDays",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xeBda230Aa3CE2d8a6aa08Cb20A03bc45Cee5B882",
+      "transactionHash": "0x9cea9e1bf9082d4ef8b3ea272b3e1a746a67e86fed358c5b159d85fb644961ba"
+    },
+    "1620753208491": {
+      "events": {},
+      "links": {},
+      "address": "0x6f05Fa2FA6f21A2a004AAe7215d6173A0646B0a2",
+      "transactionHash": "0xd97f95cc571ae5360c49d20324a2b573a792d7de7313029c3b5a976de84b8d7d"
+    },
+    "1621014608367": {
+      "events": {
+        "0x3ef37ec580f71948d160049e31c67ac1e6fc9711038f837710cdfaf9074d7b85": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "minDepositDays",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogUpdateMinDepositDays",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x93Dac20b469EC98C772a93E8fEAC41D0275FbBb9",
+      "transactionHash": "0xe7773faa5671a0e56f2e212cb93179a5aaf7ac78a271e58d84c00047dbb37cb4"
+    },
+    "1621015969136": {
+      "events": {},
+      "links": {},
+      "address": "0x6f05Fa2FA6f21A2a004AAe7215d6173A0646B0a2",
+      "transactionHash": "0xbad5edb05e68c3c6f1c340187c234ec449454613df3885b14d76412d2783791b"
+    },
+    "1621272904531": {
+      "events": {
+        "0x3ef37ec580f71948d160049e31c67ac1e6fc9711038f837710cdfaf9074d7b85": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "minDepositDays",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogUpdateMinDepositDays",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x2a8E426b8EaAA8fEE39Ad8e3E08Bb513a15dAD14",
+      "transactionHash": "0x28849ec5a1bbc856224d7e24469fc6adef4b5dc4b564fa6369052a16cc6b092d"
     }
   },
   "schemaVersion": "3.4.0",
-  "updatedAt": "2021-05-06T00:12:27.930Z",
+  "updatedAt": "2021-05-18T18:33:06.813Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

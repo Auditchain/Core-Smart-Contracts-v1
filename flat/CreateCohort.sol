@@ -298,7 +298,7 @@ library EnumerableSet {
     }
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -488,7 +488,7 @@ library Address {
     }
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -513,7 +513,7 @@ abstract contract Context {
     }
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -731,7 +731,7 @@ abstract contract AccessControl is Context {
     }
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -809,7 +809,7 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -1024,7 +1024,7 @@ library SafeMath {
     }
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -1331,7 +1331,7 @@ contract ERC20 is Context, IERC20 {
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual { }
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -1374,7 +1374,7 @@ abstract contract ERC20Burnable is Context, ERC20 {
     }
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -1465,7 +1465,7 @@ abstract contract Pausable is Context {
     }
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 /// @title Migration Agent interface
@@ -1474,7 +1474,7 @@ abstract contract MigrationAgent {
     function migrateFrom(address _from, uint256 _value) public virtual;
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -1554,11 +1554,10 @@ contract Locked is AccessControl {
 
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 pragma experimental ABIEncoderV2;
-
 
 
 
@@ -1605,9 +1604,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
     uint256 public totalMigrated;
     
     event Migrate(address indexed from, address indexed to, uint256 value);
-    event MigrationAgentSet(address indexed migrationAgent);
-    event LogControllerSet(address indexed controller);
-    event LogControllerRevoked(address indexed controller);
+    event MigrationAgentSet(address indexed migrationAgent);   
 
     /// @dev Constructor that gives an account all initial tokens.
     constructor(address account) ERC20("Auditchain", "AUDT") {
@@ -1847,7 +1844,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
 
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -1923,7 +1920,7 @@ library SafeERC20 {
     }
 }
 
-// SPDX-License-Identifier: MIT
+
 
     
 interface ICohort {
@@ -1933,9 +1930,10 @@ interface ICohort {
     function returnValidators() external view returns(address[] memory);
     function addAdditionalValidator(address additionalValidator) external returns (bool);
     function removeValidator(address validator, address _enterprise) external returns (bool);
+    function validations(bytes32 validationHash) external returns ( uint256, uint256, string memory, uint256 consensus);
 }
 
-// SPDX-License-Identifier: MIT
+
     
     
 interface ICohortFactory {
@@ -1944,12 +1942,12 @@ interface ICohortFactory {
     function returnOutstandingValidations() external view returns(uint256);
 }
 
-// SPDX-License-Identifier: MIT
+
 
 pragma experimental ABIEncoderV2;
 
 
-
+// 
 
 
 
@@ -1989,8 +1987,8 @@ contract Members is  AccessControl {
     address public platformAddress;
     uint256 public platformShareValidation = 15;    
     uint256 public recentBlockUpdated;
-    uint256 public enterpriseMatch = 15e3;          //allow fractional enterprise match up to 4 decimal points
-    uint256 public minDepositDays = 30;
+    uint256 public enterpriseMatch = 200;         
+    
  
     /// @dev check if caller is a controller     
     modifier isController {
@@ -2007,30 +2005,13 @@ contract Members is  AccessControl {
     }
 
      // Audit types to be used. Two types added for future expansion 
-    enum UserType {Enterprise, Validator, DataSubscriber, RuleCreator}
+    enum UserType {Enterprise, Validator, DataSubscriber}  
 
-    // Structure to store address and name of the registered
-    struct User {  
-        address user;
-        string name;                                                                                                                         
-    }
-
-    User[] public enterprises;
-    mapping(address => bool) public enterpriseMap;
-    // mapping(address => uint256) public enterpriseNameMap;
-
-    User[] public ruleCreators;
-    mapping(address => bool) public ruleCreatorMap;
-    // mapping(address => uint256) public ruleCreatorNameMap;
-
-    User[] public validators;
-    mapping(address => bool) public validatorMap;
-    mapping(address => uint256) public validatorNameMap;
-
-    User[] public dataSubscribers;
-    mapping(address => bool) public dataSubscriberMap;
-    // mapping(address => uint256) public dataSubscriberNameMap;
-   
+    mapping(address => mapping(UserType => string)) public user;
+    mapping(address => mapping(UserType => bool)) public userMap;
+    uint256 public enterpriseCount;
+    uint256 public validatorCount;
+    uint256 public dataSubscriberCount;
     
     event EnterpriseUserAdded(address indexed user, string name);
     event UserAdded(address indexed user, string name, UserType userType);
@@ -2043,7 +2024,7 @@ contract Members is  AccessControl {
     event LogSubscriptionCompleted(address subscriber, uint256 numberOfSubscriptions);
     event LogUpdateRewards(uint256 rewards);
     event LogUpdateEnterpriseMatch(uint256 portion);
-    event LogUpdateMinDepositDays(uint256 minDepositDays);
+    
 
     constructor(AuditToken _auditToken, address _platformAddress ) {
 
@@ -2074,18 +2055,6 @@ contract Members is  AccessControl {
         require(_amountTokensPerValidation != 0, "Members:updateRewards - New value for the reward can't be 0");
         amountTokensPerValidation = _amountTokensPerValidation;
         emit LogUpdateRewards(_amountTokensPerValidation);
-    }
-
-
-    /**
-    * @dev to be called by Governance contract to update days to calculate enterprise min deposit requirements
-    * @param _minDepositDays new value of min deposit days
-    */
-    function updateMinDepositDays(uint256 _minDepositDays) public isSetter()  {
-
-        require(_minDepositDays != 0, "Members:updateMinDepositDays - New value for the min deposit days can't be 0");
-        minDepositDays = _minDepositDays;
-        emit LogUpdateMinDepositDays(_minDepositDays);
     }
     
     /**
@@ -2120,11 +2089,14 @@ contract Members is  AccessControl {
 
         require(amount > 0, "Members:stake - Amount can't be 0");
 
-        if (validatorMap[msg.sender]){ 
+        // user[newUser][userType] = name;
+        // userMap[newUser][userType] = true;
+
+        if (userMap[msg.sender][UserType.Validator]){ 
             require(amount + deposits[msg.sender] >= 5e21, "Staking:stake - Minimum contribution amount is 5000 AUDT tokens");  
             require(amount + deposits[msg.sender] <= 25e21, "Staking:stake - Maximum contribution amount is 25000 AUDT tokens");     
         }
-        require(validatorMap[msg.sender] || enterpriseMap[msg.sender], "Staking:stake - User has been not registered as a validator or enterprise."); 
+        require(userMap[msg.sender][UserType.Validator] || userMap[msg.sender][UserType.Enterprise], "Staking:stake - User has been not registered as a validator or enterprise."); 
         stakedAmount = stakedAmount.add(amount);  // track tokens contributed so far
         auditToken.safeTransferFrom(msg.sender, address(this), amount);
         deposits[msg.sender] = deposits[msg.sender].add(amount);
@@ -2168,6 +2140,24 @@ contract Members is  AccessControl {
         emit LogRewardsDeposited(cohort, totalRewardTokens, totalEnterprisePay, enterpriseAddress);
     }
 
+    function processPayment(address[] memory _validators) public isController() {
+
+        address enterpriseAddress = ICohort(msg.sender).enterprise();
+        uint256 enterprisePortion =  amountTokensPerValidation.mul(enterpriseMatch).div(100);
+        uint256 platformFee = amountTokensPerValidation.mul(platformShareValidation).div(100);
+        uint256 validatorsFee = amountTokensPerValidation.add(enterprisePortion).sub(platformFee);
+        uint256 paymentPerValidator = validatorsFee.div(_validators.length);
+        deposits[enterpriseAddress] = deposits[enterpriseAddress].sub(enterprisePortion);
+        auditToken.mint(address(this), amountTokensPerValidation);
+        deposits[platformAddress] = deposits[platformAddress].add(platformFee);
+
+        for (uint256 i=0; i< _validators.length; i++){                     
+            deposits[_validators[i]] = deposits[_validators[i]].add(paymentPerValidator);
+            LogRewardsReceived(_validators[i], paymentPerValidator);
+        }
+        emit LogRewardsDeposited(msg.sender, validatorsFee, enterprisePortion, enterpriseAddress);
+    }
+
     /**
     * @dev called when data subscriber initiates subscription 
     * @param cohortAddress - address of the cohort to which data subscriber wants access 
@@ -2178,14 +2168,14 @@ contract Members is  AccessControl {
         require(cohortAddress != address(0), "Members:dataSubscriberPayment - Cohort address can't be 0");
         require(audits >=0 && audits <=5, "Audit type is not in the required range");
         require(!dataSubscriberCohortMap[msg.sender][cohortAddress], "Members:dataSubscriberPayment - You are already subscribed");
-        require(dataSubscriberMap[msg.sender], "Members:dataSubscriberPayment - You have to register as data subscriber");
+        require(userMap[msg.sender][UserType.DataSubscriber], "Members:dataSubscriberPayment - You have to register as data subscriber");
 
         auditToken.safeTransferFrom(msg.sender, address(this), accessFee);
         uint platformShare = (((enterpriseShareSubscriber).add(validatorShareSubscriber)).mul(100)).div(accessFee);
         auditToken.safeTransfer(platformAddress, accessFee.mul(platformShare).div(100));
         // auditToken.safeTransfer(platformAddress, accessFee.mul((uint256(100)).sub(enterpriseShareSubscriber).sub(validatorShareSubscriber)).div(100));
 
-        if (validatorMap[msg.sender] || enterpriseMap[msg.sender]){
+        if (userMap[msg.sender][UserType.Validator] || userMap[msg.sender][UserType.Enterprise]){
             stakedAmount = stakedAmount.sub(accessFee);  // track tokens contributed so far
             deposits[msg.sender] = deposits[msg.sender].sub(accessFee);
         }
@@ -2255,7 +2245,7 @@ contract Members is  AccessControl {
      */
     function redeem(uint256 amount) public {
 
-          if (enterpriseMap[msg.sender]){
+          if (userMap[msg.sender][UserType.Enterprise]){
               // div(1e4) to adjust for four decimal points
             require(deposits[msg.sender]
             .sub(enterpriseMatch.mul(amountTokensPerValidation).mul(cohortFactory.returnOutstandingValidations()).div(1e4)) >= amount, 
@@ -2276,75 +2266,25 @@ contract Members is  AccessControl {
     * @param name name of the user
     * @param userType  
     */
-    function addUser(address user, string memory name, UserType userType) public isController() {
+    function addUser(address newUser, string memory name, UserType userType) public isController() {
 
-        User memory newUser;
-        newUser.user = user;
-        newUser.name = name;
+        require(!userMap[newUser][userType], "Members:addUser - This user already exist.");
+        user[newUser][userType] = name;
+        userMap[newUser][userType] = true;
 
-        if (userType == UserType.DataSubscriber){
-            require(!dataSubscriberMap[user], "Members:addUser - This Data Subscriber already exist.");
-            dataSubscribers.push(newUser);
-            dataSubscriberMap[user]= true;
-            // dataSubscriberNameMap[user] = dataSubscribers.length - 1;
-        }
-        else if (userType == UserType.Validator){            
-            require(!validatorMap[user], "Members:addUser - This Validator already exist.");
-            validators.push(newUser);
-            validatorMap[user]= true;
-            // validatorNameMap[user] = validators.length - 1;
-        }
-        else if (userType == UserType.Enterprise){
-            require(!enterpriseMap[user], "Members:addUser - This Enterprise already exist.");
-            enterprises.push(newUser);
-            enterpriseMap[user]= true;
-            // enterpriseNameMap[user] = enterprises.length - 1;
-        }
-        else if (userType == UserType.RuleCreator){
-            require(!enterpriseMap[user], "Members:addUser - This Rule Creator already exist.");
-            ruleCreators.push(newUser);
-            ruleCreatorMap[user]= true;
-            // ruleCreatorNameMap[user] = enterprises.length - 1;
-        }
-
-        emit UserAdded(user, name, userType);
-    }
-
-    /*
-    * @dev return enterprise count
-    */
-    function returnEnterpriseCount() public view returns (uint256) {
-
-        return enterprises.length;
-    }
-
-    /*
-    * @dev return validator count
-    */
-    function returnValidatorCount() public view returns (uint256) {
-
-        return validators.length;
-    }
-
-    /*
-    * @dev return data subscribers count
-    */
-    function returnDataSubscriberCount() public view returns (uint256) {
-
-        return dataSubscribers.length;
-    }
-
-     /*
-    * @dev return data rule creators count
-    */
-    function returnRuleCreatorsCount() public view returns (uint256) {
-
-        return dataSubscribers.length;
+        if (userType == UserType.DataSubscriber) 
+            dataSubscriberCount++;
+        else if (userType == UserType.Validator)
+            validatorCount++;
+        else if (userType == UserType.Enterprise)
+            enterpriseCount++;
+     
+        emit UserAdded(newUser, name, userType);
     }
 
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 
@@ -2396,19 +2336,27 @@ contract Cohort is AccessControl {
 
     AuditTypes public audits;
 
+
     // Validation can be approved or disapproved. Initial status is undefined.
-    enum ValidationStatus {Undefined, Yes, No}
+    enum ValidationStatus {Undefined, Yes, No}        
 
     struct Validation {
         uint256 validationTime;
         uint256 executionTime;
+        string url;
+        uint256 consensus;
+        uint256 validationsCompleted;
         mapping(address => ValidationStatus) validatorChoice;
     }
 
+
+  
     mapping(bytes32 => Validation) public validations; // track each validation
+    
+
     mapping(address => uint256) public deposits; //track deposits per user
 
-    event ValidationInitialized(bytes32 validationHash, uint256 indexed initTime, bytes32 documentHash);
+    event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url);
     event ValidatorValidated(address validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
     event ValidationExecuted(bytes32 indexed validationHash, uint256 indexed timeExecuted, bytes32 documentHash);
     event additionalValidatorAdded(address indexed validator);
@@ -2452,7 +2400,7 @@ contract Cohort is AccessControl {
     }
 
     /**
-     * @dev to be called by administrator to update new amount for required quorum
+     * @dev to be called by governance to update new amount for required quorum
      * @param _requiredQuorum new value of required quorum
      */
     function updateQuorum(uint256 _requiredQuorum) public isSetter() {
@@ -2498,7 +2446,7 @@ contract Cohort is AccessControl {
      * @dev to be called by Enterprise to initiate new validation
      * @param documentHash - hash of unique identifier of validated transaction
      */
-    function initializeValidation(bytes32 documentHash) public {
+    function initializeValidation(bytes32 documentHash, string memory url) public {
         // div(1e4) account for precision up to 4 decimal points
         require(checkIfEnterpriseHasFunds(msg.sender), "Cohort:initializeValidation - Not sufficient funds. Deposit additional funds.");
         require(documentHash.length > 0, "Cohort:initializeValidation - Document hash value can't be 0");
@@ -2507,9 +2455,14 @@ contract Cohort is AccessControl {
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
 
         outstandingValidations++;
-        Validation storage newValidation = validations[validationHash];
-        newValidation.validationTime = block.timestamp;
-        emit ValidationInitialized(validationHash, validationTime, documentHash);
+        // Validation storage newValidation = validations[validationHash];
+        // newValidation.validationTime = block.timestamp;
+        // newValidation.url= url;
+
+        validations[validationHash].validationTime = block.timestamp;
+        validations[validationHash].url = url;
+
+        emit ValidationInitialized(msg.sender, validationHash, validationTime, documentHash, url);
     }
 
     /**
@@ -2574,6 +2527,44 @@ contract Cohort is AccessControl {
         return (currentlyVoted * 100) / totalStaked;
     }
 
+    function determineConsensus(ValidationStatus[] memory validation) public pure returns(uint256 ) {
+
+        // const validatorsValues = validation[2];
+        uint256 yes;
+        uint256 no;
+
+        for (uint256 i=0; i< validation.length; i++) {
+
+            if (validation[i] == ValidationStatus.Yes)
+                yes++;
+            else
+                no++;
+        }
+
+        if (yes > no)
+            return 1; // consensus is to approve
+        else if (no > yes)
+            return 2; // consensus is to disapprove
+        else
+            return 0; // consensus is tie - should not happen
+    }
+
+    function processPayments(bytes32 validationHash) internal {
+
+        Validation storage validation = validations[validationHash];
+        address[] memory activeValidators = new address[](validation.validationsCompleted);
+
+        (address[] memory user, ,ValidationStatus[] memory status) =  collectValidationResults(validationHash);
+
+        for (uint256 i=0; i< user.length; i++){
+            if (status[i] == ValidationStatus.Yes || status[i] == ValidationStatus.No)
+                activeValidators[i] = user[i];
+        }
+
+        members.processPayment(activeValidators);
+        
+    }
+
     /**
      * @dev to mark validation as executed. This happens when participation level reached "requiredQuorum"
      * @param validationHash - consist of hash of hashed document and timestamp
@@ -2582,6 +2573,11 @@ contract Cohort is AccessControl {
         if (calculateVoteQuorum(validationHash) >= requiredQuorum) {
             Validation storage validation = validations[validationHash];
             validation.executionTime = block.timestamp;
+
+            (,, ValidationStatus[] memory results) = collectValidationResults(validationHash);
+
+            validation.consensus = determineConsensus(results);
+            processPayments(validationHash);
             emit ValidationExecuted(validationHash, block.timestamp, documentHash);
         }
     }
@@ -2599,10 +2595,12 @@ contract Cohort is AccessControl {
     ) public {
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
-        require(members.validatorMap(msg.sender),"Cohort:validate - Validator is not authorized.");
+        require(members.userMap(msg.sender, Members.UserType(1)), "Cohort:validate - Validator is not authorized.");
         require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
         require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Cohort:validate - This document has been validated already.");
         validation.validatorChoice[msg.sender] = decision;
+        validation.validationsCompleted ++;
+
 
         if (validation.executionTime == 0) 
             executeValidation(validationHash, documentHash);
@@ -2621,7 +2619,7 @@ contract Cohort is AccessControl {
     }
 }
 
-// SPDX-License-Identifier: MIT
+
 
 
 

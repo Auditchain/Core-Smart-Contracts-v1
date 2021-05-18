@@ -43,7 +43,7 @@ contract Members is  AccessControl {
     address public platformAddress;
     uint256 public platformShareValidation = 15;    
     uint256 public recentBlockUpdated;
-    uint256 public enterpriseMatch = 15e3;          //allow fractional enterprise match up to 4 decimal points
+    uint256 public enterpriseMatch = 200;         
     
  
     /// @dev check if caller is a controller     
@@ -61,15 +61,7 @@ contract Members is  AccessControl {
     }
 
      // Audit types to be used. Two types added for future expansion 
-    enum UserType {Enterprise, Validator, DataSubscriber}
-
-    // Structure to store address and name of the registered
-    struct User {  
-        address user;
-        string name;                                                                                                                         
-    }
-
-  
+    enum UserType {Enterprise, Validator, DataSubscriber}  
 
     mapping(address => mapping(UserType => string)) public user;
     mapping(address => mapping(UserType => bool)) public userMap;
@@ -77,7 +69,6 @@ contract Members is  AccessControl {
     uint256 public validatorCount;
     uint256 public dataSubscriberCount;
     
-    event EnterpriseUserAdded(address indexed user, string name);
     event UserAdded(address indexed user, string name, UserType userType);
     event LogDepositReceived(address indexed from, uint amount);
     event LogRewardsRedeemed(address indexed from, uint256 amount);
@@ -202,6 +193,24 @@ contract Members is  AccessControl {
         auditToken.mint(platformAddress, amountTokensPlatform);
         auditToken.mint(address(this), totalRewardTokens);
         emit LogRewardsDeposited(cohort, totalRewardTokens, totalEnterprisePay, enterpriseAddress);
+    }
+
+    function processPayment(address[] memory _validators) public isController() {
+
+        address enterpriseAddress = ICohort(msg.sender).enterprise();
+        uint256 enterprisePortion =  amountTokensPerValidation.mul(enterpriseMatch).div(100);
+        uint256 platformFee = amountTokensPerValidation.mul(platformShareValidation).div(100);
+        uint256 validatorsFee = amountTokensPerValidation.add(enterprisePortion).sub(platformFee);
+        uint256 paymentPerValidator = validatorsFee.div(_validators.length);
+        deposits[enterpriseAddress] = deposits[enterpriseAddress].sub(enterprisePortion);
+        auditToken.mint(address(this), amountTokensPerValidation);
+        deposits[platformAddress] = deposits[platformAddress].add(platformFee);
+
+        for (uint256 i=0; i< _validators.length; i++){                     
+            deposits[_validators[i]] = deposits[_validators[i]].add(paymentPerValidator);
+            LogRewardsReceived(_validators[i], paymentPerValidator);
+        }
+        emit LogRewardsDeposited(msg.sender, validatorsFee, enterprisePortion, enterpriseAddress);
     }
 
     /**

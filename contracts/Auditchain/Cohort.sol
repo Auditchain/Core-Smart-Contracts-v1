@@ -59,6 +59,7 @@ contract Cohort is AccessControl {
         uint256 executionTime;
         string url;
         uint256 consensus;
+        uint256 validationsCompleted;
         mapping(address => ValidationStatus) validatorChoice;
     }
 
@@ -113,7 +114,7 @@ contract Cohort is AccessControl {
     }
 
     /**
-     * @dev to be called by administrator to update new amount for required quorum
+     * @dev to be called by governance to update new amount for required quorum
      * @param _requiredQuorum new value of required quorum
      */
     function updateQuorum(uint256 _requiredQuorum) public isSetter() {
@@ -260,7 +261,23 @@ contract Cohort is AccessControl {
             return 2; // consensus is to disapprove
         else
             return 0; // consensus is tie - should not happen
-}
+    }
+
+    function processPayments(bytes32 validationHash) internal {
+
+        Validation storage validation = validations[validationHash];
+        address[] memory activeValidators = new address[](validation.validationsCompleted);
+
+        (address[] memory user, ,ValidationStatus[] memory status) =  collectValidationResults(validationHash);
+
+        for (uint256 i=0; i< user.length; i++){
+            if (status[i] == ValidationStatus.Yes || status[i] == ValidationStatus.No)
+                activeValidators[i] = user[i];
+        }
+
+        members.processPayment(activeValidators);
+        
+    }
 
     /**
      * @dev to mark validation as executed. This happens when participation level reached "requiredQuorum"
@@ -274,6 +291,7 @@ contract Cohort is AccessControl {
             (,, ValidationStatus[] memory results) = collectValidationResults(validationHash);
 
             validation.consensus = determineConsensus(results);
+            processPayments(validationHash);
             emit ValidationExecuted(validationHash, block.timestamp, documentHash);
         }
     }
@@ -295,6 +313,8 @@ contract Cohort is AccessControl {
         require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
         require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Cohort:validate - This document has been validated already.");
         validation.validatorChoice[msg.sender] = decision;
+        validation.validationsCompleted ++;
+
 
         if (validation.executionTime == 0) 
             executeValidation(validationHash, documentHash);
