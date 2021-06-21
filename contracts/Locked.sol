@@ -27,7 +27,7 @@ contract Locked is AccessControl {
     /// @param _to  - user involved in process
     modifier isNotLocked(address _from, address _to) {
 
-        if (hasRole(DEFAULT_ADMIN_ROLE, _from)){  // allow contract admin on sending tokens even if recipient is locked
+        if (!hasRole(DEFAULT_ADMIN_ROLE, _from)){  // allow contract admin on sending tokens even if recipient is locked
             require(!lockedList[_from], "Locked::isNotLocked - User is locked");
             require(!lockedList[_to], "Locked::isNotLocked - User is locked");
         }

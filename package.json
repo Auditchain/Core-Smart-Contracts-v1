@@ -8,7 +8,7 @@
     "compile": "truffle compile --optimize-runs 200",
     "migrate-local": "truffle migrate --network=development --reset",
     "migrate-ropsten": "truffle migrate --network=ropsten --reset",
-    "flatten": "sol-merger './contracts/Auditchain/*.sol' ./flat",
+    "flatten": "sol-merger './contracts/NFT/*.sol' ./flat",
     "flatten-STOs": "sol-merger './contracts/OfferingFactories/*.sol' ./flat/OfferingFactories",
     "coverage": "./node_modules/.bin/solidity-coverage"
   },

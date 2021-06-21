@@ -48,6 +48,16 @@ contract RulesERC721Token is ERC721
         return newTokenId;
     }
 
+    function mintToPure(address user, string memory url) public returns (uint256) {
+
+        uint256 newTokenId = _getNextTokenId();
+
+        _safeMint(user, newTokenId);
+        _setTokenURI(newTokenId, url);
+        return newTokenId;
+
+    }
+
     function _getNextTokenId() private view returns (uint256) {
         return totalSupply().add(1);
     }

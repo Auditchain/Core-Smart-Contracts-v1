@@ -23,8 +23,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -37,8 +36,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -73,15 +71,15 @@
     "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Governance/TestSetDelay.sol",
     "exportedSymbols": {
       "TestSetDelay": [
-        5896
+        6093
       ]
     },
-    "id": 5897,
+    "id": 6094,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5865,
+        "id": 6062,
         "literals": [
           "solidity",
           "=",
@@ -97,9 +95,9 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 5896,
+        "id": 6093,
         "linearizedBaseContracts": [
-          5896
+          6093
         ],
         "name": "TestSetDelay",
         "nodeType": "ContractDefinition",
@@ -107,11 +105,11 @@
           {
             "constant": false,
             "functionSelector": "6a42b8f8",
-            "id": 5867,
+            "id": 6064,
             "mutability": "mutable",
             "name": "delay",
             "nodeType": "VariableDeclaration",
-            "scope": 5896,
+            "scope": 6093,
             "src": "97:17:9",
             "stateVariable": true,
             "storageLocation": "default",
@@ -120,7 +118,7 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 5866,
+              "id": 6063,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
               "src": "97:4:9",
@@ -134,11 +132,11 @@
           {
             "constant": false,
             "functionSelector": "ccdb3f45",
-            "id": 5869,
+            "id": 6066,
             "mutability": "mutable",
             "name": "newAddress",
             "nodeType": "VariableDeclaration",
-            "scope": 5896,
+            "scope": 6093,
             "src": "121:25:9",
             "stateVariable": true,
             "storageLocation": "default",
@@ -147,7 +145,7 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 5868,
+              "id": 6065,
               "name": "address",
               "nodeType": "ElementaryTypeName",
               "src": "121:7:9",
@@ -161,23 +159,23 @@
           },
           {
             "body": {
-              "id": 5878,
+              "id": 6075,
               "nodeType": "Block",
               "src": "186:33:9",
               "statements": [
                 {
                   "expression": {
-                    "id": 5876,
+                    "id": 6073,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 5874,
+                      "id": 6071,
                       "name": "delay",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5867,
+                      "referencedDeclaration": 6064,
                       "src": "197:5:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -187,11 +185,11 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 5875,
+                      "id": 6072,
                       "name": "_delay",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5871,
+                      "referencedDeclaration": 6068,
                       "src": "205:6:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -204,29 +202,29 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 5877,
+                  "id": 6074,
                   "nodeType": "ExpressionStatement",
                   "src": "197:14:9"
                 }
               ]
             },
-            "id": 5879,
+            "id": 6076,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5872,
+              "id": 6069,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5871,
+                  "id": 6068,
                   "mutability": "mutable",
                   "name": "_delay",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5879,
+                  "scope": 6076,
                   "src": "171:14:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -235,7 +233,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5870,
+                    "id": 6067,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "171:7:9",
@@ -250,12 +248,12 @@
               "src": "170:16:9"
             },
             "returnParameters": {
-              "id": 5873,
+              "id": 6070,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "186:0:9"
             },
-            "scope": 5896,
+            "scope": 6093,
             "src": "159:60:9",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -263,23 +261,23 @@
           },
           {
             "body": {
-              "id": 5894,
+              "id": 6091,
               "nodeType": "Block",
               "src": "280:118:9",
               "statements": [
                 {
                   "expression": {
-                    "id": 5888,
+                    "id": 6085,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 5886,
+                      "id": 6083,
                       "name": "delay",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5867,
+                      "referencedDeclaration": 6064,
                       "src": "300:5:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -289,11 +287,11 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 5887,
+                      "id": 6084,
                       "name": "delay_",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5883,
+                      "referencedDeclaration": 6080,
                       "src": "308:6:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -306,23 +304,23 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 5889,
+                  "id": 6086,
                   "nodeType": "ExpressionStatement",
                   "src": "300:14:9"
                 },
                 {
                   "expression": {
-                    "id": 5892,
+                    "id": 6089,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 5890,
+                      "id": 6087,
                       "name": "newAddress",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5869,
+                      "referencedDeclaration": 6066,
                       "src": "325:10:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
@@ -332,11 +330,11 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 5891,
+                      "id": 6088,
                       "name": "t",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5881,
+                      "referencedDeclaration": 6078,
                       "src": "338:1:9",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
@@ -349,30 +347,30 @@
                       "typeString": "address"
                     }
                   },
-                  "id": 5893,
+                  "id": 6090,
                   "nodeType": "ExpressionStatement",
                   "src": "325:14:9"
                 }
               ]
             },
             "functionSelector": "6d21e4e2",
-            "id": 5895,
+            "id": 6092,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "setDelay",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5884,
+              "id": 6081,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5881,
+                  "id": 6078,
                   "mutability": "mutable",
                   "name": "t",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5895,
+                  "scope": 6092,
                   "src": "245:9:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -381,7 +379,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5880,
+                    "id": 6077,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "245:7:9",
@@ -395,11 +393,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 5883,
+                  "id": 6080,
                   "mutability": "mutable",
                   "name": "delay_",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5895,
+                  "scope": 6092,
                   "src": "256:14:9",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -408,7 +406,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5882,
+                    "id": 6079,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "256:7:9",
@@ -423,19 +421,19 @@
               "src": "244:27:9"
             },
             "returnParameters": {
-              "id": 5885,
+              "id": 6082,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "280:0:9"
             },
-            "scope": 5896,
+            "scope": 6093,
             "src": "227:171:9",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 5897,
+        "scope": 6094,
         "src": "62:339:9"
       }
     ],
@@ -446,7 +444,7 @@
       "absolutePath": "/home/bogdan/Ethereum/Projects/TGE/Core-Smart-Contracts-v1/contracts/Governance/TestSetDelay.sol",
       "exportedSymbols": {
         "TestSetDelay": [
-          5896
+          6093
         ]
       },
       "license": "MIT"
@@ -461,7 +459,7 @@
             ".6"
           ]
         },
-        "id": 5865,
+        "id": 6062,
         "name": "PragmaDirective",
         "src": "33:23:9"
       },
@@ -477,10 +475,10 @@
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            5896
+            6093
           ],
           "name": "TestSetDelay",
-          "scope": 5897
+          "scope": 6094
         },
         "children": [
           {
@@ -489,7 +487,7 @@
               "functionSelector": "6a42b8f8",
               "mutability": "mutable",
               "name": "delay",
-              "scope": 5896,
+              "scope": 6093,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "uint256",
@@ -501,12 +499,12 @@
                   "name": "uint",
                   "type": "uint256"
                 },
-                "id": 5866,
+                "id": 6063,
                 "name": "ElementaryTypeName",
                 "src": "97:4:9"
               }
             ],
-            "id": 5867,
+            "id": 6064,
             "name": "VariableDeclaration",
             "src": "97:17:9"
           },
@@ -516,7 +514,7 @@
               "functionSelector": "ccdb3f45",
               "mutability": "mutable",
               "name": "newAddress",
-              "scope": 5896,
+              "scope": 6093,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "address",
@@ -529,12 +527,12 @@
                   "stateMutability": "nonpayable",
                   "type": "address"
                 },
-                "id": 5868,
+                "id": 6065,
                 "name": "ElementaryTypeName",
                 "src": "121:7:9"
               }
             ],
-            "id": 5869,
+            "id": 6066,
             "name": "VariableDeclaration",
             "src": "121:25:9"
           },
@@ -547,7 +545,7 @@
                 null
               ],
               "name": "",
-              "scope": 5896,
+              "scope": 6093,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "public"
@@ -560,7 +558,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "_delay",
-                      "scope": 5879,
+                      "scope": 6076,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -572,17 +570,17 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 5870,
+                        "id": 6067,
                         "name": "ElementaryTypeName",
                         "src": "171:7:9"
                       }
                     ],
-                    "id": 5871,
+                    "id": 6068,
                     "name": "VariableDeclaration",
                     "src": "171:14:9"
                   }
                 ],
-                "id": 5872,
+                "id": 6069,
                 "name": "ParameterList",
                 "src": "170:16:9"
               },
@@ -593,7 +591,7 @@
                   ]
                 },
                 "children": [],
-                "id": 5873,
+                "id": 6070,
                 "name": "ParameterList",
                 "src": "186:0:9"
               },
@@ -616,11 +614,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5867,
+                              "referencedDeclaration": 6064,
                               "type": "uint256",
                               "value": "delay"
                             },
-                            "id": 5874,
+                            "id": 6071,
                             "name": "Identifier",
                             "src": "197:5:9"
                           },
@@ -629,31 +627,31 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5871,
+                              "referencedDeclaration": 6068,
                               "type": "uint256",
                               "value": "_delay"
                             },
-                            "id": 5875,
+                            "id": 6072,
                             "name": "Identifier",
                             "src": "205:6:9"
                           }
                         ],
-                        "id": 5876,
+                        "id": 6073,
                         "name": "Assignment",
                         "src": "197:14:9"
                       }
                     ],
-                    "id": 5877,
+                    "id": 6074,
                     "name": "ExpressionStatement",
                     "src": "197:14:9"
                   }
                 ],
-                "id": 5878,
+                "id": 6075,
                 "name": "Block",
                 "src": "186:33:9"
               }
             ],
-            "id": 5879,
+            "id": 6076,
             "name": "FunctionDefinition",
             "src": "159:60:9"
           },
@@ -667,7 +665,7 @@
                 null
               ],
               "name": "setDelay",
-              "scope": 5896,
+              "scope": 6093,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "public"
@@ -680,7 +678,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "t",
-                      "scope": 5895,
+                      "scope": 6092,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -693,12 +691,12 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 5880,
+                        "id": 6077,
                         "name": "ElementaryTypeName",
                         "src": "245:7:9"
                       }
                     ],
-                    "id": 5881,
+                    "id": 6078,
                     "name": "VariableDeclaration",
                     "src": "245:9:9"
                   },
@@ -707,7 +705,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "delay_",
-                      "scope": 5895,
+                      "scope": 6092,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -719,17 +717,17 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 5882,
+                        "id": 6079,
                         "name": "ElementaryTypeName",
                         "src": "256:7:9"
                       }
                     ],
-                    "id": 5883,
+                    "id": 6080,
                     "name": "VariableDeclaration",
                     "src": "256:14:9"
                   }
                 ],
-                "id": 5884,
+                "id": 6081,
                 "name": "ParameterList",
                 "src": "244:27:9"
               },
@@ -740,7 +738,7 @@
                   ]
                 },
                 "children": [],
-                "id": 5885,
+                "id": 6082,
                 "name": "ParameterList",
                 "src": "280:0:9"
               },
@@ -763,11 +761,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5867,
+                              "referencedDeclaration": 6064,
                               "type": "uint256",
                               "value": "delay"
                             },
-                            "id": 5886,
+                            "id": 6083,
                             "name": "Identifier",
                             "src": "300:5:9"
                           },
@@ -776,21 +774,21 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5883,
+                              "referencedDeclaration": 6080,
                               "type": "uint256",
                               "value": "delay_"
                             },
-                            "id": 5887,
+                            "id": 6084,
                             "name": "Identifier",
                             "src": "308:6:9"
                           }
                         ],
-                        "id": 5888,
+                        "id": 6085,
                         "name": "Assignment",
                         "src": "300:14:9"
                       }
                     ],
-                    "id": 5889,
+                    "id": 6086,
                     "name": "ExpressionStatement",
                     "src": "300:14:9"
                   },
@@ -811,11 +809,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5869,
+                              "referencedDeclaration": 6066,
                               "type": "address",
                               "value": "newAddress"
                             },
-                            "id": 5890,
+                            "id": 6087,
                             "name": "Identifier",
                             "src": "325:10:9"
                           },
@@ -824,41 +822,41 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 5881,
+                              "referencedDeclaration": 6078,
                               "type": "address",
                               "value": "t"
                             },
-                            "id": 5891,
+                            "id": 6088,
                             "name": "Identifier",
                             "src": "338:1:9"
                           }
                         ],
-                        "id": 5892,
+                        "id": 6089,
                         "name": "Assignment",
                         "src": "325:14:9"
                       }
                     ],
-                    "id": 5893,
+                    "id": 6090,
                     "name": "ExpressionStatement",
                     "src": "325:14:9"
                   }
                 ],
-                "id": 5894,
+                "id": 6091,
                 "name": "Block",
                 "src": "280:118:9"
               }
             ],
-            "id": 5895,
+            "id": 6092,
             "name": "FunctionDefinition",
             "src": "227:171:9"
           }
         ],
-        "id": 5896,
+        "id": 6093,
         "name": "ContractDefinition",
         "src": "62:339:9"
       }
     ],
-    "id": 5897,
+    "id": 6094,
     "name": "SourceUnit",
     "src": "33:370:9"
   },
@@ -902,11 +900,34 @@
       "links": {},
       "address": "0xB33116bE19Eceb687F625A079f6e8eC8f010Da1B",
       "transactionHash": "0x06c233b23fcd11144b471b3caf55e16a249d2db2f9fd09c035587e765010960d"
+    },
+    "1623092702526": {
+      "events": {},
+      "links": {},
+      "address": "0x7F00966dad1593e32Eb6354b5196d3f519Edf97b",
+      "transactionHash": "0x2c04716aca39af7410e011685e11ab2ec581535566d9f16dd482f60b26795d1d"
+    },
+    "1623345487366": {
+      "events": {},
+      "links": {},
+      "address": "0x07E633Efc3aDB58518Bc262189C0Db3fC7Ce000D",
+      "transactionHash": "0x440d401cf43b9bbd11bd863567237407c8b7704722bd48f2a9d574da1d98abe8"
+    },
+    "1623428047008": {
+      "events": {},
+      "links": {},
+      "address": "0x7F00966dad1593e32Eb6354b5196d3f519Edf97b",
+      "transactionHash": "0x2c04716aca39af7410e011685e11ab2ec581535566d9f16dd482f60b26795d1d"
+    },
+    "1623776537850": {
+      "events": {},
+      "links": {},
+      "address": "0x878EEDdD99d54d422413a70373673f9771B5c7b2",
+      "transactionHash": "0x7a86e017a35aa1ebe066dfb6975b1655454ec55b12a070649fcd0d01ed0ca44b"
     }
   },
   "schemaVersion": "3.4.0",
-  "updatedAt": "2021-05-18T18:33:06.832Z",
-  "networkType": "ethereum",
+  "updatedAt": "2021-06-21T04:15:44.955Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
