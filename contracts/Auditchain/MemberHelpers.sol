@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./../IAuditToken.sol";
 import "./ICohortFactory.sol";
-import "./ICohort.sol";
+import "./Validations.sol";
 
 
 
@@ -25,11 +25,15 @@ contract MemberHelpers is  AccessControl {
     uint256 public minDepositDays = 30;
     uint256 public nonCohortValidationFee = 100e18;
     uint256 public cohortValidationFee = 100e18;
+    uint256 public amountTokensPerValidation =  100000000000000000000;    //New minted amount per validation
+    uint256 public enterpriseMatch = 200;         
+
+
     uint256 public stakedAmount;                        //total number of staked tokens   
     address public auditToken;                       //AUDT token 
     Members members;
     ICohortFactory public cohortFactory;
-    ICohort public cohort;
+    Validations public validations;
     mapping(address => uint256) public deposits;        //track deposits per user
     mapping(address => DataSubscriberTypes[]) public dataSubscriberCohorts;
     mapping(address => mapping(address => mapping(uint256 => bool))) public dataSubscriberCohortMap;
@@ -109,12 +113,12 @@ contract MemberHelpers is  AccessControl {
 
     /**
     * @dev to be called by administrator to set cohort Factory contract
-    * @param _cohort cohort contract
+    * @param _validations cohort contract
     */
-    function setCohort(address _cohort) public isController() {
+    function setCohort(address _validations) public isController() {
 
-        require(_cohort != address(0), "Members:setCohort - Cohort address can't be 0");
-        cohort = ICohort(_cohort);
+        require(_validations != address(0), "Members:setCohort - Cohort address can't be 0");
+        validations = Validations(_validations);
     }
 
 
@@ -125,7 +129,7 @@ contract MemberHelpers is  AccessControl {
     function redeem(uint256 amount) public {
 
           if (members.userMap(msg.sender, Members.UserType(0))){
-              uint256  outstandingVal = cohort.outstandingValidations(msg.sender);
+              uint256  outstandingVal = validations.outstandingValidations(msg.sender);
               if (outstandingVal > 0 ) 
               // div(1e4) to adjust for four decimal points
             require(deposits[msg.sender]
@@ -153,7 +157,7 @@ contract MemberHelpers is  AccessControl {
         emit LogNonCohortValidationPaid(_requestor, _validators);
     }
 
-     function processPayment(address[] memory _validators, address _requestor) public isController() {
+    function processPayment(address[] memory _validators, address _requestor) public isController() {
 
         uint256 enterprisePortion =  members.amountTokensPerValidation().mul(members.enterpriseMatch()).div(100);
         uint256 platformFee = members.amountTokensPerValidation().mul(members.platformShareValidation()).div(100);
@@ -170,6 +174,7 @@ contract MemberHelpers is  AccessControl {
         emit LogRewardsDeposited(validatorsFee, enterprisePortion, _requestor);
     }
 
+    
     /**
     * @dev called when data subscriber initiates subscription 
     * @param enterpriseAddress - address of the enterprise
