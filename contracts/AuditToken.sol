@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity =0.7.6;
+pragma solidity =0.8.0;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./MigrationAgent.sol";
 import "./Locked.sol";
 
 contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
@@ -44,11 +43,9 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
 
     uint8 public constant DECIMALS = 18;
     uint256 public constant INITIAL_SUPPLY = 250000000 * (10**uint256(DECIMALS));
-    address public migrationAgent;
     uint256 public totalMigrated;
     
     event Migrate(address indexed from, address indexed to, uint256 value);
-    event MigrationAgentSet(address indexed migrationAgent);   
 
     /// @dev Constructor that gives an account all initial tokens.
     constructor(address account) ERC20("Auditchain", "AUDT") {
@@ -118,28 +115,6 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
         super._unpause();
     }
 
-        /// @notice Migrate tokens to the new token contract.
-    function migrate() external whenNotPaused() {
-        uint256 value = balanceOf(msg.sender);
-        require(migrationAgent != address(0), "Token:migrate - Enter migration agent address");
-        require(value > 0, "Token:migrate - Amount of tokens is required");
-
-        _addLock(msg.sender);
-        _burn(msg.sender, balanceOf(msg.sender));
-        totalMigrated += value;
-        MigrationAgent(migrationAgent).migrateFrom(msg.sender, value);
-        _removeLock(msg.sender);
-        emit Migrate(msg.sender, migrationAgent, value);
-    }
-
-    /// @notice Set address of migration target contract and enable migration process
-    /// @param _agent The address of the MigrationAgent contract
-    function setMigrationAgent(address _agent) external  {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "AuditToken-setMigrationAgent: Only admin can call this function");
-        require(_agent != address(0), "Token:setMigrationAgent - Migration agent can't be 0");
-        migrationAgent = _agent;
-        emit MigrationAgentSet(_agent);
-    }
     
     /**
      * @notice Delegate votes from `msg.sender` to `delegatee`
@@ -277,7 +252,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
         return a - b;
     }
 
-    function getChainId() internal pure returns (uint) {
+    function getChainId() internal view returns (uint) {
         uint256 chainId;
         assembly { chainId := chainid() }
         return chainId;
