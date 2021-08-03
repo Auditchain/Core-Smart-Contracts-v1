@@ -321,7 +321,7 @@ abstract contract Validations is AccessControl{
 
         if (validation.executionTime == 0 )
             executeValidation(validationHash, documentHash);
-        // emit ValidatorValidated(msg.sender, documentHash, validationTime, decision);
+        emit ValidatorValidated(msg.sender, documentHash, validationTime, decision);
     }
 
     function isHashAndTimeCorrect( bytes32 documentHash, uint256 validationTime) public view returns (bool){

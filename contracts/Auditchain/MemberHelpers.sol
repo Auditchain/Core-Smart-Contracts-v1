@@ -155,25 +155,19 @@ contract MemberHelpers is  AccessControl {
 
      function processPayment(address[] memory _validators, address _requestor) public isController() {
 
-        uint256 enterprisePortion =  (members.amountTokensPerValidation().mul(members.enterpriseMatch())).div(100);
-        // uint256 platformFee = (members.amountTokensPerValidation().mul(members.platformShareValidation())).div(100);
-        // uint256 validatorsFee = (members.amountTokensPerValidation().add(enterprisePortion)).sub(platformFee);
-        // uint256 paymentPerValidator = validatorsFee.div(_validators.length);
-        // deposits[_requestor] = deposits[_requestor].sub(enterprisePortion);
-        // IAuditToken(auditToken).mint(address(this), members.amountTokensPerValidation());
-        // deposits[members.platformAddress()] = deposits[members.platformAddress()].add(platformFee);
+        uint256 enterprisePortion =  members.amountTokensPerValidation().mul(members.enterpriseMatch()).div(100);
+        uint256 platformFee = members.amountTokensPerValidation().mul(members.platformShareValidation()).div(100);
+        uint256 validatorsFee = members.amountTokensPerValidation().add(enterprisePortion).sub(platformFee);
+        uint256 paymentPerValidator = validatorsFee.div(_validators.length);
+        deposits[_requestor] = deposits[_requestor].sub(enterprisePortion);
+        IAuditToken(auditToken).mint(address(this), members.amountTokensPerValidation());
+        deposits[members.platformAddress()] = deposits[members.platformAddress()].add(platformFee);
 
-        uint256 paymentPerValidator = 1000000000000000000;
-        uint256 validatorsFee = 100000000000000000;
-        // uint256 enterprisePortion = 100000000000000000;
-
-
-        // for (uint256 i=0; i< _validators.length; i++){                     
-        //     deposits[_validators[i]] = deposits[_validators[i]].add(paymentPerValidator);
-
-        //     emit LogRewardsReceived(_validators[i], paymentPerValidator);
-        // }
-        // emit LogRewardsDeposited(validatorsFee, enterprisePortion, _requestor);
+        for (uint256 i=0; i< _validators.length; i++){                     
+            deposits[_validators[i]] = deposits[_validators[i]].add(paymentPerValidator);
+            emit LogRewardsReceived(_validators[i], paymentPerValidator);
+        }
+        emit LogRewardsDeposited(validatorsFee, enterprisePortion, _requestor);
     }
 
     /**

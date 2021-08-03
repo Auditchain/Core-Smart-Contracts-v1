@@ -52,7 +52,7 @@ contract ValidationsCohort is Validations {
         Validation storage validation = validations[validationHash];
         outstandingValidations[validation.requestor] = outstandingValidations[validation.requestor].sub(1);
         memberHelpers.processPayment(validators, validation.requestor);
-        // emit PaymentProcessed(validationHash, validators);
+        emit PaymentProcessed(validationHash, validators);
         
     }
 
