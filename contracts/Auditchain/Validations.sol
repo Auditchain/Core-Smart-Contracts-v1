@@ -16,7 +16,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 abstract contract Validations is AccessControl{
     using SafeMath for uint256;
     using SafeERC20 for AuditToken;
-    uint256 public requiredQuorum = 95;
+    uint256 public requiredQuorum = 80;
     AuditToken public auditToken;
     Members public members;
     MemberHelpers public memberHelpers;

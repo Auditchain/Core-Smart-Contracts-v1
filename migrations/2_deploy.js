@@ -71,7 +71,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await memberHelpers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
 
 
-  await memberHelpers.setCohortFactory(cohortFactory.address, { from: admin });
+  // await memberHelpers.setCohortFactory(cohortFactory.address, { from: admin });
 
 
   await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
@@ -148,7 +148,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 0, { from: enterprise2 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise2 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise2 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3], 0, { from: enterprise1 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 0, { from: enterprise1 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise1 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise1 });
 
@@ -160,16 +160,16 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
   await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
   await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
-  // await cohortFactory.acceptInvitation(enterprise1, 3, { from: validator4 });
+  await cohortFactory.acceptInvitation(enterprise1, 3, { from: validator4 });
 
 
-  await cohortFactory.acceptInvitation(enterprise1, 7, { from: validator1 });
-  await cohortFactory.acceptInvitation(enterprise1, 8, { from: validator2 });
-  await cohortFactory.acceptInvitation(enterprise1, 9, { from: validator3 });
-  await cohortFactory.acceptInvitation(enterprise1, 10, { from: validator4 });
+  await cohortFactory.acceptInvitation(enterprise1, 4, { from: validator1 });
+  await cohortFactory.acceptInvitation(enterprise1, 5, { from: validator2 });
+  await cohortFactory.acceptInvitation(enterprise1, 6, { from: validator3 });
+  await cohortFactory.acceptInvitation(enterprise1, 7, { from: validator4 });
 
 
-  let result = await cohortFactory.createCohort(0, { from: enterprise2 });
+  let result = await cohortFactory.createCohort(0, { from: enterprise1 });
 
   // assert.lengthOf(result.logs, 1);
   let event = result.logs[0];
@@ -185,19 +185,19 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   const documentURL = "http://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml"
   documentHash = web3.utils.soliditySha3(documentURL);
 
-  result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise2 });
+  result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
 
-  let validationInitTime;
+
 
   event = result.logs[0];
-  validationInitTime = event.args.initTime;
+  let validationInitTime = event.args.initTime;
 
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 500000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator2, gas: 500000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 500000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 500000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator2, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
 
 
 
