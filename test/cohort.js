@@ -186,7 +186,7 @@ contract("cohort contract", (accounts) => {
 
         it("Should succeed. Validation initialized by registered user who has sufficient funds", async () => {
 
-            let result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+            let result = await cohort.initializeValidationCohort(documentHash, documentURL, 0,  { from: enterprise1 });
 
             let event = result.logs[0];
             assert.equal(event.event, 'ValidationInitialized');
@@ -202,7 +202,7 @@ contract("cohort contract", (accounts) => {
         it("Should fail. Validation initialized by not registered user.", async () => {
 
             try {
-                let result = await cohort.initializeValidation(documentHash, documentURL, 0, { from: admin });
+                let result = await cohort.initializeValidationCohort(documentHash, documentURL, 0, { from: admin });
                 expectRevert();
             }
             catch (error) {
@@ -216,7 +216,7 @@ contract("cohort contract", (accounts) => {
             await memberHelpers.redeem(auditTokenMin, { from: enterprise1 });
 
             try {
-                await cohort.initializeValidation(documentHash, documentURL, 0, { from: enterprise1 });
+                await cohort.initializeValidationCohort(documentHash, documentURL, 0, { from: enterprise1 });
                 expectRevert();
             }
             catch (error) {
@@ -233,7 +233,7 @@ contract("cohort contract", (accounts) => {
 
             // await cohortFactory.createCohort(0, { from: enterprise1 });
 
-            let result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+            let result = await cohort.initializeValidationCohort(documentHash, documentURL, 0,  { from: enterprise1 });
             let event = result.logs[0];
             assert.equal(event.event, 'ValidationInitialized');
             validationInitTime = event.args.initTime;
@@ -314,7 +314,7 @@ contract("cohort contract", (accounts) => {
             let earned3 = BN(depositAmountAfter3.toString()).minus(BN(depositAmountBefore3.toString()));
 
             let mintedPerValidation = await members.amountTokensPerValidation();
-            let enterpriseMatch = await members.enterpriseMatch();
+            let enterpriseMatch = await members.enterpriseMatch(enterprise1);
             let platformFeePercantage = await members.platformShareValidation();
             let enterprisePortion = mintedPerValidation * enterpriseMatch / 100;
             let platformPortion = mintedPerValidation * platformFeePercantage / 100;
@@ -342,7 +342,7 @@ contract("cohort contract", (accounts) => {
 
         beforeEach(async () => {
 
-            let result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+            let result = await cohort.initializeValidationCohort(documentHash, documentURL, 0, { from: enterprise1 });
 
             let event = result.logs[0];
             assert.equal(event.event, 'ValidationInitialized');
@@ -376,7 +376,7 @@ contract("cohort contract", (accounts) => {
 
         beforeEach(async () => {
 
-            let result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+            let result = await cohort.initializeValidationCohort(documentHash, documentURL, 0, { from: enterprise1 });
 
             let event = result.logs[0];
             assert.equal(event.event, 'ValidationInitialized');
@@ -416,7 +416,7 @@ contract("cohort contract", (accounts) => {
 
         beforeEach(async () => {
 
-            let result = await cohort.initializeValidation(documentHash, documentURL, 0,  true,{ from: enterprise1 });
+            let result = await cohort.initializeValidationCohort(documentHash, documentURL, 0, { from: enterprise1 });
 
             let event = result.logs[0];
             assert.equal(event.event, 'ValidationInitialized');
