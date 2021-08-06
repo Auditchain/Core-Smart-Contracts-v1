@@ -42,23 +42,22 @@ contract RulesERC721Token is ERC721, ERC721URIStorage, ERC721Enumerable
     }
 
 
-    constructor(string memory _name, string memory _symbol)
+    constructor(string memory _name, string memory _symbol, address _cohort)
         ERC721(_name, _symbol)
     {
+        cohort = ValidationsCohort(_cohort);
         
     }
 
     /**
      * @dev Mints a token to an enterprise/rule creator with a given validation hash and cohort
      * @param _hash of the validated document
-     * @param _cohort address of the cohort
      * @return newTokenId
      */
-    function mintTo(bytes32 _hash, address _cohort)
+    function mintTo(bytes32 _hash)
         public
         returns (uint256)
     {
-        cohort = ValidationsCohort(_cohort);
         (,address enterprise,, uint256 executionTime , string memory url, uint256 consensus, , ) = cohort.validations(_hash);
         require(enterprise != address(0), "RulesERC721Token:mintTo - Recipient address can't be 0");
         require(executionTime > 0 , "RulesERC721Token:mintTo - This rule hasn't been approved yet");
