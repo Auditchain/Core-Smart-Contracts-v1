@@ -38,6 +38,7 @@ contract CohortFactory is  AccessControl {
 
     mapping(address => uint256[]) public cohortList;
     mapping(address => mapping(uint256=>bool)) public cohortMap;
+    mapping (address => mapping(address=> AuditTypes[])) public validatorCohortList;  // list of validators
     
 
     Members members;                                            // pointer to Members contract1 
@@ -49,7 +50,7 @@ contract CohortFactory is  AccessControl {
 
     event ValidatorInvited(address  inviting, address indexed invitee, AuditTypes audits, uint256 invitationNumber);
     event InvitationAccepted(address indexed validator, uint256 invitationNumber);
-    event CohortCreated(address indexed enterprise, AuditTypes audits);
+    event CohortCreated(address indexed enterprise, uint256 audits);
     event UpdateMinValidatorsPerCohort(uint256 minValidatorPerCohort, AuditTypes audits);
     event ValidatorCleared(address validator, AuditTypes audit, address cohort, address enterprise);
 
@@ -230,6 +231,30 @@ contract CohortFactory is  AccessControl {
         return validatorsList;
     }
 
+     /**
+    * @dev create a list of validators to be initialized in new cohort   
+    * @param validators any array of address of the validators
+    * @param enterprise who created cohort
+    * @param audit  type of audit
+    */
+    function createValidatorCohortList(address[] memory validators, address enterprise, AuditTypes audit) internal {
+
+        for (uint256 i=0; i< validators.length; i++){
+            validatorCohortList[validators[i]][enterprise].push(audit);
+        }
+    }
+
+    // function returnCohortsForDataSubscriber(address dataSubscriber)
+
+    /**
+    * @dev Used to determine cohorts count for given validator
+    * @param validator address of the validator
+    */
+    function returnValidatorCohortsCount(address validator, address enterprise) public view returns (uint256){
+
+        return validatorCohortList[validator][enterprise].length;
+    }
+
     /**
     * @dev Initiate creation of a new cohort 
     * @param audit type
@@ -238,7 +263,8 @@ contract CohortFactory is  AccessControl {
         address[] memory validators =  returnValidatorList(msg.sender, audit);
         require(validators.length >= minValidatorPerCohort[uint256(audit)], "CohortFactory:createCohort - Number of validators below required minimum.");
         cohortMap[msg.sender][uint256(audit)] = true;   
-        emit CohortCreated(msg.sender, AuditTypes(audit));
+        createValidatorCohortList(validators, msg.sender, AuditTypes(audit));
+        emit CohortCreated(msg.sender, audit);
         
     }
 }
