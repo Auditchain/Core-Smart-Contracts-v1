@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./../IAuditToken.sol";
 import "./ICohortFactory.sol";
-import "./Validations.sol";
+import "./IValidations.sol";
 
 
 
@@ -33,7 +33,7 @@ contract MemberHelpers is  AccessControl {
     address public auditToken;                       //AUDT token 
     Members members;
     ICohortFactory public cohortFactory;
-    Validations public validations;
+    IValidatinos public validations;
     mapping(address => uint256) public deposits;        //track deposits per user
     mapping(address => DataSubscriberTypes[]) public dataSubscriberCohorts;
     mapping(address => mapping(address => mapping(uint256 => bool))) public dataSubscriberCohortMap;
@@ -52,7 +52,7 @@ contract MemberHelpers is  AccessControl {
     event LogRewardsReceived(address indexed validator, uint256 tokens );
     event LogNonCohortValidationPaid(address requestor, address[] validators);
     event LogRewardsDeposited(uint256 tokens, uint256 enterpriseAmount, address indexed enterprise);
-    event LogDataSubscriberPaid(address indexed from, uint256 accessFee,  uint256 audits, address enterprise, uint256 enterpriseShare);
+    event LogDataSubscriberPaid(address indexed from, uint256 accessFee,  uint256 indexed audits, address enterprise, uint256 enterpriseShare);
     event LogSubscriptionCompleted(address subscriber, uint256 numberOfSubscriptions);
     event LogDataSubscriberValidatorPaid(address  from, address indexed validator, uint256 amount);
     
@@ -118,7 +118,7 @@ contract MemberHelpers is  AccessControl {
     function setCohort(address _validations) public isController() {
 
         require(_validations != address(0), "Members:setCohort - Cohort address can't be 0");
-        validations = Validations(_validations);
+        validations = IValidatinos(_validations);
     }
 
 
@@ -134,7 +134,7 @@ contract MemberHelpers is  AccessControl {
               // div(1e4) to adjust for four decimal points
             require(deposits[msg.sender]
             .sub(members.enterpriseMatch().mul(members.amountTokensPerValidation()).mul(outstandingVal).div(1e4)) >= amount, 
-            "MemberHelpers:redeem - Your deposit will be too looutstandingValw to fullfil your outstanding payments.");
+            "MemberHelpers:redeem - Your deposit will be too low to fullfil your outstanding payments.");
           }
 
         stakedAmount = stakedAmount.sub(amount);       
@@ -189,7 +189,6 @@ contract MemberHelpers is  AccessControl {
         require(deposits[msg.sender] >= members.accessFee(), "MemberHelpers:dataSubscriberPayment - You don't have enough AUDT to complet this tranasction.");
 
         IERC20(auditToken).safeTransferFrom(msg.sender, address(this), members.accessFee());
-        // uint platformShare = (((members.enterpriseShareSubscriber()).add(members.validatorShareSubscriber())).mul(100)).div(members.accessFee());
         uint platformShare = 100 - members.enterpriseShareSubscriber() -members.validatorShareSubscriber();
         IERC20(auditToken).safeTransfer(members.platformAddress(), members.accessFee().mul(platformShare).div(100));
 
@@ -208,15 +207,15 @@ contract MemberHelpers is  AccessControl {
 
     /**
     * @dev To automate subscription for multiple cohorts for data subscriber 
-    * @param cohortAddress - array of cohort addresses
+    * @param enterprise - array of enterprise addresses
     * @param audits - array of audit types for each cohort
     */
-    function dataSubscriberPaymentMultiple(address[] memory cohortAddress, uint256[] memory audits) public {
+    function dataSubscriberPaymentMultiple(address[] memory enterprise, uint256[] memory audits) public {
 
-        uint256 length = cohortAddress.length;
+        uint256 length = enterprise.length;
         require(length <= 256, "MemberHelpers:dataSubscriberPaymentMultiple - List too long");
         for (uint256 i = 0; i < length; i++) {
-            dataSubscriberPayment(cohortAddress[i], audits[i]);
+            dataSubscriberPayment(enterprise[i], audits[i]);
         }
 
         emit LogSubscriptionCompleted(msg.sender, length);
@@ -235,20 +234,16 @@ contract MemberHelpers is  AccessControl {
 
         for (uint i=0; i < cohortValidators.length; i++){
             totalDeposits = totalDeposits.add(deposits[cohortValidators[i]]);
-        // emit total(totalDeposits);
         }
 
         for (uint i=0; i < cohortValidators.length; i++){
             uint256 oneValidatorPercentage = (deposits[cohortValidators[i]].mul(10e18)).div(totalDeposits);
             uint256 oneValidatorAmount = amount.mul(oneValidatorPercentage).div(10e18);
-        //     deposits[cohortValidators[i]] = deposits[cohortValidators[i]].add(members.accessFee().mul(oneValidatorAmount).div(100).div(10e18)  );
-
             deposits[cohortValidators[i]] = deposits[cohortValidators[i]].add(oneValidatorAmount);
             emit LogDataSubscriberValidatorPaid(msg.sender, cohortValidators[i], oneValidatorAmount);
         }
     }
 
-    // event total(uint256 dep);
 
     /**
     * @dev To return all cohorts to which data subscriber is subscribed to 
