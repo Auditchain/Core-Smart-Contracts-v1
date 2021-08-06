@@ -14,16 +14,16 @@ contract ValidationsNoCohort is Validations {
     }
 
     /**
-    * @dev to be called by Enterprise to initiate new validation
+    * @dev to be called by data subscriber to initiate new validation
     * @param documentHash - hash of unique identifier of validated transaction
     * @param url - locatoin of the file on IPFS or other decentralized file storage
     * @param auditType - type of auditing 
     */
-    function initializeValidation(bytes32 documentHash, string memory url, AuditTypes auditType, bool isCohort) public override {
+    function initializeValidationNoCohort(bytes32 documentHash, string memory url, AuditTypes auditType) public {
 
         require(checkIfRequestorHasFunds(msg.sender), "NoCohort:initializeValidation - Not sufficient funds. Deposit additional funds.");
         require(members.userMap(msg.sender, Members.UserType(2)), "MemberHelpers:dataSubscriberPayment - You have to register as data subscriber");
-        super.initializeValidation(documentHash, url, auditType, isCohort);
+        super.initializeValidation(documentHash, url, auditType, false);
         
     }
 
