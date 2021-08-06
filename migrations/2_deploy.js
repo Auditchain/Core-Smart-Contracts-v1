@@ -14,6 +14,8 @@ const Timelock = artifacts.require('./Governance/Timelock.sol');
 const ethers = require('ethers');
 const timeMachine = require('ganache-time-traveler');
 const abi = new ethers.utils.AbiCoder();
+const assert = require('chai');
+
 
 
 module.exports = async function (deployer, network, accounts) { // eslint-disable-line..
@@ -89,7 +91,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
 
-  await deployer.deploy(NFT, "Test", "Test");
+  await deployer.deploy(NFT, "Test", "Test", cohort.address);
   let nft = await NFT.deployed();
 
   await timelock.setPendingAdmin(gov.address, { from: admin });
@@ -116,6 +118,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await members.addUser(validator2, "Validators 2", 1, { from: controller });
   await members.addUser(validator3, "Validators 3", 1, { from: controller });
   await members.addUser(validator4, "Validators 4", 1, { from: controller });
+  await members.addUser(dataSubscriber, "Datasubscriber ", 1, { from: controller });
+
 
 
   await token.transfer(accounts[1], tokenAmount1);
@@ -136,6 +140,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await token.approve(memberHelpers.address, validatorAmountMin, { from: validator4 });
   await token.approve(memberHelpers.address, validatorAmountMin, { from: enterprise1 });
   await token.approve(memberHelpers.address, validatorAmountMin, { from: enterprise2 });
+  await token.approve(memberHelpers.address, validatorAmountMin, { from: dataSubscriber });
+
 
 
 
@@ -144,13 +150,15 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await memberHelpers.stake(validatorAmountMin, { from: validator3 });
   await memberHelpers.stake(validatorAmountMin, { from: validator4 });
   await memberHelpers.stake(validatorAmountMin, { from: enterprise1 });
+  await memberHelpers.stake(validatorAmountMin, { from: dataSubscriber });
+
 
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 0, { from: enterprise2 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise2 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise2 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 0, { from: enterprise1 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise1 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise1 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 3, { from: enterprise1 });
 
   await cohortFactory.acceptInvitation(enterprise2, 0, { from: validator1 });
   await cohortFactory.acceptInvitation(enterprise2, 1, { from: validator2 });
@@ -162,16 +170,21 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
   await cohortFactory.acceptInvitation(enterprise1, 3, { from: validator4 });
 
+  // await cohortFactory.acceptInvitation(enterprise1, 4, { from: validator2 });
+  // await cohortFactory.acceptInvitation(enterprise1, 5, { from: validator3 });
+  // await cohortFactory.acceptInvitation(enterprise1, 6, { from: validator4 });
+  // await cohortFactory.acceptInvitation(enterprise1, 7, { from: validator1 });
 
-  await cohortFactory.acceptInvitation(enterprise1, 4, { from: validator1 });
-  await cohortFactory.acceptInvitation(enterprise1, 5, { from: validator2 });
-  await cohortFactory.acceptInvitation(enterprise1, 6, { from: validator3 });
-  await cohortFactory.acceptInvitation(enterprise1, 7, { from: validator4 });
+  
+
+  await cohortFactory.acceptInvitation(enterprise1, 8, { from: validator1 });
+  await cohortFactory.acceptInvitation(enterprise1, 9, { from: validator2 });
+  await cohortFactory.acceptInvitation(enterprise1, 10, { from: validator3 });
+  await cohortFactory.acceptInvitation(enterprise1, 11, { from: validator4 });
 
 
   let result = await cohortFactory.createCohort(0, { from: enterprise1 });
 
-  // assert.lengthOf(result.logs, 1);
   let event = result.logs[0];
 
   await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
@@ -182,7 +195,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await memberHelpers.setCohortFactory(cohortFactory.address, { from: admin });
   await memberHelpers.setCohort(cohort.address, { from: admin });
 
-  const documentURL = "http://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml"
+  let documentURL = "http://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml"
   documentHash = web3.utils.soliditySha3(documentURL);
 
   result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
@@ -199,108 +212,98 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
   await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
 
+  
+  timeMachine.advanceTimeAndBlock(10);
+  
+  // await cohortFactory.createCohort(2, { from: enterprise1 });
+  result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+  
+  event = result.logs[0];
+  validationInitTime = event.args.initTime;
+
+
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 2, { from: validator2, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
+
+
+  timeMachine.advanceTimeAndBlock(10);
+  
+  // await cohortFactory.createCohort(2, { from: enterprise1 });
+  result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+  
+  event = result.logs[0];
+  validationInitTime = event.args.initTime;
+
+
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 2, { from: validator2, gas: 800000 });
+  result = await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
+
+
+  event = result.logs[0];
+  let event1 = result.logs[1];
+  let event2 = result.logs[2]
+
+  console.log("event", event.event);
+  console.log("event1", event1.event);
+  console.log("event2", event2.event);
 
 
 
-  // let event = result.logs[1];
-  // let cohortAddress = event.args.cohort;
-  // let cohortContract = new web3.eth.Contract(Cohort["abi"], cohortAddress);
-  // let enterprise = await cohortContract.methods.enterprise().call();
-  // let validators = await cohortContract.methods.validators(0).call();
-  // let documentHash = web3.utils.soliditySha3("2+3=4");
-  // await members.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
-  // // await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
-
-  // result = await cohortFactory.createCohort(0, { from: enterprise1 });
-
-  // event = result.logs[1];
-  // cohortAddress = event.args.cohort;
-  // cohortContract = new web3.eth.Contract(Cohort["abi"], cohortAddress);
-  // documentHash = web3.utils.soliditySha3("2+3=4");
-
-  // await cohortContract.methods.grantRole(CONTROLLER_ROLE, admin).send({ from: admin });
-  // // await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
-  // await members.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
-
-  // result = await cohortContract.methods.initializeValidation(documentHash, "234").send({ from: enterprise1, gas: 6000000 });
+  // validationInitTime = event.args.initTime;
 
 
-  // values = result.events.ValidationInitialized.returnValues;
-  // validationHash = values.validationHash;
-  // validationTime = values.initTime;
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
 
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 500000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 500000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator3, gas: 500000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 500000 });
+  
+ 
+  await token.approve(memberHelpers.address, subscriberFee, { from: dataSubscriber });
 
-  // timeMachine.advanceTimeAndBlock(10);
+  await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: controller });
 
-
-  // documentHash = web3.utils.soliditySha3("2+3=5");
-  // result = await cohortContract.methods.initializeValidation(documentHash, "234").send({ from: enterprise1, gas: 6000000 });
-  // timeMachine.advanceTimeAndBlock(10);
-
-  // values = result.events.ValidationInitialized.returnValues;
-  // validationHash = values.validationHash;
-  // validationTime = values.initTime;
-
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 500000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 2).send({ from: validator2, gas: 500000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator3, gas: 500000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 500000 });
-
-  // timeMachine.advanceTimeAndBlock(10);
-  // result = await cohortFactory.createCohort(2, { from: enterprise1 });
-  // console.log("cohort", result);
+  await memberHelpers.dataSubscriberPayment(enterprise1, 0, { from: dataSubscriber });
 
 
-  // event = result.logs[1];
-  // cohortAddress = event.args.cohort;
-  // cohortContract = new web3.eth.Contract(Cohort["abi"], cohortAddress);
+  // ****************NFT***************************************//
+
+  await cohortFactory.createCohort(3, { from: enterprise1 });
+
+  documentURL= "QmNhaANyYwWmfrRBfMbXyogPhBSTQdzFL8TiWbqjBmNuoc/Auditchain.json";
+
+  documentHash = web3.utils.soliditySha3(documentURL);
+  result = await cohort.initializeValidation(documentHash, documentURL , 3, true, { from: enterprise1, gas: 6000000 });
+
+  event = result.logs[0];
+  validationInitTime = event.args.initTime;
 
 
-  // await members.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
+  await cohort.validate(documentHash, validationInitTime, 1,{ from: validator1, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1,{ from: validator2, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1,{ from: validator3, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1,{ from: validator4, gas: 900000 });
 
 
-  // documentHash = web3.utils.soliditySha3("test5");
-  // result = await cohortContract.methods.initializeValidation(documentHash, "QmNhaANyYwWmfrRBfMbXyogPhBSTQdzFL8TiWbqjBmNuoc/Auditchain.json").send({ from: enterprise1, gas: 6000000 });
-  // values = result.events.ValidationInitialized.returnValues;
-  // validationHash = values.validationHash;
-  // validationTime = values.initTime;
+  //*****************************************Cohort cases end */
 
-  // await cohortContract.methods.grantRole(CONTROLLER_ROLE, admin).send({ from: admin });
-  // // await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
+  //*****************************************No Cohort cases start */
 
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 900000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 900000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator3, gas: 900000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 900000 });
+  result = await noCohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+  event = result.logs[0];
+  validationInitTime = event.args.initTime;
+
+  await noCohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, 2, { from: validator2, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
 
 
-  // documentHash = web3.utils.soliditySha3("test56");
-  // result = await cohortContract.methods.initializeValidation(documentHash, "QmeS86JjFut8ttA3NWutB4qkum3gQTnD4CtgMBQVvi3b3N/Auditchain.json").send({ from: enterprise1, gas: 6000000 });
-  // values = result.events.ValidationInitialized.returnValues;
-  // validationHash = values.validationHash;
-  // validationTime = values.initTime;
 
-  // await cohortContract.methods.grantRole(CONTROLLER_ROLE, admin).send({ from: admin });
-  // // await token.grantRole(CONTROLLER_ROLE, cohortAddress, { from: admin });
+  //*****************************************No Cohort cases end */
 
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator1, gas: 900000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator2, gas: 900000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator3, gas: 900000 });
-  // await cohortContract.methods.validate(documentHash, validationTime, 1).send({ from: validator4, gas: 900000 });
 
-  // const validation = await cohortContract.methods.validations(validationHash).call();
-  // console.log("validation", validation);
-  // console.log("validation hash", validationHash);
 
-  // await token.approve(members.address, subscriberFee, { from: dataSubscriber });
-
-  // await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: controller });
-
-  // await members.dataSubscriberPayment(cohortAddress, 1, { from: dataSubscriber });
 
 
   // // Governance data
@@ -420,22 +423,26 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   // await gov.cancel(5, { from: accounts[0] });
 
 
-
+// front format
 
   console.log("\n\n" + '"AUDT_TOKEN_ADDRESS":"' + token.address + '",');
   console.log('"MEMBERS_ADDRESS":"' + members.address + '",');
   console.log('"MEMBER_HELPERS_ADDRESS":"' + memberHelpers.address + '",');
   console.log('"COHORT_FACTORY_ADDRESS":"' + cohortFactory.address + '",');
+  console.log('"VALIDATIONS_COHORT_ADDRESS":"' + cohort.address + '",');
+  console.log('"VALIDATIONS_NO_COHORT_ADDRESS":"' + noCohort.address + '",');
   console.log('"GOVERNOR_ALPHA_ADDRESS":"' + gov.address + '",');
   console.log('"TIMELOCK_ADDRESS":"' + timelock.address + '",');
   console.log('"NFT":"' + nft.address + '"' + "\n\n");
 
+// env format
 
-
-  console.log('COHORT_FACTORY_ADDRESS=' + cohortFactory.address);
   console.log('AUDT_TOKEN_ADDRESS=' + token.address);
   console.log('MEMBER_ADDRESS=' + members.address);
   console.log('MEMBER_HELPERS_ADDRESS=' + memberHelpers.address);
+  console.log('COHORT_FACTORY_ADDRESS=' + cohortFactory.address);
+  console.log('VALIDATIONS_COHORT_ADDRESS=' + cohort.address);
+  console.log('VALIDATIONS_NO_COHORT_ADDRESS=' + noCohort.address);
   console.log('GOVERNOR_ALPHA_ADDRESS=' + gov.address);
   console.log('TIMELOCK_ADDRESS=' + timelock.address);
   console.log('RULES_NFT_ADDRESS=' + nft.address);
@@ -448,6 +455,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('membersAddress:"' + members.address + '",');
   console.log('memberHelpersAddress:"' + memberHelpers.address + '",');
   console.log('cohortFactoryAddress:"' + cohortFactory.address + '",');
+  console.log('cohortAddress:"' + cohort.address + '",');
+  console.log('noCohortAddress:"' + noCohort.address + '",');
   console.log('governorAlphaAddress:"' + gov.address + '",');
   console.log('timelockAddress:"' + timelock.address + '",');
   console.log('rulesNFTAddress:"' + nft.address + '",' + "\n\n");
