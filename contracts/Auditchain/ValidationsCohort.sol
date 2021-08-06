@@ -20,11 +20,11 @@ contract ValidationsCohort is Validations {
     * @param url - locatoin of the file on IPFS or other decentralized file storage
     * @param auditType - type of auditing 
     */
-    function initializeValidation(bytes32 documentHash, string memory url, AuditTypes auditType, bool isCohort) public override {
+    function initializeValidationCohort(bytes32 documentHash, string memory url, AuditTypes auditType) public {
 
         require(checkIfRequestorHasFunds(msg.sender), "NoCohort:initializeValidation - Not sufficient funds. Deposit additional funds.");
         require(cohortFactory.cohortMap(msg.sender, uint256(auditType)), "Cohort:intializeValidation - Only enterprise owing this cohort can call this function");
-        super.initializeValidation(documentHash, url, auditType, isCohort);
+        super.initializeValidation(documentHash, url, auditType, true);
         
     }
 
@@ -42,6 +42,8 @@ contract ValidationsCohort is Validations {
                     .mul(outstandingValidations[requestor])
                     .mul(members.enterpriseMatch())
                     .div(1e4));
+        else if (memberHelpers.deposits(requestor) == 0)
+            return false;
         else
             return true;
     }
@@ -73,6 +75,7 @@ contract ValidationsCohort is Validations {
         require(ivited && accepted, "Cohort:validate - validator is not part of the cohort.");
 
         super.validate(documentHash, validationTime, decision);
+        
     }
 
 
