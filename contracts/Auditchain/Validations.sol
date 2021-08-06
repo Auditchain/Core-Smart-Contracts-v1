@@ -16,7 +16,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 abstract contract Validations is AccessControl{
     using SafeMath for uint256;
     using SafeERC20 for AuditToken;
-    uint256 public requiredQuorum = 80;
+    uint256 public requiredQuorum = 60;
     AuditToken public auditToken;
     Members public members;
     MemberHelpers public memberHelpers;
@@ -58,10 +58,10 @@ abstract contract Validations is AccessControl{
 
     event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes auditType);
     event ValidatorValidated(address validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
-    event ValidationExecuted(bytes32 indexed validationHash, uint256 indexed timeExecuted, bytes32 documentHash);
+    event RequestExecuted(uint256 indexed audits, address requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted);
     event PaymentProcessed(bytes32 validationHash, address[] validators);
     event Winners(address[] winners);
- 
+
     constructor(address _auditToken, address _members, address _memberHelpers, address _cohortFactory) {
 
         auditToken = AuditToken(_auditToken);
@@ -123,7 +123,7 @@ abstract contract Validations is AccessControl{
      * @dev Review the validation results
      * @param validationHash - consist of hash of hashed document and timestamp
      * @return array  of validators
-     * @return array of stakes of each validator
+     * @return array of stakes of each validatoralidation.requestor
      * @return array of validation choices for each validator
      */
     function collectValidationResults(bytes32 validationHash)
@@ -222,21 +222,21 @@ abstract contract Validations is AccessControl{
      * @param validationHash - consist of hash of hashed document and timestamp
      */
     function executeValidation(bytes32 validationHash, bytes32 documentHash) internal {
-        if (calculateVoteQuorum(validationHash) >= requiredQuorum) {
+        uint256 quorum = calculateVoteQuorum(validationHash);
+        if (quorum >= requiredQuorum) {
             Validation storage validation = validations[validationHash];
             validation.executionTime = block.timestamp;
 
             (address[] memory winners, uint256 consensus) = determineWinners(validationHash);
-            emit Winners(winners);
             validation.consensus = consensus;
+            
+            emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp);
             processPayments(validationHash, winners);
-            emit ValidationExecuted(validationHash, block.timestamp, documentHash);
         }
     }
 
 
     function insertionSort(bytes32 validationHash) internal view returns (address[] memory, ValidationStatus[] memory, uint256[] memory) {
-
 
         (address[] memory validator, ,ValidationStatus[] memory status, uint256[] memory validationTimes) =  collectValidationResults(validationHash);
 
