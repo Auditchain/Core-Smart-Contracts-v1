@@ -64,7 +64,7 @@ contract Members is  AccessControl {
     // uint256 public validatorCount;
     // uint256 public dataSubscriberCount;
     
-    event UserAdded(address indexed user, string name, UserType userType);
+    event UserAdded(address indexed user, string name, UserType indexed userType);
     event LogDepositReceived(address indexed from, uint amount);
     event LogSubscriptionCompleted(address subscriber, uint256 numberOfSubscriptions);
     event LogUpdateRewards(uint256 rewards);
