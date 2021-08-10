@@ -16,10 +16,10 @@ contract CohortFactory is  AccessControl {
 
     // Audit types to be used. Two types added for future expansion 
     enum AuditTypes {
-        Financial, System, Rules, NFT, Type5, Type6
+        Unknown, Financial, System, NFT, Type4, Type5
     }
 
-    uint256[] public minValidatorPerCohort = [3,3,3,3,3,3];
+    uint256[] public minValidatorPerCohort = [0,3,3,3,3,3,3];
 
     // Invitation structure to hold info about its status
     struct Invitation {
@@ -48,11 +48,11 @@ contract CohortFactory is  AccessControl {
 
     bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
 
-    event ValidatorInvited(address  inviting, address indexed invitee, AuditTypes audits, uint256 invitationNumber);
+    event ValidatorInvited(address  inviting, address indexed invitee, AuditTypes indexed audits, uint256 invitationNumber);
     event InvitationAccepted(address indexed validator, uint256 invitationNumber);
     event CohortCreated(address indexed enterprise, uint256 audits);
     event UpdateMinValidatorsPerCohort(uint256 minValidatorPerCohort, AuditTypes audits);
-    event ValidatorCleared(address validator, AuditTypes audit, address cohort, address enterprise);
+    event ValidatorCleared(address validator, AuditTypes audit, address enterprise);
 
     /// @dev check if caller is a setter     
     modifier isSetter {
@@ -75,7 +75,7 @@ contract CohortFactory is  AccessControl {
     function updateMinValidatorsPerCohort(uint256 _minValidatorPerCohort, uint256 audits) public  {
 
         require(_minValidatorPerCohort != 0, "CohortFactory:updateMinValidatorsPerCohort - New value for the  min validator per cohort can't be 0");
-        require(audits <= 5 && audits >=0 , "Cohort Factory:updateMinValidatorsPerCohort - Audit type has to be <= 5 and >=0");
+        require(audits <= 6 && audits >=0 , "Cohort Factory:updateMinValidatorsPerCohort - Audit type has to be <= 5 and >=0");
         minValidatorPerCohort[audits] = _minValidatorPerCohort;
         emit UpdateMinValidatorsPerCohort(_minValidatorPerCohort, AuditTypes(audits));
     }
@@ -139,10 +139,11 @@ contract CohortFactory is  AccessControl {
         for (uint256 i = 0; i < invitations[msg.sender].length; i++){
             if (invitations[msg.sender][i].audits == audit && invitations[msg.sender][i].validator ==  validator){
                 invitations[msg.sender][i].deleted = true;                
-                emit ValidatorCleared(validator, audit, address(0x0), msg.sender);
+                emit ValidatorCleared(validator, audit, msg.sender);
                 return true;
             }
         }
+
 
         revert("This invitation doesn't exist");
     }
@@ -202,13 +203,34 @@ contract CohortFactory is  AccessControl {
     }
 
      /**
+    * @dev Used to determine if validator has been invited and/or if validation has been accepted
+    * @param enterprise inviting party
+    * @param validator address of the validator
+    * @param audits types
+    * @param invitNumber invitation number
+    * @return true if invited
+    * @return true if accepted invitation
+    */
+    function isValidatorInvitedNumber(address enterprise, address validator, uint256 audits, uint256 invitNumber) public view returns (bool, bool) {
+
+        if (invitations[enterprise][invitNumber].audits == AuditTypes(audits) && 
+            invitations[enterprise][invitNumber].validator == validator &&
+            !invitations[enterprise][invitNumber].deleted){
+            if (invitations[enterprise][invitNumber].acceptanceDate > 0)
+                return (true, true);
+            return (true, false);
+        }
+        return (false, false);
+    }
+
+     /**
     * @dev Returns true for audit types for which enterprise has created cohorts.
     * @param enterprise inviting party
     * @return list of boolean variables with value true for audit types enterprise has initiated cohort, 
     */
     function returnCohorts(address enterprise) public view returns (bool[] memory){
 
-        uint256 auditCount = 5;
+        uint256 auditCount = 6;
         bool[] memory audits = new bool[](auditCount);
 
         for (uint256 i; i < auditCount; i++){
@@ -260,6 +282,7 @@ contract CohortFactory is  AccessControl {
     * @param audit type
     */
     function createCohort(uint256 audit) public {
+        require(!cohortMap[msg.sender][uint256(audit)] , "CohortFactory:createCohort - This cohort already exists.");
         address[] memory validators =  returnValidatorList(msg.sender, audit);
         require(validators.length >= minValidatorPerCohort[uint256(audit)], "CohortFactory:createCohort - Number of validators below required minimum.");
         cohortMap[msg.sender][uint256(audit)] = true;   
