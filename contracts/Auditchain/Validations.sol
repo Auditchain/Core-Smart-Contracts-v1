@@ -34,7 +34,7 @@ abstract contract Validations is AccessControl{
     }
 
     // Audit types to be used. Three types added for future expansion
-    enum AuditTypes {Financial, System, Contract, NFT, Type5, Type6}
+    enum AuditTypes {Unknown, Financial, System, NFT, Type4, Type5, Type6}
 
     AuditTypes public audits;
 
@@ -56,7 +56,7 @@ abstract contract Validations is AccessControl{
 
     mapping(bytes32 => Validation) public validations; // track each validation
 
-    event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes auditType);
+    event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
     event ValidatorValidated(address validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
     event RequestExecuted(uint256 indexed audits, address requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted);
     event PaymentProcessed(bytes32 validationHash, address[] validators);
