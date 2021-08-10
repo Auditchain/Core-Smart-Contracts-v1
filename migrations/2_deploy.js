@@ -118,7 +118,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await members.addUser(validator2, "Validators 2", 1, { from: controller });
   await members.addUser(validator3, "Validators 3", 1, { from: controller });
   await members.addUser(validator4, "Validators 4", 1, { from: controller });
-  await members.addUser(dataSubscriber, "Datasubscriber ", 1, { from: controller });
+  await members.addUser(dataSubscriber, "Datasubscriber 1", 2, { from: controller });
 
 
 
@@ -150,14 +150,16 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await memberHelpers.stake(validatorAmountMin, { from: validator3 });
   await memberHelpers.stake(validatorAmountMin, { from: validator4 });
   await memberHelpers.stake(validatorAmountMin, { from: enterprise1 });
+  await memberHelpers.stake(validatorAmountMin, { from: enterprise2 });
+
   await memberHelpers.stake(validatorAmountMin, { from: dataSubscriber });
 
 
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 0, { from: enterprise2 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise2 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise2 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 0, { from: enterprise1 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 3, { from: enterprise2 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise1 });
+  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise1 });
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 3, { from: enterprise1 });
 
   await cohortFactory.acceptInvitation(enterprise2, 0, { from: validator1 });
@@ -183,7 +185,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortFactory.acceptInvitation(enterprise1, 11, { from: validator4 });
 
 
-  let result = await cohortFactory.createCohort(0, { from: enterprise1 });
+  let result = await cohortFactory.createCohort(1, { from: enterprise1 });
 
   let event = result.logs[0];
 
@@ -198,7 +200,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   let documentURL = "http://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml"
   documentHash = web3.utils.soliditySha3(documentURL);
 
-  result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+  result = await cohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
 
 
 
@@ -216,7 +218,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   timeMachine.advanceTimeAndBlock(10);
   
   // await cohortFactory.createCohort(2, { from: enterprise1 });
-  result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+  result = await cohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
   
   event = result.logs[0];
   validationInitTime = event.args.initTime;
@@ -231,7 +233,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   timeMachine.advanceTimeAndBlock(10);
   
   // await cohortFactory.createCohort(2, { from: enterprise1 });
-  result = await cohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+  result = await cohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
   
   event = result.logs[0];
   validationInitTime = event.args.initTime;
@@ -261,7 +263,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
  
   await token.approve(memberHelpers.address, subscriberFee, { from: dataSubscriber });
 
-  await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: controller });
+  // await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: controller });
 
   await memberHelpers.dataSubscriberPayment(enterprise1, 0, { from: dataSubscriber });
 
@@ -289,7 +291,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   //*****************************************No Cohort cases start */
 
-  result = await noCohort.initializeValidation(documentHash, documentURL, 0, true, { from: enterprise1 });
+  result = await noCohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
   event = result.logs[0];
   validationInitTime = event.args.initTime;
 
