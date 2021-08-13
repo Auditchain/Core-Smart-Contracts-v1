@@ -265,7 +265,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   // await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: controller });
 
-  await memberHelpers.dataSubscriberPayment(enterprise1, 0, { from: dataSubscriber });
+  await memberHelpers.dataSubscriberPayment(enterprise1, 1, { from: dataSubscriber });
+
+  // const isSubscribed = await memberHelpers.dataSubscriberCohortMap(dataSubscriber, enterprise1, audits);
+
 
 
   // ****************NFT***************************************//
