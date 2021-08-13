@@ -101,8 +101,9 @@ async function getReportResult(url) {
 
 
 /**
- * @dev Store the Pacioli results on IPFS
+ * @dev Store the metadata file on IPFS
  * @param url url of the report to validate
+ * @param reportPacioliIPFSUrl Location of Pacioli report
  */
 async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl) {
 
@@ -133,6 +134,13 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl) {
 }
 
 
+/**
+ * @dev Validate the report
+ * @param hash hash of the document to validate
+ * @param initTime time validation has been initiated
+ * @param choice decision of the validator
+ * @param validator address of the validator
+ */
 async function validate(hash, initTime, choice, validator) {
 
     console.log("[4] Waiting for validation transaction to complete... ");
@@ -157,6 +165,10 @@ async function validate(hash, initTime, choice, validator) {
 }
 
 
+
+/**
+ * @dev Start listening to events
+ */
 
 async function startProcess() {
 
