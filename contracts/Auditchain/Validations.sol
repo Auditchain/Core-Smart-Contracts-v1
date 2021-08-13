@@ -8,12 +8,14 @@ import "./CohortFactory.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
 
 /**
  * @title NoCohort
  * Allows on validation without cohort requested by data subscribers. 
  */
-abstract contract Validations is AccessControl{
+abstract contract Validations is AccessControl, ReentrancyGuard{
     using SafeMath for uint256;
     using SafeERC20 for AuditToken;
     uint256 public requiredQuorum = 60;
@@ -58,7 +60,7 @@ abstract contract Validations is AccessControl{
 
     event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
     event ValidatorValidated(address validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
-    event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted);
+    event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url);
     event PaymentProcessed(bytes32 validationHash, address[] validators);
     event Winners(address[] winners);
 
@@ -149,8 +151,8 @@ abstract contract Validations is AccessControl{
         for (uint256 i = 0; i < validatorsList.length; i++) {
             if(validation.validatorChoice[validatorsList[i]] != ValidationStatus.Undefined) {
                 stake[j] = memberHelpers.returnDepositAmount(validatorsList[i]);
-                validatorsValues[j] = validation.validatorChoice[validatorsList[j]];
-                validationTime[j] = validation.validatorTime[validatorsList[j]];
+                validatorsValues[j] = validation.validatorChoice[validatorsList[i]];
+                validationTime[j] = validation.validatorTime[validatorsList[i]];
                 validatorListActive[j] = validatorsList[i];
                 j++;
             }
@@ -220,17 +222,19 @@ abstract contract Validations is AccessControl{
     /**
      * @dev to mark validation as executed. This happens when participation level reached "requiredQuorum"
      * @param validationHash - consist of hash of hashed document and timestamp
+     * @param documentHash hash of the document
+     * @param executeValidationTime time of the completion of validation
      */
-    function executeValidation(bytes32 validationHash, bytes32 documentHash) internal {
+    function executeValidation(bytes32 validationHash, bytes32 documentHash, uint256 executeValidationTime) internal nonReentrant {
         uint256 quorum = calculateVoteQuorum(validationHash);
-        if (quorum >= requiredQuorum) {
+        if (quorum >= requiredQuorum && executeValidationTime == 0) {
             Validation storage validation = validations[validationHash];
             validation.executionTime = block.timestamp;
 
             (address[] memory winners, uint256 consensus) = determineWinners(validationHash);
             validation.consensus = consensus;
             
-            emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp);
+            emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp, validation.url);
             processPayments(validationHash, winners);
         }
     }
@@ -320,7 +324,7 @@ abstract contract Validations is AccessControl{
         validation.validationsCompleted ++;
 
         if (validation.executionTime == 0 )
-            executeValidation(validationHash, documentHash);
+            executeValidation(validationHash, documentHash, validation.executionTime);
         emit ValidatorValidated(msg.sender, documentHash, validationTime, decision);
     }
 
