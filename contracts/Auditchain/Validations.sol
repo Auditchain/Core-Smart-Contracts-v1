@@ -3,7 +3,7 @@ pragma solidity =0.8.0;
 
 import "../AuditToken.sol";
 import "./Members.sol";
-import "./MemberHelpers.sol";
+import "./DepositModifiers.sol";
 import "./CohortFactory.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -22,6 +22,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
     AuditToken public auditToken;
     Members public members;
     MemberHelpers public memberHelpers;
+    DepositModifiers public depositModifiers;
     CohortFactory public cohortFactory;
     mapping(address => uint256) public outstandingValidations;
 
@@ -64,12 +65,13 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
     event PaymentProcessed(bytes32 validationHash, address[] validators);
     event Winners(address[] winners);
 
-    constructor(address _auditToken, address _members, address _memberHelpers, address _cohortFactory) {
+    constructor(address _auditToken, address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers) {
 
         auditToken = AuditToken(_auditToken);
         members = Members(_members);
         memberHelpers = MemberHelpers(_memberHelpers);
         cohortFactory = CohortFactory(_cohortFactory);
+        depositModifiers = DepositModifiers(_depositModifiers);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
     }
@@ -217,6 +219,10 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
     }
 
     function processPayments(bytes32 validationHash, address[] memory validators) internal virtual {
+    }
+
+    function processRewards(bytes32 validationHash, address[] memory validators, uint256[] memory stake) internal virtual {
+
     }
 
     /**
