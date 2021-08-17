@@ -5,10 +5,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./../IAuditToken.sol";
-import "./ICohortFactory.sol";
 import "./IValidations.sol";
-
-
 
 
 /**
@@ -22,66 +19,30 @@ contract MemberHelpers is  AccessControl {
 
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
 
-    uint256 public minDepositDays = 30;
-    uint256 public nonCohortValidationFee = 100e18;
-    uint256 public cohortValidationFee = 100e18;
-    uint256 public amountTokensPerValidation =  100000000000000000000;    //New minted amount per validation
-    uint256 public enterpriseMatch = 200;         
-
-
     uint256 public stakedAmount;                        //total number of staked tokens   
-    address public auditToken;                       //AUDT token 
-    Members members;
-    ICohortFactory public cohortFactory;
-    IValidatinos public validations;
+    address public auditToken;                          //AUDT token 
+    Members members;                                    // Members contract
+    IValidatinos public validations;                    // Validation interface
     mapping(address => uint256) public deposits;        //track deposits per user
-    mapping(address => DataSubscriberTypes[]) public dataSubscriberCohorts;
-    mapping(address => mapping(address => mapping(uint256 => bool))) public dataSubscriberCohortMap;
-
-
-     struct DataSubscriberTypes{
-        address cohort;
-        uint256 audits;
-    }
-
-
-    enum UserType {Enterprise, Validator, DataSubscriber}  
+    uint256 public minDepositDays = 60;                 // number of days considered to calculate average spendings
 
     event LogDepositReceived(address indexed from, uint amount);
     event LogRewardsRedeemed(address indexed from, uint256 amount);
-    event LogRewardsReceived(address indexed validator, uint256 tokens );
-    event LogNonCohortValidationPaid(address requestor, address[] validators);
-    event LogRewardsDeposited(uint256 tokens, uint256 enterpriseAmount, address indexed enterprise);
-    event LogDataSubscriberPaid(address indexed from, uint256 accessFee,  uint256 indexed audits, address enterprise, uint256 enterpriseShare);
-    event LogSubscriptionCompleted(address subscriber, uint256 numberOfSubscriptions);
-    event LogDataSubscriberValidatorPaid(address  from, address indexed validator, uint256 amount);
     
-
-
-
-
-     constructor(address  _members, address _auditToken ) {
+    constructor(address  _members, address _auditToken ) {
         require(_members != address(0), "MemberHelpers:constructor - Member address can't be 0");
+        require(_auditToken != address(0), "MemberHelpers:setCohort - Cohort address can't be 0");
+
         members = Members(_members);
         auditToken = _auditToken;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-     /// @dev check if caller is a controller     
+    /// @dev check if caller is a controller     
     modifier isController {
         require(hasRole(CONTROLLER_ROLE, msg.sender), "MemberHelpers:IsController - Caller is not a controller");
 
         _;
-    }
-
-   /**
-    * @dev to be called by administrator to set cohort Factory contract
-    * @param _cohortFactory cohortFactory contract
-    */
-    function setCohortFactory(address _cohortFactory) public isController() {
-
-        require(_cohortFactory != address(0), "MemberHelpers:setCohortFactory - CohortFactory address can't be 0");
-        cohortFactory = ICohortFactory(_cohortFactory);
     }
 
     function returnDepositAmount(address user) public view returns(uint256){
@@ -89,12 +50,32 @@ contract MemberHelpers is  AccessControl {
         return deposits[user];
     }
 
+    function increaserStakedAmount(uint256 amount) public isController() {
 
-     /**
-     * @dev Function to accept contribution to staking
-     * @param amount number of AUDT tokens sent to contract for staking     
-     */ 
-     function stake(uint256 amount) public {
+        stakedAmount = stakedAmount.add(amount);
+
+    }
+
+    function decreaseStakedAmount(uint256 amount) public isController() {
+
+        stakedAmount = stakedAmount.sub(amount);
+
+    }
+
+    function increaseDeposit(address user, uint256 amount) public isController() {
+        deposits[user] = deposits[user].add(amount);
+    }
+
+    function decreaseDeposit(address user, uint256 amount) public isController() {
+        deposits[user] = deposits[user].sub(amount);
+    }
+
+
+    /**
+    * @dev Function to accept contribution to staking
+    * @param amount number of AUDT tokens sent to contract for staking     
+    */ 
+    function stake(uint256 amount) public {
 
         require(amount > 0, "MemberHelpers:stake - Amount can't be 0");
       
@@ -110,32 +91,20 @@ contract MemberHelpers is  AccessControl {
 
     }
 
-
-    /**
-    * @dev to be called by administrator to set cohort Factory contract
-    * @param _validations cohort contract
-    */
-    function setCohort(address _validations) public isController() {
-
-        require(_validations != address(0), "Members:setCohort - Cohort address can't be 0");
-        validations = IValidatinos(_validations);
-    }
-
-
     /**
      * @dev Function to redeem contribution. 
      * @param amount number of tokens being redeemed
      */
     function redeem(uint256 amount) public {
 
-          if (members.userMap(msg.sender, Members.UserType(0))){
-              uint256  outstandingVal = validations.outstandingValidations(msg.sender);
-              if (outstandingVal > 0 ) 
-              // div(1e4) to adjust for four decimal points
-            require(deposits[msg.sender]
-            .sub(members.enterpriseMatch().mul(members.amountTokensPerValidation()).mul(outstandingVal).div(1e4)) >= amount, 
-            "MemberHelpers:redeem - Your deposit will be too low to fullfil your outstanding payments.");
-          }
+        if (members.userMap(msg.sender, Members.UserType(0))){
+            uint256  outstandingVal = validations.outstandingValidations(msg.sender);
+            
+            if (outstandingVal > 0 )  // div(1e4) to adjust for four decimal points
+                require(deposits[msg.sender]
+                .sub(members.enterpriseMatch().mul(members.amountTokensPerValidation()).mul(outstandingVal).div(1e4)) >= amount, 
+                "MemberHelpers:redeem - Your deposit will be too low to fullfil your outstanding payments.");
+        }
 
         stakedAmount = stakedAmount.sub(amount);       
         deposits[msg.sender] = deposits[msg.sender].sub(amount);
@@ -144,114 +113,16 @@ contract MemberHelpers is  AccessControl {
         
     }
 
-     function processNonChortPayment(address[] memory _validators, address _requestor) public isController() {
-
-        uint paymentPerValidator = nonCohortValidationFee.div(_validators.length);
-
-        deposits[_requestor] = deposits[_requestor].sub(nonCohortValidationFee);
-        
-        for (uint i=0; i < _validators.length; i++) {
-            deposits[_validators[i]] = deposits[_validators[i]].add(paymentPerValidator);
-           emit LogRewardsReceived(_validators[i], paymentPerValidator);
-        }
-        emit LogNonCohortValidationPaid(_requestor, _validators);
-    }
-
-    function processPayment(address[] memory _validators, address _requestor) public isController() {
-
-        uint256 enterprisePortion =  members.amountTokensPerValidation().mul(members.enterpriseMatch()).div(100);
-        uint256 platformFee = members.amountTokensPerValidation().mul(members.platformShareValidation()).div(100);
-        uint256 validatorsFee = members.amountTokensPerValidation().add(enterprisePortion).sub(platformFee);
-        uint256 paymentPerValidator = validatorsFee.div(_validators.length);
-        deposits[_requestor] = deposits[_requestor].sub(enterprisePortion);
-        IAuditToken(auditToken).mint(address(this), members.amountTokensPerValidation());
-        deposits[members.platformAddress()] = deposits[members.platformAddress()].add(platformFee);
-
-        for (uint256 i=0; i< _validators.length; i++){                     
-            deposits[_validators[i]] = deposits[_validators[i]].add(paymentPerValidator);
-            emit LogRewardsReceived(_validators[i], paymentPerValidator);
-        }
-        emit LogRewardsDeposited(validatorsFee, enterprisePortion, _requestor);
-    }
-
-    
-    /**
-    * @dev called when data subscriber initiates subscription 
-    * @param enterpriseAddress - address of the enterprise
-    * @param audits - type of audits this cohort is part of
+     /**
+    * @dev to be called by administrator to set Validation address
+    * @param _validations validation contract address
     */
-    function dataSubscriberPayment(address enterpriseAddress, uint256 audits) public  {
+    function setValidation(address _validations) public isController() {
 
-        require(enterpriseAddress != address(0), "MemberHelpers:dataSubscriberPayment - Enterprise address can't be 0");
-        require(audits >=0 && audits <=5, "MemberHelpers:dataSubscriberPayment - Audit type is not in the required range");
-        require(!dataSubscriberCohortMap[msg.sender][enterpriseAddress][audits], "MemberHelpers:dataSubscriberPayment - You are already subscribed");
-        require(members.userMap(msg.sender, Members.UserType(2)), "MemberHelpers:dataSubscriberPayment - You have to register as data subscriber");
-        require(deposits[msg.sender] >= members.accessFee(), "MemberHelpers:dataSubscriberPayment - You don't have enough AUDT to complet this tranasction.");
+        require(_validations != address(0), "MemberHelpers:setValidation - Validation address can't be 0");
+        validations = IValidatinos(_validations);
 
-        IERC20(auditToken).safeTransferFrom(msg.sender, address(this), members.accessFee());
-        uint platformShare = 100 - members.enterpriseShareSubscriber() -members.validatorShareSubscriber();
-        IERC20(auditToken).safeTransfer(members.platformAddress(), members.accessFee().mul(platformShare).div(100));
-
-        if (members.userMap(msg.sender, Members.UserType(2)) || members.userMap(msg.sender, Members.UserType(0))){
-            stakedAmount = stakedAmount.sub(members.accessFee());  // track tokens contributed so far
-            deposits[msg.sender] = deposits[msg.sender].sub(members.accessFee());
-        }
-
-        uint256 enterpriseShare = members.accessFee().mul(members.enterpriseShareSubscriber()).div(100);
-        deposits[enterpriseAddress] = deposits[enterpriseAddress].add(enterpriseShare);
-        allocateValidatorDataSubscriberFee(enterpriseAddress, audits, members.accessFee().mul(members.validatorShareSubscriber()).div(100));
-        dataSubscriberCohortMap[msg.sender][enterpriseAddress][audits] = true;
-
-        emit LogDataSubscriberPaid(msg.sender, members.accessFee(), audits, enterpriseAddress, enterpriseShare);
     }
 
-    /**
-    * @dev To automate subscription for multiple cohorts for data subscriber 
-    * @param enterprise - array of enterprise addresses
-    * @param audits - array of audit types for each cohort
-    */
-    function dataSubscriberPaymentMultiple(address[] memory enterprise, uint256[] memory audits) public {
-
-        uint256 length = enterprise.length;
-        require(length <= 256, "MemberHelpers:dataSubscriberPaymentMultiple - List too long");
-        for (uint256 i = 0; i < length; i++) {
-            dataSubscriberPayment(enterprise[i], audits[i]);
-        }
-
-        emit LogSubscriptionCompleted(msg.sender, length);
-    }
-
-    /**
-    * @dev To calculate validator share of data subscriber fee and allocate it to validator deposits
-    * @param enterprise - address of cohort holding list of validators
-    * @param audits - audit type
-    * @param amount - total amount of tokens available for allocation
-    */
-    function allocateValidatorDataSubscriberFee(address enterprise, uint256 audits, uint256 amount) internal  {
-
-        address[] memory cohortValidators = cohortFactory.returnValidatorList(enterprise, audits);
-        uint256 totalDeposits;
-
-        for (uint i=0; i < cohortValidators.length; i++){
-            totalDeposits = totalDeposits.add(deposits[cohortValidators[i]]);
-        }
-
-        for (uint i=0; i < cohortValidators.length; i++){
-            uint256 oneValidatorPercentage = (deposits[cohortValidators[i]].mul(10e18)).div(totalDeposits);
-            uint256 oneValidatorAmount = amount.mul(oneValidatorPercentage).div(10e18);
-            deposits[cohortValidators[i]] = deposits[cohortValidators[i]].add(oneValidatorAmount);
-            emit LogDataSubscriberValidatorPaid(msg.sender, cohortValidators[i], oneValidatorAmount);
-        }
-    }
-
-
-    /**
-    * @dev To return all cohorts to which data subscriber is subscribed to 
-    * @param subscriber - address of the subscriber
-    * @return the structure with cohort address and their types for subscriber
-    */
-    function returnCohortsForDataSubscriber(address subscriber) public view returns(DataSubscriberTypes[] memory){
-            return (dataSubscriberCohorts[subscriber]);
-    }
     
 }
