@@ -6,6 +6,7 @@ const CohortFactory = artifacts.require('..build/contracts/CohortFactory.sol');
 
 const GovernorAlpha = artifacts.require('../build/contracts/GovernorAlpha.sol')
 const MemberHelpers = artifacts.require('../build/contracts/MemberHelpers.sol');
+const DepositModifiers = artifacts.require('../build/contracts/DepositModifiers.sol');
 const NFT = artifacts.require('./RulesERC721Token.sol');
 
 
@@ -63,14 +64,19 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await deployer.deploy(CohortFactory, members.address, memberHelpers.address);
   let cohortFactory = await CohortFactory.deployed();
 
-  await deployer.deploy(Cohort, token.address, members.address, memberHelpers.address, cohortFactory.address);
+  await deployer.deploy(DepositModifiers, members.address, token.address, memberHelpers.address, cohortFactory.address);
+  let depositModifiers = await DepositModifiers.deployed();
+
+  await deployer.deploy(Cohort, token.address, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address);
   let cohort = await Cohort.deployed();
 
-  await deployer.deploy(NoCohort, token.address, members.address, memberHelpers.address, cohortFactory.address);
+  await deployer.deploy(NoCohort, token.address, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address);
   let noCohort = await NoCohort.deployed();
 
   await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
   await memberHelpers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
+  await memberHelpers.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
+
 
 
   // await memberHelpers.setCohortFactory(cohortFactory.address, { from: admin });
@@ -78,8 +84,6 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
   await token.grantRole(CONTROLLER_ROLE, admin, { from: admin });
-
-
 
 
   await deployer.deploy(Timelock, admin, 5);
@@ -107,6 +111,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortFactory.grantRole(SETTER_ROLE, timelock.address, { from: admin });
 
   await token.grantRole(CONTROLLER_ROLE, members.address, { from: admin });
+  await depositModifiers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
+  await depositModifiers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
+
+
 
 
   // await members.addUser(admin, "Admin 1", 0, { from: controller });
@@ -192,10 +200,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
   await memberHelpers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
 
-  await token.grantRole(CONTROLLER_ROLE, memberHelpers.address, { from: admin });
+  await token.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
 
-  await memberHelpers.setCohortFactory(cohortFactory.address, { from: admin });
-  await memberHelpers.setCohort(cohort.address, { from: admin });
+  await memberHelpers.setValidation(cohort.address, { from: admin });
+  // await memberHelpers.setCohort(cohort.address, { from: admin });
 
   let documentURL = "http://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml"
   documentHash = web3.utils.soliditySha3(documentURL);
@@ -226,6 +234,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
   await cohort.validate(documentHash, validationInitTime, 2, { from: validator2, gas: 800000 });
+
   await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
   await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
 
@@ -261,11 +270,11 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   
  
-  await token.approve(memberHelpers.address, subscriberFee, { from: dataSubscriber });
+  await token.approve(depositModifiers.address, subscriberFee, { from: dataSubscriber });
 
   // await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: controller });
 
-  await memberHelpers.dataSubscriberPayment(enterprise1, 1, { from: dataSubscriber });
+  await depositModifiers.dataSubscriberPayment(enterprise1, 1, { from: dataSubscriber });
 
   // const isSubscribed = await memberHelpers.dataSubscriberCohortMap(dataSubscriber, enterprise1, audits);
 
@@ -433,6 +442,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log("\n\n" + '"AUDT_TOKEN_ADDRESS":"' + token.address + '",');
   console.log('"MEMBERS_ADDRESS":"' + members.address + '",');
   console.log('"MEMBER_HELPERS_ADDRESS":"' + memberHelpers.address + '",');
+  console.log('"DEPOSIT_MODIFIERS_ADDRESS":"' + depositModifiers.address + '",');
   console.log('"COHORT_FACTORY_ADDRESS":"' + cohortFactory.address + '",');
   console.log('"VALIDATIONS_COHORT_ADDRESS":"' + cohort.address + '",');
   console.log('"VALIDATIONS_NO_COHORT_ADDRESS":"' + noCohort.address + '",');
@@ -445,6 +455,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('AUDT_TOKEN_ADDRESS=' + token.address);
   console.log('MEMBER_ADDRESS=' + members.address);
   console.log('MEMBER_HELPERS_ADDRESS=' + memberHelpers.address);
+  console.log('DEPOSIT_MODIFIERS_ADDRESS=' + depositModifiers.address);
   console.log('COHORT_FACTORY_ADDRESS=' + cohortFactory.address);
   console.log('VALIDATIONS_COHORT_ADDRESS=' + cohort.address);
   console.log('VALIDATIONS_NO_COHORT_ADDRESS=' + noCohort.address);
@@ -459,6 +470,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log("\n\n" + 'audtTokenAddress:"' + token.address + '",');
   console.log('membersAddress:"' + members.address + '",');
   console.log('memberHelpersAddress:"' + memberHelpers.address + '",');
+  console.log('depositModifiersAddress:"' + depositModifiers.address + '",');
   console.log('cohortFactoryAddress:"' + cohortFactory.address + '",');
   console.log('cohortAddress:"' + cohort.address + '",');
   console.log('noCohortAddress:"' + noCohort.address + '",');
