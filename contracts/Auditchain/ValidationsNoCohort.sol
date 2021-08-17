@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract ValidationsNoCohort is Validations {
     using SafeMath for uint256;
 
-    constructor(address _auditToken, address _members, address _memberHelpers, address _cohortFactory) 
-        Validations(_auditToken, _members, _memberHelpers, _cohortFactory){
+    constructor(address _auditToken, address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers) 
+        Validations(_auditToken, _members, _memberHelpers, _cohortFactory, _depositModifiers){
 
     }
 
@@ -34,7 +34,7 @@ contract ValidationsNoCohort is Validations {
    */
       function checkIfRequestorHasFunds(address requestor) public override view returns (bool) {
        if (outstandingValidations[requestor] > 0 )
-          return ( memberHelpers.deposits(requestor) > memberHelpers.nonCohortValidationFee().mul(outstandingValidations[requestor]));
+          return ( memberHelpers.deposits(requestor) > depositModifiers.nonCohortValidationFee().mul(outstandingValidations[requestor]));
        else 
           return true;
     }
@@ -44,10 +44,17 @@ contract ValidationsNoCohort is Validations {
 
         Validation storage validation = validations[validationHash];
         outstandingValidations[validation.requestor] = outstandingValidations[validation.requestor].sub(1);
-        memberHelpers.processNonChortPayment(validators, validation.requestor);
+        depositModifiers.processNonChortPayment(validators, validation.requestor, validationHash);
         emit PaymentProcessed(validationHash, validators);
         
     }
+
+    function processRewards(bytes32 validationHash, address[] memory validators, uint256[] memory stake) internal override {
+        
+        depositModifiers.processNoCohortRewards(validators, stake,  validationHash);
+
+    }
+
 
     function returnValidatorList(bytes32 validationHash) internal view override  returns (address[] memory){
 

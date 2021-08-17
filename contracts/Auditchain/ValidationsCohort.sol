@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract ValidationsCohort is Validations {
     using SafeMath for uint256;
 
-    constructor(address _auditToken, address _members, address _memberHelpers, address _cohortFactory) 
-        Validations(_auditToken, _members, _memberHelpers, _cohortFactory){
+    constructor(address _auditToken, address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers) 
+        Validations(_auditToken, _members, _memberHelpers, _cohortFactory, _depositModifiers){
 
     }
 
@@ -53,7 +53,7 @@ contract ValidationsCohort is Validations {
 
         Validation storage validation = validations[validationHash];
         outstandingValidations[validation.requestor] = outstandingValidations[validation.requestor].sub(1);
-        memberHelpers.processPayment(validators, validation.requestor);
+        depositModifiers.processPayment(validators, validation.requestor, validationHash);
         emit PaymentProcessed(validationHash, validators);
         
     }
