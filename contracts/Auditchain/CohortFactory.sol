@@ -268,10 +268,10 @@ contract CohortFactory is  AccessControl {
 
     // function returnCohortsForDataSubscriber(address dataSubscriber)
 
-    /**
+   /**
     * @dev Used to determine cohorts count for given validator
     * @param validator address of the validator
-    */
+    */ 
     function returnValidatorCohortsCount(address validator, address enterprise) public view returns (uint256){
 
         return validatorCohortList[validator][enterprise].length;
