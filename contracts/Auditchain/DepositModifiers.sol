@@ -45,8 +45,8 @@ contract DepositModifiers is  AccessControl {
     event LogDataSubscriberValidatorPaid(address  from, address indexed validator, uint256 amount);
     event LogFeesReceived(address indexed validator, uint256 tokens, bytes32 validationHash);
     event LogRewardsDeposited(uint256 tokens, uint256 enterpriseAmount, address indexed enterprise, bytes32 validationHash);
-    event LogRewardsReceived(address indexed validator, uint256 tokens, bytes32 validationHash);
-    event LogNonCohortValidationPaid(address requestor, address[] validators, bytes32 validationHash);
+    event LogNonCohortPaymentReceived(address indexed validator, uint256 tokens, bytes32 validationHash);
+    event LogNonCohortValidationPaid(address requestor, address[] validators, bytes32 validationHash, uint256 amount);
 
 
 
@@ -67,17 +67,6 @@ contract DepositModifiers is  AccessControl {
     }
 
 
-    // /**
-    // * @dev to be called by administrator to set cohort Factory contract
-    // * @param _cohortFactory cohortFactory contract
-    // */
-    // function setCohortFactory(address _cohortFactory) public isController() {
-
-    //     require(_cohortFactory != address(0), "MemberHelpers:setCohortFactory - CohortFactory address can't be 0");
-    //     cohortFactory = ICohortFactory(_cohortFactory);
-    // }
-
-
     /**
     * @dev called when data subscriber initiates subscription 
     * @param enterpriseAddress - address of the enterprise
@@ -91,23 +80,18 @@ contract DepositModifiers is  AccessControl {
         require(members.userMap(msg.sender, Members.UserType(2)), "MemberHelpers:dataSubscriberPayment - You have to register as data subscriber");
 
         require(memberHelpers.returnDepositAmount(msg.sender) >= members.accessFee(), "MemberHelpers:dataSubscriberPayment - You don't have enough AUDT to complet this tranasction.");
-        // require(deposits[msg.sender] >= members.accessFee(), "MemberHelpers:dataSubscriberPayment - You don't have enough AUDT to complet this tranasction.");
-
         IERC20(auditToken).safeTransferFrom(msg.sender, address(this), members.accessFee());
         uint platformShare = 100 - members.enterpriseShareSubscriber() -members.validatorShareSubscriber();
         IERC20(auditToken).safeTransfer(members.platformAddress(), members.accessFee().mul(platformShare).div(100));
 
         if (members.userMap(msg.sender, Members.UserType(2)) || members.userMap(msg.sender, Members.UserType(0))){
             memberHelpers.decreaseStakedAmount(members.accessFee());
-            // stakedAmount = stakedAmount.sub(members.accessFee());  // track tokens contributed so far
             memberHelpers.decreaseDeposit(msg.sender, members.accessFee());
-            // deposits[msg.sender] = deposits[msg.sender].sub(members.accessFee());
         }
 
         uint256 enterpriseShare = members.accessFee().mul(members.enterpriseShareSubscriber()).div(100);
         memberHelpers.increaseDeposit(enterpriseAddress, enterpriseShare);
 
-        // deposits[enterpriseAddress] = deposits[enterpriseAddress].add(enterpriseShare);
         allocateValidatorDataSubscriberFee(enterpriseAddress, audits, members.accessFee().mul(members.validatorShareSubscriber()).div(100));
         dataSubscriberCohortMap[msg.sender][enterpriseAddress][audits] = true;
 
@@ -127,14 +111,12 @@ contract DepositModifiers is  AccessControl {
 
         for (uint i=0; i < cohortValidators.length; i++){
             totalDeposits = totalDeposits.add(memberHelpers.returnDepositAmount(cohortValidators[i]));
-            // totalDeposits = totalDeposits.add(deposits[cohortValidators[i]]);
         }
 
         for (uint i=0; i < cohortValidators.length; i++){
             uint256 oneValidatorPercentage = (memberHelpers.returnDepositAmount(cohortValidators[i]).mul(10e18)).div(totalDeposits);
             uint256 oneValidatorAmount = amount.mul(oneValidatorPercentage).div(10e18);
             memberHelpers.increaseDeposit(cohortValidators[i], oneValidatorAmount);
-            // deposits[cohortValidators[i]] = deposits[cohortValidators[i]].add(oneValidatorAmount);
             emit LogDataSubscriberValidatorPaid(msg.sender, cohortValidators[i], oneValidatorAmount);
         }
     }
@@ -165,17 +147,11 @@ contract DepositModifiers is  AccessControl {
         uint256 paymentPerValidator = validatorsFee.div(_validators.length);
 
         memberHelpers.decreaseDeposit(_requestor, enterprisePortion);
-
-        // deposits[_requestor] = deposits[_requestor].sub(enterprisePortion);
         IAuditToken(auditToken).mint(address(this), members.amountTokensPerValidation());
         memberHelpers.increaseDeposit(members.platformAddress(), platformFee);
 
-        // deposits[members.platformAddress()] = deposits[members.platformAddress()].add(platformFee);
-
         for (uint256 i=0; i< _validators.length; i++){                     
             memberHelpers.increaseDeposit(_validators[i], paymentPerValidator);
-
-            // deposits[_validators[i]] = deposits[_validators[i]].add(paymentPerValidator);
             emit LogFeesReceived(_validators[i], paymentPerValidator, validationHash);
         }
         emit LogRewardsDeposited(validatorsFee, enterprisePortion, _requestor, validationHash);
@@ -188,27 +164,15 @@ contract DepositModifiers is  AccessControl {
         uint paymentPerValidator = nonCohortValidationFee.div(_validators.length);
 
         memberHelpers.decreaseDeposit(_requestor, nonCohortValidationFee);
-
-
-        // deposits[_requestor] = deposits[_requestor].sub(nonCohortValidati_validators[i]onFee);
-        
         for (uint i=0; i < _validators.length; i++) {
             memberHelpers.increaseDeposit(_validators[i], paymentPerValidator);
-
-            // deposits[_validators[i]] = deposits[_validators[i]].add(paymentPerValidator);
-           emit LogRewardsReceived(_validators[i], paymentPerValidator, validationHash);
+           emit LogNonCohortPaymentReceived(_validators[i], paymentPerValidator, validationHash);
         }
-        emit LogNonCohortValidationPaid(_requestor, _validators, validationHash);
+
+        emit LogNonCohortValidationPaid(_requestor, _validators, validationHash, nonCohortValidationFee);
     }
 
-    function processNoCohortRewards(address[] memory _validators, uint256[] memory _stake, bytes32 validationHash) public isController() {
-
-        for (uint256 i=0; i< _validators.length; i++){       
-            uint256 payment = _stake[i] * 1 / 10000;
-            IAuditToken(auditToken).mint(_validators[i], payment);
-            emit LogRewardsReceived(_validators[i], payment, validationHash);
-        }
-    }
+    
 
 
     /**
