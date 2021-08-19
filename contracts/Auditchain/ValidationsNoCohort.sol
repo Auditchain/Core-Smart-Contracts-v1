@@ -49,12 +49,6 @@ contract ValidationsNoCohort is Validations {
         
     }
 
-    function processRewards(bytes32 validationHash, address[] memory validators, uint256[] memory stake) internal override {
-        
-        depositModifiers.processNoCohortRewards(validators, stake,  validationHash);
-
-    }
-
 
     function returnValidatorList(bytes32 validationHash) internal view override  returns (address[] memory){
 
