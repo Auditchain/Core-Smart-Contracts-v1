@@ -25,9 +25,14 @@ contract MemberHelpers is  AccessControl {
     IValidatinos public validations;                    // Validation interface
     mapping(address => uint256) public deposits;        //track deposits per user
     uint256 public minDepositDays = 60;                 // number of days considered to calculate average spendings
+    mapping(address => uint256) public stakeCounts;
+    uint256 public stakeRatio = 1000;
+
 
     event LogDepositReceived(address indexed from, uint amount);
-    event LogRewardsRedeemed(address indexed from, uint256 amount);
+    event LogDepositRedeemed(address indexed from, uint256 amount);
+    event LogStakingRewardsClaimed(address indexed user, uint256 amount);
+    event LogStakingRewardsTransferredOut(address indexed user, uint256 amount);
     
     constructor(address  _members, address _auditToken ) {
         require(_members != address(0), "MemberHelpers:constructor - Member address can't be 0");
@@ -70,6 +75,15 @@ contract MemberHelpers is  AccessControl {
         deposits[user] = deposits[user].sub(amount);
     }
 
+    function increaseStakeCounts(address validator) public isController() {
+        stakeCounts[validator]++;
+
+    }
+
+    function clearStakeCounts(address validator) public isController() {
+        stakeCounts[validator] = 0;
+    }
+ 
 
     /**
     * @dev Function to accept contribution to staking
@@ -109,7 +123,7 @@ contract MemberHelpers is  AccessControl {
         stakedAmount = stakedAmount.sub(amount);       
         deposits[msg.sender] = deposits[msg.sender].sub(amount);
         IERC20(auditToken).safeTransfer(msg.sender, amount);
-        emit LogRewardsRedeemed(msg.sender, amount);
+        emit LogDepositRedeemed(msg.sender, amount);
         
     }
 
@@ -122,6 +136,31 @@ contract MemberHelpers is  AccessControl {
         require(_validations != address(0), "MemberHelpers:setValidation - Validation address can't be 0");
         validations = IValidatinos(_validations);
 
+    }
+
+
+    function calimStakeRewards(bool deliver) public {
+
+       uint256 payment = displayStakeRewards();
+
+        stakeCounts[msg.sender] = 0;
+        if (deliver){
+            IAuditToken(auditToken).mint(msg.sender, payment);
+            LogStakingRewardsTransferredOut(msg.sender, payment);
+        }
+        else{
+            IAuditToken(auditToken).mint(address(this), payment);
+            deposits[msg.sender] = deposits[msg.sender].add(payment);
+            LogStakingRewardsClaimed(msg.sender, payment);
+        }
+    }
+
+
+    function displayStakeRewards() public view returns (uint256) {
+
+        uint256 counts = stakeCounts[msg.sender];
+        uint256 payment = deposits[msg.sender].mul(counts).div(stakeRatio);
+        return payment;
     }
 
     
