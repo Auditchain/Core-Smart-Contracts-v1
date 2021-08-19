@@ -328,6 +328,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         validation.validatorChoice[msg.sender] = decision;
         validation.validatorTime[msg.sender] = block.timestamp;
         validation.validationsCompleted ++;
+        memberHelpers.increaseStakeCounts(msg.sender);
 
         if (validation.executionTime == 0 )
             executeValidation(validationHash, documentHash, validation.executionTime);
