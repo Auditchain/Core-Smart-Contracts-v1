@@ -298,6 +298,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohort.validate(documentHash, validationInitTime, 1,{ from: validator3, gas: 900000 });
   await cohort.validate(documentHash, validationInitTime, 1,{ from: validator4, gas: 900000 });
 
+  
+
 
   //*****************************************Cohort cases end */
 
@@ -312,6 +314,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await noCohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
   await noCohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
 
+
+  let stakingRewards = await memberHelpers.displayStakeRewards({from:validator1});
+
+  console.log("staking rewards:", stakingRewards.toString());
 
 
   //*****************************************No Cohort cases end */
