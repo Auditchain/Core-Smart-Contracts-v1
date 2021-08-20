@@ -19,13 +19,12 @@ contract MemberHelpers is  AccessControl {
 
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
 
-    uint256 public stakedAmount;                        //total number of staked tokens   
     address public auditToken;                          //AUDT token 
     Members members;                                    // Members contract
     IValidatinos public validations;                    // Validation interface
     mapping(address => uint256) public deposits;        //track deposits per user
     uint256 public minDepositDays = 60;                 // number of days considered to calculate average spendings
-    mapping(address => uint256) public stakeCounts;
+    mapping(address => uint256) public stakeAmount;
     uint256 public stakeRatio = 1000;
 
 
@@ -33,6 +32,9 @@ contract MemberHelpers is  AccessControl {
     event LogDepositRedeemed(address indexed from, uint256 amount);
     event LogStakingRewardsClaimed(address indexed user, uint256 amount);
     event LogStakingRewardsTransferredOut(address indexed user, uint256 amount);
+    event LogIncreaseDeposit(address user, uint256 amount);
+    event LogDecreaseDeposit(address user, uint256 amount);
+
     
     constructor(address  _members, address _auditToken ) {
         require(_members != address(0), "MemberHelpers:constructor - Member address can't be 0");
@@ -55,35 +57,17 @@ contract MemberHelpers is  AccessControl {
         return deposits[user];
     }
 
-    function increaserStakedAmount(uint256 amount) public isController() {
-
-        stakedAmount = stakedAmount.add(amount);
-
-    }
-
-    function decreaseStakedAmount(uint256 amount) public isController() {
-
-        stakedAmount = stakedAmount.sub(amount);
-
-    }
 
     function increaseDeposit(address user, uint256 amount) public isController() {
         deposits[user] = deposits[user].add(amount);
+        emit LogIncreaseDeposit(user, amount);
     }
 
     function decreaseDeposit(address user, uint256 amount) public isController() {
         deposits[user] = deposits[user].sub(amount);
+        emit LogDecreaseDeposit(user, amount);
     }
 
-    function increaseStakeCounts(address validator) public isController() {
-        stakeCounts[validator]++;
-
-    }
-
-    function clearStakeCounts(address validator) public isController() {
-        stakeCounts[validator] = 0;
-    }
- 
 
     /**
     * @dev Function to accept contribution to staking
@@ -98,7 +82,6 @@ contract MemberHelpers is  AccessControl {
             require(amount + deposits[msg.sender] <= 25e21, "MemberHelpers:stake - Maximum contribution amount is 25000 AUDT tokens");     
         }
         require(members.userMap(msg.sender, Members.UserType(0)) || members.userMap(msg.sender, Members.UserType(1)) || members.userMap(msg.sender, Members.UserType(2)) , "Staking:stake - User has been not registered as a validator or enterprise."); 
-        stakedAmount = stakedAmount.add(amount);  // track tokens contributed so far
         IERC20(auditToken).safeTransferFrom(msg.sender, address(this), amount);
         deposits[msg.sender] = deposits[msg.sender].add(amount);
         emit LogDepositReceived(msg.sender, amount);
@@ -120,7 +103,6 @@ contract MemberHelpers is  AccessControl {
                 "MemberHelpers:redeem - Your deposit will be too low to fullfil your outstanding payments.");
         }
 
-        stakedAmount = stakedAmount.sub(amount);       
         deposits[msg.sender] = deposits[msg.sender].sub(amount);
         IERC20(auditToken).safeTransfer(msg.sender, amount);
         emit LogDepositRedeemed(msg.sender, amount);
@@ -138,12 +120,17 @@ contract MemberHelpers is  AccessControl {
 
     }
 
+    function increaseStakeRewards(address validator)public isController() {
 
-    function calimStakeRewards(bool deliver) public {
+        stakeAmount[validator] = stakeAmount[validator].add(deposits[validator].div(stakeRatio));
 
-       uint256 payment = displayStakeRewards();
+    }
 
-        stakeCounts[msg.sender] = 0;
+
+    function claimStakeRewards(bool deliver) public {
+
+        uint256 payment = stakeAmount[msg.sender];
+        stakeAmount[msg.sender] = 0;
         if (deliver){
             IAuditToken(auditToken).mint(msg.sender, payment);
             LogStakingRewardsTransferredOut(msg.sender, payment);
@@ -154,14 +141,4 @@ contract MemberHelpers is  AccessControl {
             LogStakingRewardsClaimed(msg.sender, payment);
         }
     }
-
-
-    function displayStakeRewards() public view returns (uint256) {
-
-        uint256 counts = stakeCounts[msg.sender];
-        uint256 payment = deposits[msg.sender].mul(counts).div(stakeRatio);
-        return payment;
-    }
-
-    
 }
