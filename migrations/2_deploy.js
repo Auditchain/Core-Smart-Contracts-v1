@@ -111,6 +111,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohortFactory.grantRole(SETTER_ROLE, timelock.address, { from: admin });
 
   await token.grantRole(CONTROLLER_ROLE, members.address, { from: admin });
+  await token.grantRole(CONTROLLER_ROLE, memberHelpers.address, { from: admin });
+
   await depositModifiers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
   await depositModifiers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
 
@@ -315,7 +317,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await noCohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
 
 
-  let stakingRewards = await memberHelpers.displayStakeRewards({from:validator1});
+  let stakingRewards = await memberHelpers.stakeAmount(validator1);
 
   console.log("staking rewards:", stakingRewards.toString());
 
