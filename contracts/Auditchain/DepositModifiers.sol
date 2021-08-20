@@ -85,7 +85,6 @@ contract DepositModifiers is  AccessControl {
         IERC20(auditToken).safeTransfer(members.platformAddress(), members.accessFee().mul(platformShare).div(100));
 
         if (members.userMap(msg.sender, Members.UserType(2)) || members.userMap(msg.sender, Members.UserType(0))){
-            memberHelpers.decreaseStakedAmount(members.accessFee());
             memberHelpers.decreaseDeposit(msg.sender, members.accessFee());
         }
 
