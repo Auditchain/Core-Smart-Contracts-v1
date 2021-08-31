@@ -60,7 +60,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
     mapping(bytes32 => Validation) public validations; // track each validation
 
     event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
-    event ValidatorValidated(address validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
+    event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
     event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url);
     event PaymentProcessed(bytes32 validationHash, address[] validators);
     event Winners(address[] winners);
@@ -325,16 +325,20 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         require(members.userMap(msg.sender, Members.UserType(1)), "Cohort:validate - Validator is not authorized.");
         require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
         require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Cohort:validate - This document has been validated already.");
+        require(memberHelpers.delegatorLink(msg.sender) == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
         validation.validatorChoice[msg.sender] = decision;
         validation.validatorTime[msg.sender] = block.timestamp;
         validation.validationsCompleted ++;
 
         memberHelpers.increaseStakeRewards(msg.sender);
+        memberHelpers.increaseDelegatedStakeRewards(msg.sender);
 
         if (validation.executionTime == 0 )
             executeValidation(validationHash, documentHash, validation.executionTime);
         emit ValidatorValidated(msg.sender, documentHash, validationTime, decision);
     }
+
+
 
     function isHashAndTimeCorrect( bytes32 documentHash, uint256 validationTime) public view returns (bool){
 
