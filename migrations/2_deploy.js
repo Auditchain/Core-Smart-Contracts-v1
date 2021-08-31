@@ -24,7 +24,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   let admin = accounts[0];
   // let admin = "0x67794670742BA1E53FD04d8bA22a9b4487CE65B4";
 
-  let controller = accounts[1];
+  let delegating = accounts[1];
   let dataSubscriber = accounts[2];
   let validator1 = accounts[3];
   let validator2 = accounts[4];
@@ -43,6 +43,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   const tokenAmount3 = "10000000000000000000000000";
   const tokenAmount4 = "44443332220000000000000000";
   const tokenAmount5 = "14443332220000000000000000";
+  const tokenAmount6 = "9000000000000000000000000"
 
 
 
@@ -101,7 +102,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await timelock.setPendingAdmin(gov.address, { from: admin });
   await timelock.acceptAdmin({ from: admin });
 
-  await members.grantRole(CONTROLLER_ROLE, controller, { from: admin });
+  // await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
   await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
   // await token.grantRole(CONTROLLER_ROLE, admin, { from: admin });
 
@@ -119,16 +120,17 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
 
-  // await members.addUser(admin, "Admin 1", 0, { from: controller });
 
-  await members.addUser(enterprise1, "Enterprise 1", 0, { from: controller });
-  await members.addUser(enterprise2, "Enterprise 2", 0, { from: controller });
+  await members.addUser(enterprise1, "Enterprise 1", 0, { from: admin });
+  await members.addUser(enterprise2, "Enterprise 2", 0, { from: admin });
 
-  await members.addUser(validator1, "Validators 1", 1, { from: controller });
-  await members.addUser(validator2, "Validators 2", 1, { from: controller });
-  await members.addUser(validator3, "Validators 3", 1, { from: controller });
-  await members.addUser(validator4, "Validators 4", 1, { from: controller });
-  await members.addUser(dataSubscriber, "Datasubscriber 1", 2, { from: controller });
+  await members.addUser(validator1, "Validators 1", 1, { from: admin });
+  await members.addUser(validator2, "Validators 2", 1, { from: admin });
+  await members.addUser(validator3, "Validators 3", 1, { from: admin });
+  await members.addUser(validator4, "Validators 4", 1, { from: admin });
+  await members.addUser(delegating, "delegating", 1, { from: admin });
+
+  await members.addUser(dataSubscriber, "Datasubscriber 1", 2, { from: admin });
 
 
 
@@ -140,6 +142,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await token.transfer(accounts[6], tokenAmount2);
   await token.transfer(accounts[7], tokenAmount2);
   await token.transfer(accounts[8], tokenAmount3);
+  await token.transfer(delegating, tokenAmount6);
+
 
 
 
@@ -151,6 +155,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await token.approve(memberHelpers.address, validatorAmountMin, { from: enterprise1 });
   await token.approve(memberHelpers.address, validatorAmountMin, { from: enterprise2 });
   await token.approve(memberHelpers.address, validatorAmountMin, { from: dataSubscriber });
+  await token.approve(memberHelpers.address, validatorAmountMin, { from: delegating });
+
 
 
 
@@ -161,8 +167,11 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await memberHelpers.stake(validatorAmountMin, { from: validator4 });
   await memberHelpers.stake(validatorAmountMin, { from: enterprise1 });
   await memberHelpers.stake(validatorAmountMin, { from: enterprise2 });
+  await memberHelpers.stake(validatorAmountMin, { from: delegating });
+
 
   await memberHelpers.stake(validatorAmountMin, { from: dataSubscriber });
+
 
 
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise2 });
@@ -274,7 +283,6 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
  
   await token.approve(depositModifiers.address, subscriberFee, { from: dataSubscriber });
 
-  // await members.addUser(dataSubscriber, "Data Subscriber 1", 2, { from: controller });
 
   await depositModifiers.dataSubscriberPayment(enterprise1, 1, { from: dataSubscriber });
 
@@ -311,15 +319,44 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   event = result.logs[0];
   validationInitTime = event.args.initTime;
 
+  // await memberHelpers.delegate(validator1, {from:delegating});
+
   await noCohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
   await noCohort.validate(documentHash, validationInitTime, 2, { from: validator2, gas: 800000 });
-  await noCohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
+  let resultVal = await noCohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
   await noCohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
+  // await noCohort.validate(documentHash, validationInitTime, 1, { from: delegating, gas: 800000 });
+
+
+  // console.log("result:", resultVal);
+
+  const eventsMember = await memberHelpers.getPastEvents(
+    "LogReferralStakeRewardsIncreased",
+    {
+      fromBlock: 0,
+      toBlock: "latest",
+    }
+  )
+
+  console.log("events", eventsMember)
 
 
   let stakingRewards = await memberHelpers.stakeAmount(validator1);
 
   console.log("staking rewards:", stakingRewards.toString());
+
+
+  await memberHelpers.toggleNodeOperator({from:validator1});
+
+  await memberHelpers.delegate(validator1 , {from:validator3});
+
+  let list = await  memberHelpers.returnPoolList(validator1);
+
+  // console.log("Pool list:", list);
+
+  // await memberHelpers.toggleNodeOperator({from:validator1});
+
+
 
 
   //*****************************************No Cohort cases end */
