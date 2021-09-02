@@ -124,10 +124,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await members.addUser(enterprise1, "Enterprise 1", 0, { from: admin });
   await members.addUser(enterprise2, "Enterprise 2", 0, { from: admin });
 
-  await members.addUser(validator1, "Validators 1", 1, { from: admin });
-  await members.addUser(validator2, "Validators 2", 1, { from: admin });
-  await members.addUser(validator3, "Validators 3", 1, { from: admin });
-  await members.addUser(validator4, "Validators 4", 1, { from: admin });
+  await members.addUser(validator1, "Validator 1", 1, { from: admin });
+  await members.addUser(validator2, "Validator 2", 1, { from: admin });
+  await members.addUser(validator3, "Validator 3", 1, { from: admin });
+  await members.addUser(validator4, "Validator 4", 1, { from: admin });
   await members.addUser(delegating, "delegating", 1, { from: admin });
 
   await members.addUser(dataSubscriber, "Datasubscriber 1", 2, { from: admin });
