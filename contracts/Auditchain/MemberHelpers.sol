@@ -26,7 +26,8 @@ contract MemberHelpers is AccessControl {
     mapping(address => mapping(address => bool)) isDelegating;
     uint256 public minDepositDays = 60; // number of days considered to calculate average spendings
     mapping(address => uint256) public stakeAmount;
-    mapping(address => bool) public nodeOperator;
+    mapping(address => bool) public isNodeOperator;
+    address[] public nodeOperators;
     uint256 public stakeRatio = 1000;
     uint256 public stakeRatioDelegating = 1100;
     uint256 public stakingRatioReferral = 9100;
@@ -42,6 +43,8 @@ contract MemberHelpers is AccessControl {
     event LogStakeRewardsIncreased(address indexed validator, uint256 amount);
     event LogDelegatedStakeRewardsIncreased(address indexed delegating, uint256 amount);
     event LogReferralStakeRewardsIncreased(address indexed delegating, uint256 amount);
+    event LogNodeOperatorCreated(address indexed user);
+    event LogNodeOperatorCancelled(address indexed user);
 
     constructor(address _members, address _auditToken) {
         require(
@@ -213,6 +216,7 @@ contract MemberHelpers is AccessControl {
                 delegations[oldDelegatee].pop();
                 isDelegating[oldDelegatee][msg.sender] = false;
                 delegatorLink[msg.sender] = address(0x0);
+                i= delegations[oldDelegatee].length;
             }
         }
 
@@ -254,13 +258,42 @@ contract MemberHelpers is AccessControl {
         }
     }
 
+    function addNodeOperator() internal {
+
+        nodeOperators.push(msg.sender);
+
+    } 
+
+    function removeNodeOperator() internal {
+
+        for (uint256 i= 0; i < nodeOperators.length; i++) {
+
+            if (nodeOperators[i] == msg.sender){
+
+                nodeOperators[i] = nodeOperators[nodeOperators.length - 1];
+                nodeOperators.pop();
+                i = nodeOperators.length;
+            }
+        }
+    }
+
     function toggleNodeOperator() public {
 
-        if (nodeOperator[msg.sender]){
-            nodeOperator[msg.sender] = false;
+        if (isNodeOperator[msg.sender]){
+            isNodeOperator[msg.sender] = false;
+            removeNodeOperator();
             removeAlldelegations();
+            emit LogNodeOperatorCreated(msg.sender);
         }
-        else    
-            nodeOperator[msg.sender] = true;
+        else{
+            isNodeOperator[msg.sender] = true;
+            addNodeOperator();
+            emit LogNodeOperatorCancelled(msg.sender);
+        }
+    }
+
+    function returnNodeOperators() public view returns (address[] memory) {
+
+        return nodeOperators;
     }
 }
