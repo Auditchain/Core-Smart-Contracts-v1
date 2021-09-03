@@ -26,6 +26,8 @@ contract MemberHelpers is AccessControl {
     mapping(address => mapping(address => bool)) isDelegating;
     uint256 public minDepositDays = 60; // number of days considered to calculate average spendings
     mapping(address => uint256) public stakeAmount;
+    mapping(address => uint256) public POWAmount;
+    mapping(address => uint256) public referralAmount;
     mapping(address => bool) public isNodeOperator;
     address[] public nodeOperators;
     uint256 public stakeRatio = 1000;
@@ -178,14 +180,21 @@ contract MemberHelpers is AccessControl {
     }
 
     function claimStakeRewards(bool deliver) public {
-        uint256 payment = stakeAmount[msg.sender];
+        uint256 stakeRewards = stakeAmount[msg.sender];
+        uint256 powRewards = POWAmount[msg.sender];
+        uint256 refRewards = referralAmount[msg.sender];
+
+        uint256 payment = stakeRewards.add(powRewards).add(refRewards);
         stakeAmount[msg.sender] = 0;
+        POWAmount[msg.sender] = 0;
+        referralAmount[msg.sender] = 0;
+
         if (deliver) {
             IAuditToken(auditToken).mint(msg.sender, payment);
             emit LogStakingRewardsTransferredOut(msg.sender, payment);
         } else {
-            IAuditToken(auditToken).mint(address(this), payment);
             deposits[msg.sender] = deposits[msg.sender].add(payment);
+            IAuditToken(auditToken).mint(address(this), payment);
             emit LogStakingRewardsClaimed(msg.sender, payment);
         }
     }
@@ -239,7 +248,11 @@ contract MemberHelpers is AccessControl {
         emit LogDelegation(msg.sender, delegatee);
     }
 
-    function increaseDelegatedStakeRewards(address validator) public {
+    function increasePOWRewards(address validator, uint256 amount) public isController() {
+            POWAmount[validator] = POWAmount[validator].add(amount);
+    }
+
+    function increaseDelegatedStakeRewards(address validator) public isController() {
         uint256 referringReward;
 
         for (uint256 i = 0; i < delegations[validator].length; i++) {
@@ -253,7 +266,7 @@ contract MemberHelpers is AccessControl {
         }
 
         if (referringReward > 0) {
-            stakeAmount[validator] = stakeAmount[validator].add(referringReward);
+            referralAmount[validator] = referralAmount[validator].add(referringReward);
             emit LogReferralStakeRewardsIncreased(validator, referringReward);
         }
     }
