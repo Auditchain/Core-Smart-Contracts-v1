@@ -52,7 +52,7 @@ contract ValidationsNoCohort is Validations {
 
     function returnValidatorList(bytes32 validationHash) internal view override  returns (address[] memory){
 
-        address[] memory validatorsList = members.returnValidatorList();
+        address[] memory validatorsList = memberHelpers.returnNodeOperators();
         return validatorsList;
     }
 
