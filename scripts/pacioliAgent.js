@@ -50,15 +50,16 @@ let ipfs = ipfsAPI('ipfs.infura.io', 5001, {
 
 
 
+
 /**
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
  * @param metadatatUrl contains information about the location of the submitted report on IPFS by the data subscriber 
  * @returns location of Pacioli report on IPFS
  */
-async function verifyPacioli(metadatatUrl) {
+async function verifyPacioli(metadatatUrl, trxHash) {
 
-    console.log("[1] Querying Pacioli");
-    
+    console.log("[1 " + trxHash + "]" + "  Querying Pacioli");
+
     const result = await ipfs.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
 
@@ -70,7 +71,7 @@ async function verifyPacioli(metadatatUrl) {
     const jsonStringFromObject = JSON.stringify(reportContent);
     const bufRule = Buffer.from(jsonStringFromObject);
 
-    console.log("[2] Saving Pacioli Results to IPFS");
+    console.log("[2 " + trxHash + "]" + "  Saving Pacioli Results to IPFS");
 
     const reportFile = [
         {
@@ -80,7 +81,7 @@ async function verifyPacioli(metadatatUrl) {
     const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true });
     const pacioliIPFS = resultPacioli[1].hash + '/' + resultPacioli[0].path;
 
-    console.log("[3] Pacioli report saved at: " + ipfsBase + pacioliIPFS);
+    console.log("[3 " + trxHash + "]" + "  Pacioli report saved at: " + ipfsBase + pacioliIPFS);
 
     return pacioliIPFS;
 }
@@ -105,12 +106,12 @@ async function getReportResult(url) {
  * @param url url of the report to validate
  * @param reportPacioliIPFSUrl Location of Pacioli report
  */
-async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl) {
+async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash) {
 
     const reportContent = (await axios.get(ipfsBase + url)).data;
     const reportHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(reportContent));
 
-    console.log("[6] Creating metadata file.");
+    console.log("[6 " + trxHash + "]" + "  Creating metadata file.");
     const isValid = await getReportResult(reportPacioliIPFSUrl);
     let metaDataObject = {
         reportUrl: url,
@@ -130,7 +131,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl) {
     const result = await ipfs.files.add(metadataFile, { wrapWithDirectory: true });
     const urlMetadata = result[1].hash + '/' + result[0].path;
 
-    console.log("[7] Metadata created: " + ipfsBase + urlMetadata);
+    console.log("[7 " + trxHash + "]" + "  Metadata created: " + ipfsBase + urlMetadata);
 }
 
 
@@ -141,27 +142,41 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl) {
  * @param choice decision of the validator
  * @param validator address of the validator
  */
-async function validate(hash, initTime, choice, validator) {
+async function validate(hash, initTime, choice, validator, trxHash) {
 
-    console.log("[4] Waiting for validation transaction to complete... ");
+    
+    console.log("[4 " + trxHash + "]" + "  Waiting for validation transaction to complete... ");
     const owner = providerForUpdate.addresses[validator];
+
+    const nonce = await  web3.eth.getTransactionCount(owner);
+
+    console.log("Transaction count:", await  web3.eth.getTransactionCount(owner));
+
+
+    // const nonCohortValidate = await initConnection();
 
     //validate request
     nonCohortValidate.methods
         .validate(hash, initTime, choice)
-        .send({ from: owner, gas: 500000 })
+        .send({ from: owner, gas: 500000, nonce:nonce })
         .on("receipt", function (receipt) {
             const event = receipt.events.ValidatorValidated.returnValues;
             let msg;
             if (choice == 1)
-                console.log("[5] Request has been validated as acceptable.")
+                console.log("[5 " + trxHash + "]" + "  Request has been validated as acceptable.")
             else
-                console.log("[5] Request has been validated as adverse")
+                console.log("[5 " + trxHash + "]" + "  Request has been validated as adverse")
         })
         .on("error", function (error) {
             console.log("An error occurred:", error)
 
         });
+}
+
+async function awardRewards() {
+
+
+
 }
 
 
@@ -175,17 +190,21 @@ async function startProcess() {
     console.log("Process started.");
     let myArgs = process.argv.slice(2);
     const owner = providerForUpdate.addresses[Number(myArgs[0])];
-    
+
+    console.log("Transaction count:", await  web3.eth.getTransactionCount(owner));
+
     // Wait for validation and start the process
     nonCohort.events.ValidationInitialized({})
-    .on('data', async function (event) {
+        .on('data', async function (event) {
             depositAmountBefore = await memberHelpers.methods.deposits(owner).call();
             let myArgs = process.argv.slice(2);
             console.log('myArgs: ', myArgs);
-            const reportPacioliIPFSUrl = await verifyPacioli(event.returnValues.url);
-            const isValid = await getReportResult(reportPacioliIPFSUrl);
-            await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, Number(myArgs[0]))
-            await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl);
+            // console.log("transaction hash:", event.transactionHash);
+            const trxHash = event.transactionHash;
+            const reportPacioliIPFSUrl = await verifyPacioli(event.returnValues.url, trxHash);
+            const isValid = await getReportResult(reportPacioliIPFSUrl, trxHash);
+            await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, Number(myArgs[0]), trxHash)
+            await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash);
         })
         .on('error', console.error);
 
@@ -195,7 +214,7 @@ async function startProcess() {
             const owner = providerForUpdate.addresses[Number(myArgs[0])];
             const balanceAfter = await memberHelpers.methods.deposits(owner).call()
             let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
-            console.log("[8] You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
+            console.log("[8  You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
         })
         .on('error', console.error);
 
