@@ -164,7 +164,8 @@ contract DepositModifiers is  AccessControl {
 
         memberHelpers.decreaseDeposit(_requestor, nonCohortValidationFee);
         for (uint i=0; i < _validators.length; i++) {
-            memberHelpers.increaseDeposit(_validators[i], paymentPerValidator);
+            memberHelpers.increasePOWRewards(_validators[i], paymentPerValidator);
+            // memberHelpers.increaseDeposit(_validators[i], paymentPerValidator);
            emit LogNonCohortPaymentReceived(_validators[i], paymentPerValidator, validationHash);
         }
 
