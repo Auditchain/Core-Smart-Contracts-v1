@@ -144,13 +144,13 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash) {
  */
 async function validate(hash, initTime, choice, validator, trxHash) {
 
-    
+
     console.log("[4 " + trxHash + "]" + "  Waiting for validation transaction to complete... ");
     const owner = providerForUpdate.addresses[validator];
 
-    const nonce = await  web3.eth.getTransactionCount(owner);
+    const nonce = await web3.eth.getTransactionCount(owner);
 
-    console.log("Transaction count:", await  web3.eth.getTransactionCount(owner));
+    console.log("Transaction count:", await web3.eth.getTransactionCount(owner));
 
 
     // const nonCohortValidate = await initConnection();
@@ -158,7 +158,7 @@ async function validate(hash, initTime, choice, validator, trxHash) {
     //validate request
     nonCohortValidate.methods
         .validate(hash, initTime, choice)
-        .send({ from: owner, gas: 500000, nonce:nonce })
+        .send({ from: owner, gas: 500000, nonce: nonce })
         .on("receipt", function (receipt) {
             const event = receipt.events.ValidatorValidated.returnValues;
             let msg;
@@ -187,36 +187,45 @@ async function awardRewards() {
 
 async function startProcess() {
 
-    console.log("Process started.");
     let myArgs = process.argv.slice(2);
     const owner = providerForUpdate.addresses[Number(myArgs[0])];
 
-    console.log("Transaction count:", await  web3.eth.getTransactionCount(owner));
+    const nodeOperator = await memberHelpers.methods.isNodeOperator(owner).call();
+    if (nodeOperator) {
+        console.log("Process started.");
+        console.log("Transaction count:", await web3.eth.getTransactionCount(owner));
 
-    // Wait for validation and start the process
-    nonCohort.events.ValidationInitialized({})
-        .on('data', async function (event) {
-            depositAmountBefore = await memberHelpers.methods.deposits(owner).call();
-            let myArgs = process.argv.slice(2);
-            console.log('myArgs: ', myArgs);
-            // console.log("transaction hash:", event.transactionHash);
-            const trxHash = event.transactionHash;
-            const reportPacioliIPFSUrl = await verifyPacioli(event.returnValues.url, trxHash);
-            const isValid = await getReportResult(reportPacioliIPFSUrl, trxHash);
-            await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, Number(myArgs[0]), trxHash)
-            await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash);
-        })
-        .on('error', console.error);
+        // Wait for validation and start the process
+        nonCohort.events.ValidationInitialized({})
+            .on('data', async function (event) {
 
-    // Wait for completion of validation and determine earnings 
-    nonCohort.events.RequestExecuted({})
-        .on('data', async function (event) {
-            const owner = providerForUpdate.addresses[Number(myArgs[0])];
-            const balanceAfter = await memberHelpers.methods.deposits(owner).call()
-            let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
-            console.log("[8  You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
-        })
-        .on('error', console.error);
+                    depositAmountBefore = await memberHelpers.methods.POWAmount(owner).call();
+                    let myArgs = process.argv.slice(2);
+                    console.log('myArgs: ', myArgs);
+                    // console.log("transaction hash:", event.transactionHash);
+                    const trxHash = event.transactionHash;
+                    const reportPacioliIPFSUrl = await verifyPacioli(event.returnValues.url, trxHash);
+                    const isValid = await getReportResult(reportPacioliIPFSUrl, trxHash);
+                    await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, Number(myArgs[0]), trxHash)
+                    await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash);
+
+                })
+            .on('error', console.error);
+
+        // Wait for completion of validation and determine earnings 
+        nonCohort.events.RequestExecuted({})
+            .on('data', async function (event) {
+                const owner = providerForUpdate.addresses[Number(myArgs[0])];
+                const balanceAfter = await memberHelpers.methods.POWAmount(owner).call()
+                let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
+                console.log("[8  You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
+            })
+            .on('error', console.error);
+
+    }
+    else
+        console.log("You can't validate because you are not a node operator. Please register as node operator first and restart this process.");
+
 
 }
 
