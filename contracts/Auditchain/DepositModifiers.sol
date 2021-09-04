@@ -46,7 +46,7 @@ contract DepositModifiers is  AccessControl {
     event LogFeesReceived(address indexed validator, uint256 tokens, bytes32 validationHash);
     event LogRewardsDeposited(uint256 tokens, uint256 enterpriseAmount, address indexed enterprise, bytes32 validationHash);
     event LogNonCohortPaymentReceived(address indexed validator, uint256 tokens, bytes32 validationHash);
-    event LogNonCohortValidationPaid(address requestor, address[] validators, bytes32 validationHash, uint256 amount);
+    event LogNonCohortValidationPaid(address indexed requestor, address[] validators, bytes32 validationHash, uint256 amount);
 
 
 
