@@ -315,7 +315,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   //*****************************************No Cohort cases start */
 
-  result = await noCohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
+  result = await noCohort.initializeValidation(documentHash, documentURL, 1, true, { from: dataSubscriber });
   event = result.logs[0];
   validationInitTime = event.args.initTime;
 
