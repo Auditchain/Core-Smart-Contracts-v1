@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./Members.sol";
 import "./MemberHelpers.sol";
 import "./ICohortFactory.sol";
+import "./INodeOperations.sol";
 
 
 
@@ -27,6 +28,7 @@ contract DepositModifiers is  AccessControl {
     Members members;
     MemberHelpers public memberHelpers;
     ICohortFactory public cohortFactory;
+    INodeOperations public nodeOperations;
 
     uint256 public nonCohortValidationFee = 100e18;
     mapping(address => DataSubscriberTypes[]) public dataSubscriberCohorts;
@@ -50,12 +52,13 @@ contract DepositModifiers is  AccessControl {
 
 
 
-    constructor(address  _members, address _auditToken, address _memberHelpers, address _cohortFactory ) {
+    constructor(address  _members, address _auditToken, address _memberHelpers, address _cohortFactory, address _nodeOperations ) {
         require(_members != address(0), "MemberHelpers:constructor - Member address can't be 0");
         members = Members(_members);
         auditToken = _auditToken;
         memberHelpers = MemberHelpers(_memberHelpers);
         cohortFactory = ICohortFactory(_cohortFactory);
+        nodeOperations = INodeOperations(_nodeOperations);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -164,7 +167,7 @@ contract DepositModifiers is  AccessControl {
 
         memberHelpers.decreaseDeposit(_requestor, nonCohortValidationFee);
         for (uint i=0; i < _validators.length; i++) {
-            memberHelpers.increasePOWRewards(_validators[i], paymentPerValidator);
+            nodeOperations.increasePOWRewards(_validators[i], paymentPerValidator);
             // memberHelpers.increaseDeposit(_validators[i], paymentPerValidator);
            emit LogNonCohortPaymentReceived(_validators[i], paymentPerValidator, validationHash);
         }

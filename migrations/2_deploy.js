@@ -8,7 +8,7 @@ const GovernorAlpha = artifacts.require('../build/contracts/GovernorAlpha.sol')
 const MemberHelpers = artifacts.require('../build/contracts/MemberHelpers.sol');
 const DepositModifiers = artifacts.require('../build/contracts/DepositModifiers.sol');
 const NFT = artifacts.require('./RulesERC721Token.sol');
-
+const NodeOperations = artifacts.require('./NodeOperations.sol');
 
 const Timelock = artifacts.require('./Governance/Timelock.sol');
 
@@ -65,18 +65,31 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await deployer.deploy(CohortFactory, members.address, memberHelpers.address);
   let cohortFactory = await CohortFactory.deployed();
 
-  await deployer.deploy(DepositModifiers, members.address, token.address, memberHelpers.address, cohortFactory.address);
+  await deployer.deploy(NodeOperations, memberHelpers.address, token.address);
+  let nodeOperations = await NodeOperations.deployed();
+
+
+  await deployer.deploy(DepositModifiers, members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address);
   let depositModifiers = await DepositModifiers.deployed();
 
-  await deployer.deploy(Cohort, token.address, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address);
+  
+
+
+  await deployer.deploy(Cohort,  members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address);
   let cohort = await Cohort.deployed();
 
-  await deployer.deploy(NoCohort, token.address, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address);
+  await deployer.deploy(NoCohort,  members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address,  nodeOperations.address);
   let noCohort = await NoCohort.deployed();
 
   await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
   await memberHelpers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
   await memberHelpers.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
+  await memberHelpers.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
+  await nodeOperations.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
+  await nodeOperations.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
+
+
+
 
 
 
@@ -113,6 +126,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   await token.grantRole(CONTROLLER_ROLE, members.address, { from: admin });
   await token.grantRole(CONTROLLER_ROLE, memberHelpers.address, { from: admin });
+  await token.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
+
 
   await depositModifiers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
   await depositModifiers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
@@ -330,7 +345,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   // console.log("result:", resultVal);
 
-  const eventsMember = await memberHelpers.getPastEvents(
+  const eventsMember = await nodeOperations.getPastEvents(
     "LogReferralStakeRewardsIncreased",
     {
       fromBlock: 0,
@@ -341,16 +356,16 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log("events", eventsMember)
 
 
-  let stakingRewards = await memberHelpers.stakeAmount(validator1);
+  let stakingRewards = await nodeOperations.stakeAmount(validator1);
 
   console.log("staking rewards:", stakingRewards.toString());
 
 
-  await memberHelpers.toggleNodeOperator({from:validator1});
+  await nodeOperations.toggleNodeOperator({from:validator1});
 
-  await memberHelpers.delegate(validator1 , {from:validator3});
+  await nodeOperations.delegate(validator1 , {from:validator3});
 
-  let list = await  memberHelpers.returnPoolList(validator1);
+  let list = await  nodeOperations.returnPoolList(validator1);
 
   // console.log("Pool list:", list);
 
@@ -491,6 +506,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('"COHORT_FACTORY_ADDRESS":"' + cohortFactory.address + '",');
   console.log('"VALIDATIONS_COHORT_ADDRESS":"' + cohort.address + '",');
   console.log('"VALIDATIONS_NO_COHORT_ADDRESS":"' + noCohort.address + '",');
+  console.log('"NODE_OPERATIONS_ADDRESS":"' + nodeOperations.address + '",');
   console.log('"GOVERNOR_ALPHA_ADDRESS":"' + gov.address + '",');
   console.log('"TIMELOCK_ADDRESS":"' + timelock.address + '",');
   console.log('"NFT":"' + nft.address + '"' + "\n\n");
@@ -504,6 +520,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('COHORT_FACTORY_ADDRESS=' + cohortFactory.address);
   console.log('VALIDATIONS_COHORT_ADDRESS=' + cohort.address);
   console.log('VALIDATIONS_NO_COHORT_ADDRESS=' + noCohort.address);
+  console.log('NODE_OPERATIONS_ADDRESS=' + nodeOperations.address);
   console.log('GOVERNOR_ALPHA_ADDRESS=' + gov.address);
   console.log('TIMELOCK_ADDRESS=' + timelock.address);
   console.log('RULES_NFT_ADDRESS=' + nft.address);
@@ -517,8 +534,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('memberHelpersAddress:"' + memberHelpers.address + '",');
   console.log('depositModifiersAddress:"' + depositModifiers.address + '",');
   console.log('cohortFactoryAddress:"' + cohortFactory.address + '",');
-  console.log('cohortAddress:"' + cohort.address + '",');
-  console.log('noCohortAddress:"' + noCohort.address + '",');
+  console.log('validationsCohortAddress:"' + cohort.address + '",');
+  console.log('validationsNoCohortAddress:"' + noCohort.address + '",')
+  console.log('nodeOperationsAddress:"' + nodeOperations.address + '",');
   console.log('governorAlphaAddress:"' + gov.address + '",');
   console.log('timelockAddress:"' + timelock.address + '",');
   console.log('rulesNFTAddress:"' + nft.address + '",' + "\n\n");

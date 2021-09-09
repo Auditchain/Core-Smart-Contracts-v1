@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.0;
 
-import "../AuditToken.sol";
+import "./INodeOperations.sol";
 import "./Members.sol";
 import "./DepositModifiers.sol";
 import "./CohortFactory.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
@@ -17,13 +16,12 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
  */
 abstract contract Validations is AccessControl, ReentrancyGuard{
     using SafeMath for uint256;
-    using SafeERC20 for AuditToken;
     uint256 public requiredQuorum = 60;
-    AuditToken public auditToken;
     Members public members;
     MemberHelpers public memberHelpers;
     DepositModifiers public depositModifiers;
     CohortFactory public cohortFactory;
+    INodeOperations public nodeOperations;
     mapping(address => uint256) public outstandingValidations;
 
     bytes32 public constant SETTER_ROLE = keccak256("SETTER_ROLE");
@@ -65,13 +63,13 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
     event PaymentProcessed(bytes32 validationHash, address[] validators);
     event Winners(address[] winners);
 
-    constructor(address _auditToken, address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers) {
+    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations) {
 
-        auditToken = AuditToken(_auditToken);
         members = Members(_members);
         memberHelpers = MemberHelpers(_memberHelpers);
         cohortFactory = CohortFactory(_cohortFactory);
         depositModifiers = DepositModifiers(_depositModifiers);
+        nodeOperations = INodeOperations(_nodeOperations);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
     }
@@ -325,13 +323,13 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         require(members.userMap(msg.sender, Members.UserType(1)), "Cohort:validate - Validator is not authorized.");
         require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
         require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Cohort:validate - This document has been validated already.");
-        require(memberHelpers.delegatorLink(msg.sender) == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
+        require(nodeOperations.delegatorLink(msg.sender) == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
         validation.validatorChoice[msg.sender] = decision;
         validation.validatorTime[msg.sender] = block.timestamp;
         validation.validationsCompleted ++;
 
-        memberHelpers.increaseStakeRewards(msg.sender);
-        memberHelpers.increaseDelegatedStakeRewards(msg.sender);
+        nodeOperations.increaseStakeRewards(msg.sender);
+        nodeOperations.increaseDelegatedStakeRewards(msg.sender);
 
         if (validation.executionTime == 0 )
             executeValidation(validationHash, documentHash, validation.executionTime);
