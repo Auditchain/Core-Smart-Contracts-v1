@@ -87,6 +87,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await memberHelpers.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
   await nodeOperations.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
   await nodeOperations.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
+  await nodeOperations.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
+
 
 
 

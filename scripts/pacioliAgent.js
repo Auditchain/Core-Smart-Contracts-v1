@@ -13,7 +13,8 @@ let HDWalletProvider = require('@truffle/hdwallet-provider');
 let dotenv = require('dotenv').config({ path: './.env' })
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
-const MEMBER_HELPERS = require('../build/contracts/MemberHelpers.json')
+const MEMBER_HELPERS = require('../build/contracts/MemberHelpers.json');
+const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
 
 
 // import ethereum connection strings. 
@@ -30,6 +31,8 @@ let depositAmountBefore;
 // Address for smart contracts
 const nonCohortAddress = process.env.VALIDATIONS_NO_COHORT_ADDRESS;
 const memberHelpersAddress = process.env.MEMBER_HELPERS_ADDRESS;
+const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
+
 
 
 const provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
@@ -39,6 +42,8 @@ const providerForUpdate = new HDWalletProvider(mnemonic, local_host); // change 
 const web3Update = new Web3(providerForUpdate);
 let nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
 let memberHelpers = new web3Update.eth.Contract(MEMBER_HELPERS["abi"], memberHelpersAddress);
+let nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
+
 
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
@@ -190,7 +195,7 @@ async function startProcess() {
     let myArgs = process.argv.slice(2);
     const owner = providerForUpdate.addresses[Number(myArgs[0])];
 
-    const nodeOperator = await memberHelpers.methods.isNodeOperator(owner).call();
+    const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call();
     if (nodeOperator) {
         console.log("Process started.");
         console.log("Transaction count:", await web3.eth.getTransactionCount(owner));
@@ -199,7 +204,7 @@ async function startProcess() {
         nonCohort.events.ValidationInitialized({})
             .on('data', async function (event) {
 
-                    depositAmountBefore = await memberHelpers.methods.POWAmount(owner).call();
+                    depositAmountBefore = await nodeOperations.methods.POWAmount(owner).call();
                     let myArgs = process.argv.slice(2);
                     console.log('myArgs: ', myArgs);
                     // console.log("transaction hash:", event.transactionHash);
@@ -216,7 +221,7 @@ async function startProcess() {
         nonCohort.events.RequestExecuted({})
             .on('data', async function (event) {
                 const owner = providerForUpdate.addresses[Number(myArgs[0])];
-                const balanceAfter = await memberHelpers.methods.POWAmount(owner).call()
+                const balanceAfter = await nodeOperations.methods.POWAmount(owner).call()
                 let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
                 console.log("[8  You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
             })
