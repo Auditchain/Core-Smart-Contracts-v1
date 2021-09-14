@@ -21,7 +21,6 @@ contract MemberHelpers is AccessControl {
     Members members; // Members contract
     IValidatinos public validations; // Validation interface
     mapping(address => uint256) public deposits; //track deposits per user
-    uint256 public minDepositDays = 60; // number of days considered to calculate average spendings
     
 
     event LogDepositReceived(address indexed from, uint256 amount);
@@ -30,14 +29,8 @@ contract MemberHelpers is AccessControl {
     event LogDecreaseDeposit(address user, uint256 amount);
 
     constructor(address _members, address _auditToken) {
-        require(
-            _members != address(0),
-            "MemberHelpers:constructor - Member address can't be 0"
-        );
-        require(
-            _auditToken != address(0),
-            "MemberHelpers:setCohort - Cohort address can't be 0"
-        );
+        require(_members != address(0),"MemberHelpers:constructor - Member address can't be 0");
+        require(_auditToken != address(0), "MemberHelpers:setCohort - Cohort address can't be 0");
 
         members = Members(_members);
         auditToken = _auditToken;
@@ -46,10 +39,7 @@ contract MemberHelpers is AccessControl {
 
     /// @dev check if caller is a controller
     modifier isController() {
-        require(
-            hasRole(CONTROLLER_ROLE, msg.sender),
-            "MemberHelpers:IsController - Caller is not a controller"
-        );
+        require(hasRole(CONTROLLER_ROLE, msg.sender), "MemberHelpers:IsController - Caller is not a controller");
 
         _;
     }
