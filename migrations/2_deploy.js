@@ -72,13 +72,13 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await deployer.deploy(DepositModifiers, members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address);
   let depositModifiers = await DepositModifiers.deployed();
 
-  
 
 
-  await deployer.deploy(Cohort,  members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address);
+
+  await deployer.deploy(Cohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address);
   let cohort = await Cohort.deployed();
 
-  await deployer.deploy(NoCohort,  members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address,  nodeOperations.address);
+  await deployer.deploy(NoCohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address);
   let noCohort = await NoCohort.deployed();
 
   await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
@@ -213,7 +213,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   // await cohortFactory.acceptInvitation(enterprise1, 6, { from: validator4 });
   // await cohortFactory.acceptInvitation(enterprise1, 7, { from: validator1 });
 
-  
+
 
   await cohortFactory.acceptInvitation(enterprise1, 8, { from: validator1 });
   await cohortFactory.acceptInvitation(enterprise1, 9, { from: validator2 });
@@ -250,12 +250,12 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
   await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
 
-  
+
   timeMachine.advanceTimeAndBlock(10);
-  
+
   // await cohortFactory.createCohort(2, { from: enterprise1 });
   result = await cohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
-  
+
   event = result.logs[0];
   validationInitTime = event.args.initTime;
 
@@ -268,10 +268,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
   timeMachine.advanceTimeAndBlock(10);
-  
+
   // await cohortFactory.createCohort(2, { from: enterprise1 });
   result = await cohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
-  
+
   event = result.logs[0];
   validationInitTime = event.args.initTime;
 
@@ -296,8 +296,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
 
-  
- 
+
+
   await token.approve(depositModifiers.address, subscriberFee, { from: dataSubscriber });
 
 
@@ -311,21 +311,21 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   await cohortFactory.createCohort(3, { from: enterprise1 });
 
-  documentURL= "QmNhaANyYwWmfrRBfMbXyogPhBSTQdzFL8TiWbqjBmNuoc/Auditchain.json";
+  documentURL = "QmNhaANyYwWmfrRBfMbXyogPhBSTQdzFL8TiWbqjBmNuoc/Auditchain.json";
 
   documentHash = web3.utils.soliditySha3(documentURL);
-  result = await cohort.initializeValidation(documentHash, documentURL , 3, true, { from: enterprise1, gas: 6000000 });
+  result = await cohort.initializeValidation(documentHash, documentURL, 3, true, { from: enterprise1, gas: 6000000 });
 
   event = result.logs[0];
   validationInitTime = event.args.initTime;
 
 
-  await cohort.validate(documentHash, validationInitTime, 1,{ from: validator1, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1,{ from: validator2, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1,{ from: validator3, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1,{ from: validator4, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator2, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 900000 });
 
-  
+
 
 
   //*****************************************Cohort cases end */
@@ -363,11 +363,11 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log("staking rewards:", stakingRewards.toString());
 
 
-  await nodeOperations.toggleNodeOperator({from:validator1});
+  await nodeOperations.toggleNodeOperator({ from: validator1 });
 
-  await nodeOperations.delegate(validator1 , {from:validator3});
+  await nodeOperations.delegate(validator1, { from: validator3 });
 
-  let list = await  nodeOperations.returnPoolList(validator1);
+  let list = await nodeOperations.returnPoolList(validator1);
 
   // console.log("Pool list:", list);
 
@@ -499,7 +499,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   // await gov.cancel(5, { from: accounts[0] });
 
 
-// front format
+  // front format
+
+  console.log("\n\n Front (Bogdan's testing suit) format" + "\n\n");
 
   console.log("\n\n" + '"AUDT_TOKEN_ADDRESS":"' + token.address + '",');
   console.log('"MEMBERS_ADDRESS":"' + members.address + '",');
@@ -513,7 +515,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('"TIMELOCK_ADDRESS":"' + timelock.address + '",');
   console.log('"NFT":"' + nft.address + '"' + "\n\n");
 
-// env format
+  // env format
+  console.log("\n\n" + ".env format" + "\n\n");
+
 
   console.log('AUDT_TOKEN_ADDRESS=' + token.address);
   console.log('MEMBER_ADDRESS=' + members.address);
@@ -528,7 +532,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('RULES_NFT_ADDRESS=' + nft.address);
 
 
-  console.log("React format:" + "\n\n");
+  console.log("\n\n" + "React format:" + "\n\n");
 
 
   console.log("\n\n" + 'audtTokenAddress:"' + token.address + '",');
