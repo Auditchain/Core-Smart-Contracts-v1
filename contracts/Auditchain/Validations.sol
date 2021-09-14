@@ -16,23 +16,12 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
  */
 abstract contract Validations is AccessControl, ReentrancyGuard{
     using SafeMath for uint256;
-    uint256 public requiredQuorum = 60;
     Members public members;
     MemberHelpers public memberHelpers;
     DepositModifiers public depositModifiers;
     CohortFactory public cohortFactory;
     INodeOperations public nodeOperations;
     mapping(address => uint256) public outstandingValidations;
-
-    bytes32 public constant SETTER_ROLE = keccak256("SETTER_ROLE");
-  
-    /// @dev check if caller is a setter
-    modifier isSetter {
-        require(hasRole(SETTER_ROLE, msg.sender),
-            "NoCohort:isSetter - Caller is not a setter"
-        );
-        _;
-    }
 
     // Audit types to be used. Three types added for future expansion
     enum AuditTypes {Unknown, Financial, System, NFT, Type4, Type5, Type6}
@@ -61,7 +50,8 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
     event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision);
     event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url);
     event PaymentProcessed(bytes32 validationHash, address[] validators);
-    event Winners(address[] winners);
+    event LogGovernanceUpdate(uint256 params, string indexed action);
+
 
     constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations) {
 
@@ -72,15 +62,6 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         nodeOperations = INodeOperations(_nodeOperations);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
-    }
-
-    /**
-     * @dev to be called by governance to update new amount for required quorum
-     * @param _requiredQuorum new value of required quorum
-     */
-    function updateQuorum(uint256 _requiredQuorum) public isSetter() {
-        require(_requiredQuorum != 0, "New quorum value can't be 0");
-        requiredQuorum = _requiredQuorum;
     }
 
    /**
@@ -119,6 +100,8 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
     }
 
     function returnValidatorList(bytes32 validationHash) internal view virtual returns (address[] memory);
+
+    
     
 
     /**
@@ -231,7 +214,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
      */
     function executeValidation(bytes32 validationHash, bytes32 documentHash, uint256 executeValidationTime) internal nonReentrant {
         uint256 quorum = calculateVoteQuorum(validationHash);
-        if (quorum >= requiredQuorum && executeValidationTime == 0) {
+        if (quorum >= members.requiredQuorum() && executeValidationTime == 0) {
             Validation storage validation = validations[validationHash];
             validation.executionTime = block.timestamp;
 
