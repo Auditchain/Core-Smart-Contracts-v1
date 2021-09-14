@@ -18,10 +18,9 @@ contract NodeOperations is AccessControl {
     using SafeMath for uint256;
 
     MemberHelpers public memberHelpers;
-    address public auditToken; //AUDT token
+    address public auditToken;          
 
     address[] public nodeOperators;
-    mapping(address => uint256) public POWAmount;
 
     mapping(address => bool) public isNodeOperator;
     mapping(address => address[]) public delegations;
@@ -29,13 +28,19 @@ contract NodeOperations is AccessControl {
     mapping(address => address) public delegatorLink;
     mapping(address => uint256) public stakeAmount;
     mapping(address => uint256) public referralAmount;
+    mapping(address => uint256) public POWAmount;
+
     uint256 public stakeRatio = 1000;
     uint256 public stakeRatioDelegating = 1100;
     uint256 public stakingRatioReferral = 9100;
+    uint256 public POWFee = 100e18;
+
 
 
 
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
+    bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
+
 
     event LogNodeOperatorCreated(address indexed user);
     event LogNodeOperatorCancelled(address indexed user);
@@ -46,10 +51,7 @@ contract NodeOperations is AccessControl {
     event LogStakingRewardsTransferredOut(address indexed user, uint256 amount);
     event LogStakingRewardsClaimed(address indexed user, uint256 amount);
     event LogStakeRewardsIncreased(address indexed validator, uint256 amount);
-
-
-
-    
+    event LogGovernanceUpdate(uint256 params, string indexed action);
 
     constructor(address _memberHelpers, address _auditToken) {
         require(_memberHelpers != address(0), "NodeOperations:constructor - MemberHelpers address can't be 0");
@@ -60,14 +62,51 @@ contract NodeOperations is AccessControl {
     }
 
 
-     /// @dev check if caller is a controller
+    /// @dev check if caller is a controller
     modifier isController() {
-        require(
-            hasRole(CONTROLLER_ROLE, msg.sender),
-            "NodeOperations:IsController - Caller is not a controller"
-        );
+        require(hasRole(CONTROLLER_ROLE, msg.sender), "NodeOperations:IsController - Caller is not a controller");
 
         _;
+    }
+
+    /// @dev check if caller is a setter     
+    modifier isSetter {
+        require(hasRole(SETTER_ROLE, msg.sender), "NodeOperations:isSetter - Caller is not a setter");
+
+        _;
+    }
+
+    function updateStakeRatioDelegating(uint256 _newRatio) public isSetter() {
+
+        require(_newRatio != 0, "NodeOperations:updateStakeRatioDelegating - New value for the stake delegating ratio can't be 0");
+        stakeRatioDelegating = _newRatio;
+
+        emit LogGovernanceUpdate(_newRatio, "updateStakeRatioDelegating");
+
+    }
+
+    function updateStakingRatioReferral(uint256 _newRatio) public isSetter() {
+
+        require(_newRatio != 0, "NodeOperations:updateStakingRatioReferral - New value for the stake ratio can't be 0");
+        stakingRatioReferral = _newRatio;
+        emit LogGovernanceUpdate(_newRatio, "updateStakingRatioReferral");
+
+    }
+
+    function updateStakeRatio(uint256 _newRatio) public isSetter() {
+
+        require(_newRatio != 0, "NodeOperations:updateStakeRatio - New value for the stake ratio can't be 0");
+        stakeRatio = _newRatio;
+        emit LogGovernanceUpdate(_newRatio, "UpdateStakeRatio");
+
+    }
+
+    function updatePOWFee(uint256 _newFee) public isSetter() {
+
+        require(_newFee != 0, "NodeOperations:updatePOWFee - New value for the POWFee can't be 0");
+        POWFee = _newFee;
+        emit LogGovernanceUpdate(_newFee, "updatePOWFee");
+
     }
 
 
@@ -76,15 +115,12 @@ contract NodeOperations is AccessControl {
         address[] memory poolUsers = new address[](delegations[poolOperator].length  );
         uint256[] memory poolUsersStakes = new uint256[](delegations[poolOperator].length );
 
-
         for (uint256 i = 0; i< delegations[poolOperator].length ;i++) {
             poolUsers[i]= delegations[poolOperator][i];
             poolUsersStakes[i] = memberHelpers.returnDepositAmount(poolUsers[i]);
 
         }
-
         return (poolUsers, poolUsersStakes);
-    
     }
 
 
@@ -103,7 +139,7 @@ contract NodeOperations is AccessControl {
         }
     }
 
-     function removeNodeOperator() internal {
+    function removeNodeOperator() internal {
 
         for (uint256 i= 0; i < nodeOperators.length; i++) {
 
@@ -128,20 +164,17 @@ contract NodeOperations is AccessControl {
         return nodeOperators;
     }
 
-       function removeAlldelegations() public {
+    function removeAlldelegations() public {
 
-        // require(delegations[msg.sender].length == 0, );
-
-         for (uint256 i = delegations[msg.sender].length  ; i > 0; i--) {
-        //    for (uint256 i = 0; i>=0; i--) {
-               address delegating = delegations[msg.sender][i-1];
-                delegations[msg.sender].pop();   
-               isDelegating[msg.sender][delegating] = false;
-               delegatorLink[delegating] = address(0x0);
-            }
+        for (uint256 i = delegations[msg.sender].length  ; i > 0; i--) {
+            address delegating = delegations[msg.sender][i-1];
+            delegations[msg.sender].pop();   
+            isDelegating[msg.sender][delegating] = false;
+            delegatorLink[delegating] = address(0x0);
+        }
     }
 
-        function removeDelegation() public {
+    function removeDelegation() public {
 
         address oldDelegatee = delegatorLink[msg.sender];
 
