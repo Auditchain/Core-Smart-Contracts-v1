@@ -30,7 +30,6 @@ contract DepositModifiers is  AccessControl {
     ICohortFactory public cohortFactory;
     INodeOperations public nodeOperations;
 
-    uint256 public nonCohortValidationFee = 100e18;
     mapping(address => DataSubscriberTypes[]) public dataSubscriberCohorts;
 
     struct DataSubscriberTypes{
@@ -82,22 +81,24 @@ contract DepositModifiers is  AccessControl {
         require(!dataSubscriberCohortMap[msg.sender][enterpriseAddress][audits], "MemberHelpers:dataSubscriberPayment - You are already subscribed");
         require(members.userMap(msg.sender, Members.UserType(2)), "MemberHelpers:dataSubscriberPayment - You have to register as data subscriber");
 
-        require(memberHelpers.returnDepositAmount(msg.sender) >= members.accessFee(), "MemberHelpers:dataSubscriberPayment - You don't have enough AUDT to complet this tranasction.");
-        IERC20(auditToken).safeTransferFrom(msg.sender, address(this), members.accessFee());
+        uint256 accessFee = members.accessFee();
+
+        require(memberHelpers.returnDepositAmount(msg.sender) >= accessFee, "MemberHelpers:dataSubscriberPayment - You don't have enough AUDT to complet this tranasction.");
+        IERC20(auditToken).safeTransferFrom(msg.sender, address(this), accessFee);
         uint platformShare = 100 - members.enterpriseShareSubscriber() -members.validatorShareSubscriber();
-        IERC20(auditToken).safeTransfer(members.platformAddress(), members.accessFee().mul(platformShare).div(100));
+        IERC20(auditToken).safeTransfer(members.platformAddress(), accessFee.mul(platformShare).div(100));
 
         if (members.userMap(msg.sender, Members.UserType(2)) || members.userMap(msg.sender, Members.UserType(0))){
-            memberHelpers.decreaseDeposit(msg.sender, members.accessFee());
+            memberHelpers.decreaseDeposit(msg.sender, accessFee);
         }
 
-        uint256 enterpriseShare = members.accessFee().mul(members.enterpriseShareSubscriber()).div(100);
+        uint256 enterpriseShare = accessFee.mul(members.enterpriseShareSubscriber()).div(100);
         memberHelpers.increaseDeposit(enterpriseAddress, enterpriseShare);
 
-        allocateValidatorDataSubscriberFee(enterpriseAddress, audits, members.accessFee().mul(members.validatorShareSubscriber()).div(100));
+        allocateValidatorDataSubscriberFee(enterpriseAddress, audits, accessFee.mul(members.validatorShareSubscriber()).div(100));
         dataSubscriberCohortMap[msg.sender][enterpriseAddress][audits] = true;
 
-        emit LogDataSubscriberPaid(msg.sender, members.accessFee(), audits, enterpriseAddress, enterpriseShare);
+        emit LogDataSubscriberPaid(msg.sender, accessFee, audits, enterpriseAddress, enterpriseShare);
     }
 
     /**
@@ -163,16 +164,17 @@ contract DepositModifiers is  AccessControl {
 
     function processNonChortPayment(address[] memory _validators, address _requestor, bytes32 validationHash) public isController() {
 
-        uint paymentPerValidator = nonCohortValidationFee.div(_validators.length);
+        uint256 POWFee = nodeOperations.POWFee();
 
-        memberHelpers.decreaseDeposit(_requestor, nonCohortValidationFee);
+        uint paymentPerValidator = POWFee.div(_validators.length);
+
+        memberHelpers.decreaseDeposit(_requestor, POWFee);
         for (uint i=0; i < _validators.length; i++) {
             nodeOperations.increasePOWRewards(_validators[i], paymentPerValidator);
-            // memberHelpers.increaseDeposit(_validators[i], paymentPerValidator);
-           emit LogNonCohortPaymentReceived(_validators[i], paymentPerValidator, validationHash);
+            emit LogNonCohortPaymentReceived(_validators[i], paymentPerValidator, validationHash);
         }
 
-        emit LogNonCohortValidationPaid(_requestor, _validators, validationHash, nonCohortValidationFee);
+        emit LogNonCohortValidationPaid(_requestor, _validators, validationHash, POWFee);
     }
 
     
