@@ -34,7 +34,7 @@ contract ValidationsNoCohort is Validations {
    */
       function checkIfRequestorHasFunds(address requestor) public override view returns (bool) {
        if (outstandingValidations[requestor] > 0 )
-          return ( memberHelpers.deposits(requestor) > depositModifiers.nonCohortValidationFee().mul(outstandingValidations[requestor]));
+          return ( memberHelpers.deposits(requestor) > nodeOperations.POWFee().mul(outstandingValidations[requestor]));
        else 
           return true;
     }
