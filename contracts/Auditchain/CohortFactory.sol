@@ -46,7 +46,6 @@ contract CohortFactory is  AccessControl {
     mapping (address =>  Invitation[]) public invitations;      // invitations list
     address platformAddress;                                    // address to deposit platform fees
 
-    bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
 
     event ValidatorInvited(address  inviting, address indexed invitee, AuditTypes indexed audits, uint256 invitationNumber);
     event InvitationAccepted(address indexed validator, uint256 invitationNumber);
@@ -54,12 +53,7 @@ contract CohortFactory is  AccessControl {
     event UpdateMinValidatorsPerCohort(uint256 minValidatorPerCohort, AuditTypes audits);
     event ValidatorCleared(address validator, AuditTypes audit, address enterprise);
 
-    /// @dev check if caller is a setter     
-    modifier isSetter {
-        require(hasRole(SETTER_ROLE, msg.sender), "Members:isSetter - Caller is not a setter");
 
-        _;
-    }
 
     constructor(Members _members, MemberHelpers _memberHelpers) {
         members = _members;
