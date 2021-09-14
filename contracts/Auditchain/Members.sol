@@ -27,13 +27,16 @@ contract Members is  AccessControl {
 
     uint256 public amountTokensPerValidation =  100e18;    //New minted amount per validation
 
-    uint256 public accessFee = 100e18;
-    uint256 public enterpriseShareSubscriber = 40;
-    uint256 public validatorShareSubscriber = 40;
-    address public platformAddress;
-    uint256 public platformShareValidation = 15;    
-    uint256 public recentBlockUpdated;
-    uint256 public enterpriseMatch = 200;         
+    uint256 public accessFee = 100e18;              // data subscriber fee for access to reports
+    uint256 public enterpriseShareSubscriber = 40;  // share of enterprise income from data subscriber fee
+    uint256 public validatorShareSubscriber = 40;   // share of validator income from data subscriber fee
+    address public platformAddress;                 // address where all platform fees are deposited
+    uint256 public platformShareValidation = 15;    // fee from validation
+    uint256 public enterpriseMatch = 200;           // percentage to match against amountTokensPerValidation
+    uint256 public minDepositDays = 60;             // number of days to considered for calculation of average spendings
+    uint256 public requiredQuorum = 60;             // quorum required to consider validation valid
+    
+
     
  
     /// @dev check if caller is a controller     
@@ -60,15 +63,12 @@ contract Members is  AccessControl {
     address[] public enterprises;
     address[] public validators;
     address[] public dataSubscribers;
-    // uint256 public enterpriseCount;
-    // uint256 public validatorCount;
-    // uint256 public dataSubscriberCount;
     
     event UserAdded(address indexed user, string name, UserType indexed userType);
     event LogDepositReceived(address indexed from, uint amount);
     event LogSubscriptionCompleted(address subscriber, uint256 numberOfSubscriptions);
-    event LogUpdateRewards(uint256 rewards);
-    event LogUpdateEnterpriseMatch(uint256 portion);
+    event LogGovernanceUpdate(uint256 params, string indexed action);
+
     
 
     constructor(address _platformAddress ) {
@@ -78,15 +78,60 @@ contract Members is  AccessControl {
     }
 
 
+     /**
+     * @dev to be called by governance to update new amount for required quorum
+     * @param _requiredQuorum new value of required quorum
+     */
+    function updateQuorum(uint256 _requiredQuorum) public isSetter() {
+        require(_requiredQuorum != 0, "Members:updateQuorum - New quorum value can't be 0");
+        requiredQuorum = _requiredQuorum;
+        LogGovernanceUpdate(_requiredQuorum, "updateQuorum");
+    }
+
+
+    /**
+    * @dev to be called by Governance contract to update new value for the validation platform fee
+    * @param _newFee new value for data subscriber access fee
+    */
+    function updatePlatformShareValidation(uint256 _newFee) public isSetter() {
+
+        require(_newFee != 0, "Members:updatePlatformShareValidation - New value for the platform fee can't be 0");
+        platformShareValidation = _newFee;
+        emit LogGovernanceUpdate(_newFee, "updatePlatformShareValidation");
+    }
+
+    /**
+    * @dev to be called by Governance contract to update new value for data sub access fee
+    * @param _accessFee new value for data subscriber access fee
+    */
+    function updateAccessFee(uint256 _accessFee) public isSetter() {
+
+        require(_accessFee != 0, "Members:updateAccessFee - New value for the access fee can't be 0");
+        accessFee = _accessFee;
+        emit LogGovernanceUpdate(_accessFee, "updateAccessFee");
+    }
+
+     /**
+    * @dev to be called by Governance contract to update new amount for validation rewards
+    * @param _minDepositDays new value for minimum of days to calculate 
+    */
+    function updateMinDepositDays(uint256 _minDepositDays) public isSetter() {
+
+        require(_minDepositDays != 0, "Members:updateMinDepositDays - New value for the min deposit days can't be 0");
+        minDepositDays = _minDepositDays;
+        emit LogGovernanceUpdate(_minDepositDays, "updateMinDepositDays");
+    }
+
     /**
     * @dev to be called by Governance contract to update new amount for validation rewards
     * @param _amountTokensPerValidation new value of reward per validation
     */
-    function updateRewards(uint256 _amountTokensPerValidation) public isSetter() {
+    function updateTokensPerValidation(uint256 _amountTokensPerValidation) public isSetter() {
 
-        require(_amountTokensPerValidation != 0, "Members:updateRewards - New value for the reward can't be 0");
+        require(_amountTokensPerValidation != 0, "Members:updateTokensPerValidation - New value for the reward can't be 0");
         amountTokensPerValidation = _amountTokensPerValidation;
-        emit LogUpdateRewards(_amountTokensPerValidation);
+        emit LogGovernanceUpdate(_amountTokensPerValidation, "updateRewards");
+
     }
     
     /**
@@ -95,9 +140,10 @@ contract Members is  AccessControl {
     */
     function updateEnterpriseMatch(uint256 _enterpriseMatch) public isSetter()  {
 
-        require(_enterpriseMatch != 0, "Members:updateMinDepositDays - New value for the enterprise match can't be 0");
+        require(_enterpriseMatch != 0, "Members:updateEnterpriseMatch - New value for the enterprise match can't be 0");
         enterpriseMatch = _enterpriseMatch;
-        emit LogUpdateEnterpriseMatch(_enterpriseMatch);
+        emit LogGovernanceUpdate(_enterpriseMatch, "updateEnterpriseMatch");
+
     }
 
     /**
@@ -106,11 +152,14 @@ contract Members is  AccessControl {
     * @param _enterpriseShareSubscriber  - share of the enterprise
     * @param _validatorShareSubscriber - share of the subscribers
     */
-    function setDataSubscriberShares(uint256 _enterpriseShareSubscriber, uint256 _validatorShareSubscriber ) public isSetter()  {
+    function updateDataSubscriberShares(uint256 _enterpriseShareSubscriber, uint256 _validatorShareSubscriber ) public isSetter()  {
 
-        require(_enterpriseShareSubscriber.add(validatorShareSubscriber) <=100, "Enterprise and Validator shares can't be larger than 100");
+        // platform share should be at least 10%
+        require(_enterpriseShareSubscriber.add(validatorShareSubscriber) <=90, "Enterprise and Validator shares can't be larger than 90");
         enterpriseShareSubscriber = _enterpriseShareSubscriber;
         validatorShareSubscriber = _validatorShareSubscriber;
+        emit LogGovernanceUpdate(enterpriseShareSubscriber, "updateDataSubscriberShares:Enterprise");
+        emit LogGovernanceUpdate(validatorShareSubscriber, "updateDataSubscriberShares:Validator");
     }
 
    
