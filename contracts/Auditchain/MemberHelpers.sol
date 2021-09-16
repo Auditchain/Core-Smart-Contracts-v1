@@ -122,10 +122,7 @@ contract MemberHelpers is AccessControl {
      * @param _validations validation contract address
      */
     function setValidation(address _validations) public isController {
-        require(
-            _validations != address(0),
-            "MemberHelpers:setValidation - Validation address can't be 0"
-        );
+        require( _validations != address(0), "MemberHelpers:setValidation - Validation address can't be 0");
         validations = IValidatinos(_validations);
     }
 
