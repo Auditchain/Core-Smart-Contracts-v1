@@ -49,7 +49,7 @@ contract("cohortFactory contract", (accounts) => {
 
         await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
         await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
-        await memberHelpers.setCohortFactory(cohortFactory.address, { from: admin });
+        // await memberHelpers.setCohortFactory(cohortFactory.address, { from: admin });
 
         // await token.transfer(validator1, tokenAmount1);
         // await token.transfer(validator2, tokenAmount2);
@@ -235,9 +235,9 @@ contract("cohortFactory contract", (accounts) => {
             await memberHelpers.stake(auditTokenMin, { from: validator3 });
 
 
-            await cohortFactory.inviteValidator(validator1, 0, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator2, 0, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator3, 0, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator1, 1, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator2, 1, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator3, 1, { from: enterprise1 });
 
             await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
             await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
@@ -247,7 +247,7 @@ contract("cohortFactory contract", (accounts) => {
         it("Should succeed. Cohort created by enterprise", async () => {
             
             await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
-            let result = await cohortFactory.createCohort(0, { from: enterprise1 });
+            let result = await cohortFactory.createCohort(1, { from: enterprise1 });
             assert.lengthOf(result.logs, 1);
 
             let event = result.logs[0];
@@ -256,7 +256,7 @@ contract("cohortFactory contract", (accounts) => {
             let auditType = event.args.audits;
 
             assert.strictEqual(creator, enterprise1);
-            assert.strictEqual(auditType.toString(), "0");
+            assert.strictEqual(auditType.toString(), "1");
 
         })
 
@@ -264,7 +264,7 @@ contract("cohortFactory contract", (accounts) => {
         it("Should fail. Less than 3 validators have accepted the invitations.", async () => {
 
             try {
-                let result = await cohortFactory.createCohort(0, { from: enterprise1 });
+                let result = await cohortFactory.createCohort(1, { from: enterprise1 });
                 expectRevert();
             } catch (error) {
                 ensureException(error);
@@ -298,9 +298,9 @@ contract("cohortFactory contract", (accounts) => {
             await memberHelpers.stake(auditTokenMin, { from: validator3 });
             await memberHelpers.stake(auditTokenMin, { from: validator4 });
 
-            await cohortFactory.inviteValidator(validator1, 0, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator2, 0, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator3, 0, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator1, 1, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator2, 1, { from: enterprise1 });
+            await cohortFactory.inviteValidator(validator3, 1, { from: enterprise1 });
 
             await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
             await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
@@ -309,8 +309,8 @@ contract("cohortFactory contract", (accounts) => {
 
         it("Should succeed. Validator is added to existing cohort by legitimate Enterprise", async () => {
 
-            await cohortFactory.createCohort(0, { from: enterprise1 });
-            let result = await cohortFactory.inviteValidator(validator4, 0, { from: enterprise1 });
+            await cohortFactory.createCohort(1, { from: enterprise1 });
+            let result = await cohortFactory.inviteValidator(validator4, 1, { from: enterprise1 });
             let event = result.logs[0];
 
             let invitationNumber = event.args.invitationNumber;
@@ -334,8 +334,8 @@ contract("cohortFactory contract", (accounts) => {
 
         it("Should succeed. Validator is removed from existing cohort by legitimate Enterprise", async () => {
 
-            let result = await cohortFactory.createCohort(0, { from: enterprise1 });
-            result = await cohortFactory.clearInvitationRemoveValidator(validator1, 0, { from: enterprise1 });
+            let result = await cohortFactory.createCohort(1, { from: enterprise1 });
+            result = await cohortFactory.clearInvitationRemoveValidator(validator1, 1, { from: enterprise1 });
 
             assert.lengthOf(result.logs, 1);
             let event = result.logs[0];
@@ -345,7 +345,7 @@ contract("cohortFactory contract", (accounts) => {
 
         it("Should fail. Validator is removed from existing cohort by random user", async () => {
 
-            await cohortFactory.createCohort(0, { from: enterprise1 });
+            await cohortFactory.createCohort(1, { from: enterprise1 });
 
             try {
                 await cohortFactory.clearInvitationRemoveValidator(validator1, 0, { from: admin });
