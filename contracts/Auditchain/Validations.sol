@@ -42,6 +42,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         AuditTypes auditType;
         mapping(address => ValidationStatus) validatorChoice;
         mapping(address => uint256) validatorTime;
+        mapping(address => string) validationUrl;
     }
 
     mapping(bytes32 => Validation) public validations; // track each validation
@@ -118,7 +119,8 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
             address[] memory,
             uint256[] memory,
             ValidationStatus[] memory,
-            uint256[] memory
+            uint256[] memory,
+            string[] memory
         )
     {
         uint256 j=0;
@@ -129,6 +131,8 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         uint256[] memory stake = new uint256[](validation.validationsCompleted);
         ValidationStatus[] memory validatorsValues = new ValidationStatus[](validation.validationsCompleted);
         uint256[] memory validationTime = new uint256[] (validation.validationsCompleted);
+        string[] memory validationUrl = new string[] (validation.validationsCompleted);
+
 
 
         for (uint256 i = 0; i < validatorsList.length; i++) {
@@ -136,11 +140,12 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
                 stake[j] = memberHelpers.returnDepositAmount(validatorsList[i]);
                 validatorsValues[j] = validation.validatorChoice[validatorsList[i]];
                 validationTime[j] = validation.validatorTime[validatorsList[i]];
+                validationUrl[j] = validation.validationUrl[validatorsList[i]];
                 validatorListActive[j] = validatorsList[i];
                 j++;
             }
         }
-        return (validatorListActive, stake, validatorsValues, validationTime);
+        return (validatorListActive, stake, validatorsValues, validationTime, validationUrl);
     }
 
     /**
@@ -229,7 +234,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
 
     function insertionSort(bytes32 validationHash) internal view returns (address[] memory, ValidationStatus[] memory, uint256[] memory) {
 
-        (address[] memory validator, ,ValidationStatus[] memory status, uint256[] memory validationTimes) =  collectValidationResults(validationHash);
+        (address[] memory validator, ,ValidationStatus[] memory status, uint256[] memory validationTimes,) =  collectValidationResults(validationHash);
 
         uint length = validationTimes.length;
         
@@ -299,16 +304,20 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
      * @param validationTime - this is the time when validation has been initialized
      * @param decision - one of the ValidationStatus choices cast by validator
      */
-        function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision) public virtual {
+        function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl) public virtual {
 
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
         require(members.userMap(msg.sender, Members.UserType(1)), "Cohort:validate - Validator is not authorized.");
         require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
         require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Cohort:validate - This document has been validated already.");
-        require(nodeOperations.delegatorLink(msg.sender) == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
+        // require(nodeOperations.nodeOpStruct(msg.sender).delegatorLink == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
+        require(nodeOperations.returnDelegatorLink(msg.sender) == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
         validation.validatorChoice[msg.sender] = decision;
         validation.validatorTime[msg.sender] = block.timestamp;
+        validation.validationUrl[msg.sender] = valUrl;
+
+    
         validation.validationsCompleted ++;
 
         nodeOperations.increaseStakeRewards(msg.sender);
