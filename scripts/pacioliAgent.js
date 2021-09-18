@@ -63,11 +63,11 @@ let ipfs = ipfsAPI('ipfs.infura.io', 5001, {
  */
 async function verifyPacioli(metadatatUrl, trxHash) {
 
-    console.log("[1 " + trxHash + "]" + "  Querying Pacioli");
-
+    
     const result = await ipfs.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
-
+    
+    console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
 
     const pacioliUrl = "https://pacioli.auditchain.finance/analyseReport_";
     const formatString = "?format=json&apiToken=dummyToken&isLinkbase=false&url=";
@@ -119,7 +119,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash) {
     console.log("[6 " + trxHash + "]" + "  Creating metadata file.");
     const isValid = await getReportResult(reportPacioliIPFSUrl);
     let metaDataObject = {
-        reportUrl: url,
+        reportUrl: ipfsBase + url,
         reportHash: reportHash,
         reportPacioli: ipfsBase + reportPacioliIPFSUrl,
         result: isValid
@@ -137,6 +137,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash) {
     const urlMetadata = result[1].hash + '/' + result[0].path;
 
     console.log("[7 " + trxHash + "]" + "  Metadata created: " + ipfsBase + urlMetadata);
+    return urlMetadata;
 }
 
 
@@ -147,7 +148,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash) {
  * @param choice decision of the validator
  * @param validator address of the validator
  */
-async function validate(hash, initTime, choice, validator, trxHash) {
+async function validate(hash, initTime, choice, validator, trxHash, valUrl) {
 
 
     console.log("[4 " + trxHash + "]" + "  Waiting for validation transaction to complete... ");
@@ -162,7 +163,7 @@ async function validate(hash, initTime, choice, validator, trxHash) {
 
     //validate request
     nonCohortValidate.methods
-        .validate(hash, initTime, choice)
+        .validate(hash, initTime, choice, valUrl)
         .send({ from: owner, gas: 500000, nonce: nonce })
         .on("receipt", function (receipt) {
             const event = receipt.events.ValidatorValidated.returnValues;
@@ -196,6 +197,7 @@ async function startProcess() {
     const owner = providerForUpdate.addresses[Number(myArgs[0])];
 
     const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call();
+    // const nodeOperator = true;
     if (nodeOperator) {
         console.log("Process started.");
         console.log("Transaction count:", await web3.eth.getTransactionCount(owner));
@@ -204,15 +206,18 @@ async function startProcess() {
         nonCohort.events.ValidationInitialized({})
             .on('data', async function (event) {
 
-                    depositAmountBefore = await nodeOperations.methods.POWAmount(owner).call();
+                    const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
+                    depositAmountBefore = validationStruct.POWAmount;
+
+                    // depositAmountBefore = await nodeOperations.methods.POWAmount(owner).call();
                     let myArgs = process.argv.slice(2);
                     console.log('myArgs: ', myArgs);
                     // console.log("transaction hash:", event.transactionHash);
                     const trxHash = event.transactionHash;
                     const reportPacioliIPFSUrl = await verifyPacioli(event.returnValues.url, trxHash);
                     const isValid = await getReportResult(reportPacioliIPFSUrl, trxHash);
-                    await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, Number(myArgs[0]), trxHash)
-                    await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash);
+                    const metaDataLink = await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash);
+                    await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, Number(myArgs[0]), trxHash, metaDataLink)
 
                 })
             .on('error', console.error);
@@ -221,7 +226,12 @@ async function startProcess() {
         nonCohort.events.RequestExecuted({})
             .on('data', async function (event) {
                 const owner = providerForUpdate.addresses[Number(myArgs[0])];
-                const balanceAfter = await nodeOperations.methods.POWAmount(owner).call()
+
+                const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
+                // console.log("validation Struct:", validationStruct);
+                let balanceAfter= validationStruct.POWAmount;
+
+                // const balanceAfter = await nodeOperations.methods.POWAmount(owner).call()
                 let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
                 console.log("[8  You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
             })

@@ -67,14 +67,14 @@ contract ValidationsCohort is Validations {
 
 
 
-     function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision) public override {
+     function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl) public override {
 
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
         (bool ivited, bool accepted) = cohortFactory.isValidatorInvited(validation.requestor, msg.sender, uint256(validation.auditType));
         require(ivited && accepted, "Cohort:validate - validator is not part of the cohort.");
 
-        super.validate(documentHash, validationTime, decision);
+        super.validate(documentHash, validationTime, decision, valUrl);
         
     }
 

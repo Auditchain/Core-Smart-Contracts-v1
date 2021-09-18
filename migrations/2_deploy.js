@@ -245,10 +245,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator2, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
 
 
   timeMachine.advanceTimeAndBlock(10);
@@ -260,11 +260,11 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationInitTime = event.args.initTime;
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 2, { from: validator2, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "",  { from: validator1, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 2, "", { from: validator2, gas: 800000 });
 
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
 
 
   timeMachine.advanceTimeAndBlock(10);
@@ -276,9 +276,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationInitTime = event.args.initTime;
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 2, { from: validator2, gas: 800000 });
-  result = await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 2, "",  { from: validator2, gas: 800000 });
+  result = await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
 
 
   event = result.logs[0];
@@ -294,7 +294,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   // validationInitTime = event.args.initTime;
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
 
 
 
@@ -320,10 +320,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationInitTime = event.args.initTime;
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator2, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 900000 });
 
 
 
@@ -338,10 +338,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   // await memberHelpers.delegate(validator1, {from:delegating});
 
-  await noCohort.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 800000 });
-  await noCohort.validate(documentHash, validationInitTime, 2, { from: validator2, gas: 800000 });
-  let resultVal = await noCohort.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 800000 });
-  await noCohort.validate(documentHash, validationInitTime, 1, { from: validator4, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, 2, "", { from: validator2, gas: 800000 });
+  let resultVal = await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
   // await noCohort.validate(documentHash, validationInitTime, 1, { from: delegating, gas: 800000 });
 
 
@@ -358,9 +358,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log("events", eventsMember)
 
 
-  let stakingRewards = await nodeOperations.stakeAmount(validator1);
+  // let stakingRewards = await nodeOperations.stakeAmount(validator1);
 
-  console.log("staking rewards:", stakingRewards.toString());
+  // console.log("staking rewards:", stakingRewards.toString());
 
 
   await nodeOperations.toggleNodeOperator({ from: validator1 });

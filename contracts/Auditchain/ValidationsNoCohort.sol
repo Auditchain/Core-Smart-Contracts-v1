@@ -56,8 +56,8 @@ contract ValidationsNoCohort is Validations {
         return validatorsList;
     }
 
-    function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision) public override {
-        super.validate(documentHash, validationTime, decision);
+    function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl) public override {
+        super.validate(documentHash, validationTime, decision, valUrl);
     }
 
 
