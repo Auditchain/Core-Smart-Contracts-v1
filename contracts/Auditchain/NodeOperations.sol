@@ -22,19 +22,34 @@ contract NodeOperations is AccessControl {
 
     address[] public nodeOperators;
 
-    mapping(address => bool) public isNodeOperator;
-    mapping(address => address[]) public delegations;
-    mapping(address => mapping(address => bool)) isDelegating;
-    mapping(address => address) public delegatorLink;
-    mapping(address => uint256) public stakeAmount;
-    mapping(address => uint256) public referralAmount;
-    mapping(address => uint256) public POWAmount;
+    // mapping(address => bool) public isNodeOperator;
+    // mapping(address => address[]) public delegations;
+    // mapping(address => mapping(address => bool)) isDelegating;
+    // mapping(address => address) public delegatorLink;
+    // mapping(address => uint256) public stakeAmount;
+    // mapping(address => uint256) public referralAmount;
+    // mapping(address => uint256) public POWAmount;
+    // mapping(address => bool) public noDelegations;
 
     uint256 public stakeRatio = 1000;
     uint256 public stakeRatioDelegating = 1100;
     uint256 public stakingRatioReferral = 9100;
     uint256 public POWFee = 100e18;
 
+
+    struct nodeOperator {
+
+        bool isNodeOperator;
+        address[] delegations;
+        mapping(address => bool) isDelegating;
+        uint256 stakeAmount;
+        uint256 referralAmount;
+        uint256 POWAmount;
+        bool noDelegations;
+        address delegatorLink;
+    }
+
+    mapping(address => nodeOperator) public nodeOpStruct;
 
 
 
@@ -109,14 +124,39 @@ contract NodeOperations is AccessControl {
 
     }
 
+    function returnDelegatorLink(address operator) public view returns (address){
 
-    function returnPoolList(address poolOperator)public view returns (address[] memory, uint256[] memory) {
+        return nodeOpStruct[operator].delegatorLink;
+    }
 
-        address[] memory poolUsers = new address[](delegations[poolOperator].length  );
-        uint256[] memory poolUsersStakes = new uint256[](delegations[poolOperator].length );
+    function isNodeOperator(address operator) public view returns (bool) {
 
-        for (uint256 i = 0; i< delegations[poolOperator].length ;i++) {
-            poolUsers[i]= delegations[poolOperator][i];
+        return nodeOpStruct[operator].isNodeOperator;
+    }
+
+    
+
+    // function returnPoolList(address poolOperator)public view returns (address[] memory, uint256[] memory) {
+
+    //     address[] memory poolUsers = new address[](delegations[poolOperator].length  );
+    //     uint256[] memory poolUsersStakes = new uint256[](delegations[poolOperator].length );
+
+    //     for (uint256 i = 0; i< delegations[poolOperator].length ;i++) {
+    //         poolUsers[i]= delegations[poolOperator][i];
+    //         poolUsersStakes[i] = memberHelpers.returnDepositAmount(poolUsers[i]);
+
+    //     }
+    //     return (poolUsers, poolUsersStakes);
+    // }
+
+
+     function returnPoolList(address poolOperator)public view returns (address[] memory, uint256[] memory) {
+
+        address[] memory poolUsers = new address[](nodeOpStruct[poolOperator].delegations.length  );
+        uint256[] memory poolUsersStakes = new uint256[](nodeOpStruct[poolOperator].delegations.length );
+
+        for (uint256 i = 0; i< nodeOpStruct[poolOperator].delegations.length ;i++) {
+            poolUsers[i]= nodeOpStruct[poolOperator].delegations[i];
             poolUsersStakes[i] = memberHelpers.returnDepositAmount(poolUsers[i]);
 
         }
@@ -124,20 +164,36 @@ contract NodeOperations is AccessControl {
     }
 
 
-    function toggleNodeOperator() public {
+    // function toggleNodeOperatorOld() public {
 
-        if (isNodeOperator[msg.sender]){
-            isNodeOperator[msg.sender] = false;
+    //     if (isNodeOperator[msg.sender]){
+    //         isNodeOperator[msg.sender] = false;
+    //         removeNodeOperator();
+    //         removeAlldelegations();
+    //         emit LogNodeOperatorCreated(msg.sender);
+    //     }
+    //     else{
+    //         isNodeOperator[msg.sender] = true;
+    //         addNodeOperator();
+    //         emit LogNodeOperatorCancelled(msg.sender);
+    //     }
+    // }
+
+    function toggleNodeOperator( ) public {
+
+        if (nodeOpStruct[msg.sender].isNodeOperator){
+            nodeOpStruct[msg.sender].isNodeOperator = false;
             removeNodeOperator();
             removeAlldelegations();
             emit LogNodeOperatorCreated(msg.sender);
         }
         else{
-            isNodeOperator[msg.sender] = true;
+            nodeOpStruct[msg.sender].isNodeOperator = true;
             addNodeOperator();
             emit LogNodeOperatorCancelled(msg.sender);
         }
     }
+
 
     function removeNodeOperator() internal {
 
@@ -152,6 +208,8 @@ contract NodeOperations is AccessControl {
         }
     }
 
+    
+
 
     function addNodeOperator() internal {
 
@@ -164,83 +222,174 @@ contract NodeOperations is AccessControl {
         return nodeOperators;
     }
 
+    // function removeAlldelegations() public {
+
+    //     for (uint256 i = delegations[msg.sender].length  ; i > 0; i--) {
+    //         address delegating = delegations[msg.sender][i-1];
+    //         delegations[msg.sender].pop();   
+    //         isDelegating[msg.sender][delegating] = false;
+    //         delegatorLink[delegating] = address(0x0);
+    //     }
+    // }
+
     function removeAlldelegations() public {
 
-        for (uint256 i = delegations[msg.sender].length  ; i > 0; i--) {
-            address delegating = delegations[msg.sender][i-1];
-            delegations[msg.sender].pop();   
-            isDelegating[msg.sender][delegating] = false;
-            delegatorLink[delegating] = address(0x0);
+        for (uint256 i = nodeOpStruct[msg.sender].delegations.length  ; i > 0; i--) {
+            address delegating = nodeOpStruct[msg.sender].delegations[i-1];
+            nodeOpStruct[msg.sender].delegations.pop();   
+            nodeOpStruct[msg.sender].isDelegating[delegating] = false;
+            nodeOpStruct[delegating].delegatorLink = address(0x0);
         }
     }
 
-    function removeDelegation() public {
+    // function removeDelegation() public {
 
-        address oldDelegatee = delegatorLink[msg.sender];
+    //     address oldDelegatee = delegatorLink[msg.sender];
 
-        require(oldDelegatee != address(0x0), "MemberHelpers:removeDelegation You are not delegating your stake yet.");
+    //     require(oldDelegatee != address(0x0), "MemberHelpers:removeDelegation You are not delegating your stake yet.");
 
 
-        for (uint256 i = 0; i < delegations[oldDelegatee].length; i++) {
-            if (delegations[oldDelegatee][i] == msg.sender) {
-                delegations[oldDelegatee][i] = delegations[oldDelegatee][delegations[oldDelegatee].length - 1];
-                delegations[oldDelegatee].pop();
-                isDelegating[oldDelegatee][msg.sender] = false;
-                delegatorLink[msg.sender] = address(0x0);
-                i= delegations[oldDelegatee].length;
+    //     for (uint256 i = 0; i < delegations[oldDelegatee].length; i++) {
+    //         if (delegations[oldDelegatee][i] == msg.sender) {
+    //             delegations[oldDelegatee][i] = delegations[oldDelegatee][delegations[oldDelegatee].length - 1];
+    //             delegations[oldDelegatee].pop();
+    //             isDelegating[oldDelegatee][msg.sender] = false;
+    //             delegatorLink[msg.sender] = address(0x0);
+    //             i= delegations[oldDelegatee].length;
+    //         }
+    //     }
+
+    //     emit LogRemoveDelegation(msg.sender, oldDelegatee);
+    // }
+
+
+     function removeDelegation() public {
+
+        address oldDelegatee = nodeOpStruct[msg.sender].delegatorLink;
+
+        require(oldDelegatee != address(0x0), "NodeOperations:removeDelegation You are not delegating your stake yet.");
+
+
+        for (uint256 i = 0; i < nodeOpStruct[oldDelegatee].delegations.length; i++) {
+            if (nodeOpStruct[oldDelegatee].delegations[i] == msg.sender) {
+                nodeOpStruct[oldDelegatee].delegations[i] = nodeOpStruct[oldDelegatee].delegations[nodeOpStruct[oldDelegatee].delegations.length - 1];
+                nodeOpStruct[oldDelegatee].delegations.pop();
+                nodeOpStruct[oldDelegatee].isDelegating[msg.sender] = false;
+                nodeOpStruct[msg.sender].delegatorLink = address(0x0);
+                i= nodeOpStruct[oldDelegatee].delegations.length;
             }
         }
 
         emit LogRemoveDelegation(msg.sender, oldDelegatee);
     }
 
-    function delegate(address delegatee) public {
-        require(
-            !isDelegating[delegatee][msg.sender],
-            "MemberHelpers:delegatge - You are already delegating to this member."
+    // function delegate(address delegatee) public {
+    //     require(
+    //         !isDelegating[delegatee][msg.sender],
+    //         "MemberHelpers:delegatge - You are already delegating to this member."
+    //     );
+
+    //     if (delegatorLink[msg.sender] != address(0x0)) 
+    //         removeDelegation();
+
+    //     delegations[delegatee].push(msg.sender);
+    //     delegatorLink[msg.sender] = delegatee;
+    //     isDelegating[delegatee][msg.sender] = true;
+
+    //     emit LogDelegation(msg.sender, delegatee);
+    // }
+
+     function delegate(address delegatee) public {
+        require(!nodeOpStruct[delegatee].isDelegating[msg.sender], 
+          "NodeOperations:delegate - You have are already delegating to this member."
         );
 
-        if (delegatorLink[msg.sender] != address(0x0)) 
+        if (nodeOpStruct[msg.sender].delegatorLink != address(0x0)) 
             removeDelegation();
 
-        delegations[delegatee].push(msg.sender);
-        delegatorLink[msg.sender] = delegatee;
-        isDelegating[delegatee][msg.sender] = true;
+        nodeOpStruct[delegatee].delegations.push(msg.sender);
+        nodeOpStruct[msg.sender].delegatorLink = delegatee;
+        nodeOpStruct[delegatee].isDelegating[msg.sender] = true;
 
         emit LogDelegation(msg.sender, delegatee);
     }
 
+
+
+    // function increasePOWRewards(address validator, uint256 amount) public isController() {
+    //         POWAmount[validator] = POWAmount[validator].add(amount);
+    // }
+
     function increasePOWRewards(address validator, uint256 amount) public isController() {
-            POWAmount[validator] = POWAmount[validator].add(amount);
+            nodeOpStruct[validator].POWAmount = nodeOpStruct[validator].POWAmount.add(amount);
     }
+
+    // function increaseDelegatedStakeRewards(address validator) public isController() {
+    //     uint256 referringReward;
+
+    //     for (uint256 i = 0; i < delegations[validator].length; i++) {
+    //         address delegating = delegations[validator][i];
+    //         uint256 amount = memberHelpers.returnDepositAmount(delegating).div(stakeRatioDelegating);
+    //         stakeAmount[delegating] = stakeAmount[delegating].add(amount);
+    //         referringReward = referringReward.add(memberHelpers.returnDepositAmount(delegating).div(stakingRatioReferral)
+    //         );
+    //         emit LogDelegatedStakeRewardsIncreased(delegating, amount);
+    //     }
+
+    //     if (referringReward > 0) {
+    //         referralAmount[validator] = referralAmount[validator].add(referringReward);
+    //         emit LogReferralStakeRewardsIncreased(validator, referringReward);
+    //     }
+    // }
 
     function increaseDelegatedStakeRewards(address validator) public isController() {
         uint256 referringReward;
 
-        for (uint256 i = 0; i < delegations[validator].length; i++) {
-            address delegating = delegations[validator][i];
+        for (uint256 i = 0; i < nodeOpStruct[validator].delegations.length ; i++) {
+            address delegating = nodeOpStruct[validator].delegations[i];
             uint256 amount = memberHelpers.returnDepositAmount(delegating).div(stakeRatioDelegating);
-            stakeAmount[delegating] = stakeAmount[delegating].add(amount);
+            nodeOpStruct[delegating].stakeAmount = nodeOpStruct[delegating].stakeAmount.add(amount);
             referringReward = referringReward.add(memberHelpers.returnDepositAmount(delegating).div(stakingRatioReferral)
             );
             emit LogDelegatedStakeRewardsIncreased(delegating, amount);
         }
 
         if (referringReward > 0) {
-            referralAmount[validator] = referralAmount[validator].add(referringReward);
+            nodeOpStruct[validator].referralAmount = nodeOpStruct[validator].referralAmount.add(referringReward);
             emit LogReferralStakeRewardsIncreased(validator, referringReward);
         }
     }
 
+    // function claimStakeRewards(bool deliver) public {
+    //     uint256 stakeRewards = stakeAmount[msg.sender];
+    //     uint256 powRewards = POWAmount[msg.sender];
+    //     uint256 refRewards = referralAmount[msg.sender];
+
+    //     uint256 payment = stakeRewards.add(powRewards).add(refRewards);
+    //     stakeAmount[msg.sender] = 0;
+    //     POWAmount[msg.sender] = 0;
+    //     referralAmount[msg.sender] = 0;
+
+    //     if (deliver) {
+    //         IAuditToken(auditToken).mint(msg.sender, payment);
+    //         emit LogStakingRewardsTransferredOut(msg.sender, payment);
+    //     } else {
+    //         memberHelpers.increaseDeposit(msg.sender, payment);
+    //         IAuditToken(auditToken).mint(address(this), payment);
+    //         emit LogStakingRewardsClaimed(msg.sender, payment);
+    //     }
+    // }
+
+
     function claimStakeRewards(bool deliver) public {
-        uint256 stakeRewards = stakeAmount[msg.sender];
-        uint256 powRewards = POWAmount[msg.sender];
-        uint256 refRewards = referralAmount[msg.sender];
+        uint256 stakeRewards = nodeOpStruct[msg.sender].stakeAmount;
+        uint256 powRewards = nodeOpStruct[msg.sender].POWAmount;
+        uint256 refRewards = nodeOpStruct[msg.sender].referralAmount;
 
         uint256 payment = stakeRewards.add(powRewards).add(refRewards);
-        stakeAmount[msg.sender] = 0;
-        POWAmount[msg.sender] = 0;
-        referralAmount[msg.sender] = 0;
+        nodeOpStruct[msg.sender].stakeAmount= 0;
+        nodeOpStruct[msg.sender].POWAmount = 0;
+        nodeOpStruct[msg.sender].referralAmount = 0;
 
         if (deliver) {
             IAuditToken(auditToken).mint(msg.sender, payment);
@@ -252,10 +401,18 @@ contract NodeOperations is AccessControl {
         }
     }
 
-    function increaseStakeRewards(address validator) public isController {
+    // function increaseStakeRewards(address validator) public isController {
+    //     uint256 amount = memberHelpers.returnDepositAmount(validator).div(stakeRatio);
+
+    //     stakeAmount[validator] = stakeAmount[validator].add(amount);
+    //     emit LogStakeRewardsIncreased(validator, amount);
+    // }
+
+     function increaseStakeRewards(address validator) public isController {
         uint256 amount = memberHelpers.returnDepositAmount(validator).div(stakeRatio);
 
-        stakeAmount[validator] = stakeAmount[validator].add(amount);
+        // [validator] = stakstakeAmounteAmount[validator].add(amount);
+        nodeOpStruct[validator].stakeAmount = nodeOpStruct[validator].stakeAmount.add(amount);
         emit LogStakeRewardsIncreased(validator, amount);
     }
 
