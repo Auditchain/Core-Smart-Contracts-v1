@@ -189,6 +189,13 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   await memberHelpers.stake(validatorAmountMin, { from: dataSubscriber });
 
+  await nodeOperations.toggleNodeOperator({ from: validator1 });
+  await nodeOperations.toggleNodeOperator({ from: validator2 });
+  await nodeOperations.toggleNodeOperator({ from: validator3 });
+  await nodeOperations.toggleNodeOperator({ from: validator4 });
+
+
+
 
 
   await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise2 });
@@ -363,9 +370,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   // console.log("staking rewards:", stakingRewards.toString());
 
 
-  await nodeOperations.toggleNodeOperator({ from: validator1 });
+  // await nodeOperations.toggleNodeOperator({ from: validator1 });
 
-  await nodeOperations.delegate(validator1, { from: validator3 });
+  // await nodeOperations.delegate(validator1, { from: validator3 });
 
   let list = await nodeOperations.returnPoolList(validator1);
 
