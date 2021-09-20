@@ -300,8 +300,10 @@ contract NodeOperations is AccessControl {
     // }
 
      function delegate(address delegatee) public {
+
+        require(!nodeOpStruct[msg.sender].isNodeOperator, "NodeOperations:delegagte - You are a node operator, first cancel this role and then delegate again. ");
         require(!nodeOpStruct[delegatee].isDelegating[msg.sender], 
-          "NodeOperations:delegate - You have are already delegating to this member."
+          "NodeOperations:delegate - You are already delegating to this member."
         );
 
         if (nodeOpStruct[msg.sender].delegatorLink != address(0x0)) 
