@@ -63,10 +63,10 @@ let ipfs = ipfsAPI('ipfs.infura.io', 5001, {
  */
 async function verifyPacioli(metadatatUrl, trxHash) {
 
-    
+
     const result = await ipfs.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
-    
+
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
 
     const pacioliUrl = "https://pacioli.auditchain.finance/analyseReport_";
@@ -196,9 +196,13 @@ async function startProcess() {
     let myArgs = process.argv.slice(2);
     const owner = providerForUpdate.addresses[Number(myArgs[0])];
 
-    const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call();
-    // const nodeOperator = true;
-    if (nodeOperator) {
+    // const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call();
+    const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
+
+    const isNodeOperator = validationStruct.isNodeOperator;
+    const isDelegating = validationStruct.isDelegating;
+
+    if (isNodeOperator && !isDelegating) {
         console.log("Process started.");
         console.log("Transaction count:", await web3.eth.getTransactionCount(owner));
 
@@ -206,20 +210,20 @@ async function startProcess() {
         nonCohort.events.ValidationInitialized({})
             .on('data', async function (event) {
 
-                    const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
-                    depositAmountBefore = validationStruct.POWAmount;
+                const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
+                depositAmountBefore = validationStruct.POWAmount;
 
-                    // depositAmountBefore = await nodeOperations.methods.POWAmount(owner).call();
-                    let myArgs = process.argv.slice(2);
-                    console.log('myArgs: ', myArgs);
-                    // console.log("transaction hash:", event.transactionHash);
-                    const trxHash = event.transactionHash;
-                    const reportPacioliIPFSUrl = await verifyPacioli(event.returnValues.url, trxHash);
-                    const isValid = await getReportResult(reportPacioliIPFSUrl, trxHash);
-                    const metaDataLink = await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash);
-                    await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, Number(myArgs[0]), trxHash, metaDataLink)
+                // depositAmountBefore = await nodeOperations.methods.POWAmount(owner).call();
+                let myArgs = process.argv.slice(2);
+                console.log('myArgs: ', myArgs);
+                // console.log("transaction hash:", event.transactionHash);
+                const trxHash = event.transactionHash;
+                const reportPacioliIPFSUrl = await verifyPacioli(event.returnValues.url, trxHash);
+                const isValid = await getReportResult(reportPacioliIPFSUrl, trxHash);
+                const metaDataLink = await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash);
+                await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, Number(myArgs[0]), trxHash, metaDataLink)
 
-                })
+            })
             .on('error', console.error);
 
         // Wait for completion of validation and determine earnings 
@@ -229,7 +233,7 @@ async function startProcess() {
 
                 const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
                 // console.log("validation Struct:", validationStruct);
-                let balanceAfter= validationStruct.POWAmount;
+                let balanceAfter = validationStruct.POWAmount;
 
                 // const balanceAfter = await nodeOperations.methods.POWAmount(owner).call()
                 let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
@@ -238,6 +242,9 @@ async function startProcess() {
             .on('error', console.error);
 
     }
+    else if (!isDelegating)
+        console.log("You can't validate because you are delegating your stake to another member. To become validator, register as Node Operator first.");
+
     else
         console.log("You can't validate because you are not a node operator. Please register as node operator first and restart this process.");
 
