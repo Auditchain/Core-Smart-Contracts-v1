@@ -313,6 +313,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Cohort:validate - This document has been validated already.");
         // require(nodeOperations.nodeOpStruct(msg.sender).delegatorLink == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
         require(nodeOperations.returnDelegatorLink(msg.sender) == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
+        require(nodeOperations.isNodeOperator(msg.sender), "Validations:validate - you are not a node operator");
         validation.validatorChoice[msg.sender] = decision;
         validation.validatorTime[msg.sender] = block.timestamp;
         validation.validationUrl[msg.sender] = valUrl;
