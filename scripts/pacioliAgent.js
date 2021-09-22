@@ -16,6 +16,8 @@ const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
 const MEMBER_HELPERS = require('../build/contracts/MemberHelpers.json');
 const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
 
+//TODO: this module is still copied from https://github.com/Auditchain/Reporting-Validation-Engine/tree/main/clientExamples/pacioliClient:
+const pacioli = require('./pacioliClient'); 
 
 // import ethereum connection strings. 
 const ropsten_infura_server = process.env.ROPSTEN_INFURA_SERVER;
@@ -69,10 +71,30 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
 
-    const pacioliUrl = "https://pacioli.auditchain.finance/analyseReport_";
-    const formatString = "?format=json&apiToken=dummyToken&isLinkbase=false&url=";
-    const axiosToCall = pacioliUrl + formatString + reportUrl;
-    const reportContent = (await axios.get(axiosToCall)).data;
+    const reportContent = await pacioli.callRemote(reportUrl,trxHash,true);
+    //const reportContent = await pacioli.callLocal(reportUrl,trxHash,false); 
+    /*BUG: somehow callLocal is causing this:
+        [2 0x4baa71c73c76876d8a6441b082aede53c9ed7259d7a32d1895cac17313144742]  Saving Pacioli Results to IPFS
+        Error: CONNECTION ERROR: The connection got closed with the close code `1006` and the following reason string `Socket Error: read ECONNRESET`
+            at Object.ConnectionError (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-helpers/lib/errors.js:66:23)
+            at Object.ConnectionCloseError (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-helpers/lib/errors.js:53:25)
+            at /Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-requestmanager/lib/index.js:119:50
+            at Map.forEach (<anonymous>)
+            at WebsocketProvider.disconnect (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-requestmanager/lib/index.js:118:37)
+            at WebsocketProvider.emit (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/eventemitter3/index.js:181:35)
+            at WebsocketProvider._onClose (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-providers-ws/lib/index.js:152:10)
+            at W3CWebSocket._dispatchEvent [as dispatchEvent] (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/yaeti/lib/EventTarget.js:115:12)
+            at W3CWebSocket.onClose (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/websocket/lib/W3CWebSocket.js:228:10)
+            at WebSocketConnection.<anonymous> (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/websocket/lib/W3CWebSocket.js:201:17)
+            at WebSocketConnection.emit (events.js:314:20)
+            at WebSocketConnection.handleSocketClose (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/websocket/lib/WebSocketConnection.js:389:14)
+            at Socket.emit (events.js:314:20)
+            at TCP.<anonymous> (net.js:676:12) {
+        code: 1006,
+        reason: 'Socket Error: read ECONNRESET'
+        }
+    */
+
     const jsonStringFromObject = JSON.stringify(reportContent);
     const bufRule = Buffer.from(jsonStringFromObject);
 

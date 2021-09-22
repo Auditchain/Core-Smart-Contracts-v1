@@ -1,0 +1,15 @@
+{
+  "name": "pacioliClient",
+  "version": "1.0.0",
+  "description": "simple API to access Pacioli",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Miguel Calejo",
+  "license": "Copyright Auditchain 2021, all rights reserved",
+  "dependencies": {
+    "axios": "^0.21.4"
+  }
+}
