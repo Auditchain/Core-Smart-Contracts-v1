@@ -73,7 +73,20 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
     const reportContent = await pacioli.callRemote(reportUrl,trxHash,true);
     //const reportContent = await pacioli.callLocal(reportUrl,trxHash,false); 
-    /*BUG: somehow callLocal is causing this:
+
+    const jsonStringFromObject = JSON.stringify(reportContent);
+
+    const bufRule = Buffer.from(jsonStringFromObject);
+
+    console.log("[2 " + trxHash + "]" + "  Saving Pacioli Results to IPFS");
+
+    const reportFile = [
+        {
+            path: "Pacioli.json",
+            content: bufRule
+        }];
+    const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true }); // incompatible with callLocal!!!
+        /*BUG: somehow callLocal is causing the following to be thrown in the line ABOVE:
         [2 0x4baa71c73c76876d8a6441b082aede53c9ed7259d7a32d1895cac17313144742]  Saving Pacioli Results to IPFS
         Error: CONNECTION ERROR: The connection got closed with the close code `1006` and the following reason string `Socket Error: read ECONNRESET`
             at Object.ConnectionError (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-helpers/lib/errors.js:66:23)
@@ -95,17 +108,6 @@ async function verifyPacioli(metadatatUrl, trxHash) {
         }
     */
 
-    const jsonStringFromObject = JSON.stringify(reportContent);
-    const bufRule = Buffer.from(jsonStringFromObject);
-
-    console.log("[2 " + trxHash + "]" + "  Saving Pacioli Results to IPFS");
-
-    const reportFile = [
-        {
-            path: "Pacioli.json",
-            content: bufRule
-        }];
-    const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true });
     const pacioliIPFS = resultPacioli[1].hash + '/' + resultPacioli[0].path;
 
     console.log("[3 " + trxHash + "]" + "  Pacioli report saved at: " + ipfsBase + pacioliIPFS);

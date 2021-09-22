@@ -18,8 +18,8 @@ const pacioli = function(){
         "ARELLE_DIR":"/Users/mc/git/Arelle",
         // needed only if Pacioli saves to IPFS:
         "IPFS_NODE":"https://ipfs.infura.io:5001",
-        "IPFS_USER":"1xAgPuFTqkyjDxITICfVMkGrALU",
-        "IPFS_PASSWORD":"862f9548e472977b5395e9f52e9cc164",
+        "IPFS_USER":"UU",
+        "IPFS_PASSWORD":"PP",
         "IPFS_GATEWAY":"https://ipfs.infura.io/ipfs/"
     }, process.env);
     const PUBLIC_URL_ROOT = ENV.PACIOLI_HOST;
