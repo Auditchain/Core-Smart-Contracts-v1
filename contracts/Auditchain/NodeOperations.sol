@@ -21,15 +21,7 @@ contract NodeOperations is AccessControl {
     address public auditToken;          
 
     address[] public nodeOperators;
-
-    // mapping(address => bool) public isNodeOperator;
-    // mapping(address => address[]) public delegations;
-    // mapping(address => mapping(address => bool)) isDelegating;
-    // mapping(address => address) public delegatorLink;
-    // mapping(address => uint256) public stakeAmount;
-    // mapping(address => uint256) public referralAmount;
-    // mapping(address => uint256) public POWAmount;
-    // mapping(address => bool) public noDelegations;
+    address[] public CPAs;
 
     uint256 public stakeRatio = 1000;
     uint256 public stakeRatioDelegating = 1100;
@@ -45,8 +37,9 @@ contract NodeOperations is AccessControl {
         uint256 stakeAmount;
         uint256 referralAmount;
         uint256 POWAmount;
-        bool noDelegations;
         address delegatorLink;
+        bool noDelegations;
+        bool isCPA;
     }
 
     mapping(address => nodeOperator) public nodeOpStruct;
@@ -59,6 +52,10 @@ contract NodeOperations is AccessControl {
 
     event LogNodeOperatorCreated(address indexed user);
     event LogNodeOperatorCancelled(address indexed user);
+    event LogCPACreated(address indexed user);
+    event LogCPACancelled(address indexed user);
+    event LogNoFollowSet(address indexed user);
+    event LogNoFollowRemoved(address indexed user);
     event LogRemoveDelegation(address indexed delegating, address indexed delegatee);
     event LogDelegation(address indexed delegating, address indexed newDelegatee);
     event LogDelegatedStakeRewardsIncreased(address indexed delegating, uint256 amount);
@@ -97,7 +94,6 @@ contract NodeOperations is AccessControl {
         stakeRatioDelegating = _newRatio;
 
         emit LogGovernanceUpdate(_newRatio, "updateStakeRatioDelegating");
-
     }
 
     function updateStakingRatioReferral(uint256 _newRatio) public isSetter() {
@@ -105,7 +101,6 @@ contract NodeOperations is AccessControl {
         require(_newRatio != 0, "NodeOperations:updateStakingRatioReferral - New value for the stake ratio can't be 0");
         stakingRatioReferral = _newRatio;
         emit LogGovernanceUpdate(_newRatio, "updateStakingRatioReferral");
-
     }
 
     function updateStakeRatio(uint256 _newRatio) public isSetter() {
@@ -113,7 +108,6 @@ contract NodeOperations is AccessControl {
         require(_newRatio != 0, "NodeOperations:updateStakeRatio - New value for the stake ratio can't be 0");
         stakeRatio = _newRatio;
         emit LogGovernanceUpdate(_newRatio, "UpdateStakeRatio");
-
     }
 
     function updatePOWFee(uint256 _newFee) public isSetter() {
@@ -121,7 +115,6 @@ contract NodeOperations is AccessControl {
         require(_newFee != 0, "NodeOperations:updatePOWFee - New value for the POWFee can't be 0");
         POWFee = _newFee;
         emit LogGovernanceUpdate(_newFee, "updatePOWFee");
-
     }
 
     function returnDelegatorLink(address operator) public view returns (address){
@@ -134,23 +127,8 @@ contract NodeOperations is AccessControl {
         return nodeOpStruct[operator].isNodeOperator;
     }
 
-    
 
-    // function returnPoolList(address poolOperator)public view returns (address[] memory, uint256[] memory) {
-
-    //     address[] memory poolUsers = new address[](delegations[poolOperator].length  );
-    //     uint256[] memory poolUsersStakes = new uint256[](delegations[poolOperator].length );
-
-    //     for (uint256 i = 0; i< delegations[poolOperator].length ;i++) {
-    //         poolUsers[i]= delegations[poolOperator][i];
-    //         poolUsersStakes[i] = memberHelpers.returnDepositAmount(poolUsers[i]);
-
-    //     }
-    //     return (poolUsers, poolUsersStakes);
-    // }
-
-
-     function returnPoolList(address poolOperator)public view returns (address[] memory, uint256[] memory) {
+    function returnPoolList(address poolOperator)public view returns (address[] memory, uint256[] memory) {
 
         address[] memory poolUsers = new address[](nodeOpStruct[poolOperator].delegations.length  );
         uint256[] memory poolUsersStakes = new uint256[](nodeOpStruct[poolOperator].delegations.length );
@@ -164,36 +142,63 @@ contract NodeOperations is AccessControl {
     }
 
 
-    // function toggleNodeOperatorOld() public {
-
-    //     if (isNodeOperator[msg.sender]){
-    //         isNodeOperator[msg.sender] = false;
-    //         removeNodeOperator();
-    //         removeAlldelegations();
-    //         emit LogNodeOperatorCreated(msg.sender);
-    //     }
-    //     else{
-    //         isNodeOperator[msg.sender] = true;
-    //         addNodeOperator();
-    //         emit LogNodeOperatorCancelled(msg.sender);
-    //     }
-    // }
-
     function toggleNodeOperator( ) public {
 
         if (nodeOpStruct[msg.sender].isNodeOperator){
             nodeOpStruct[msg.sender].isNodeOperator = false;
             removeNodeOperator();
             removeAlldelegations();
-            emit LogNodeOperatorCreated(msg.sender);
+            emit LogCPACreated(msg.sender);
         }
         else{
             nodeOpStruct[msg.sender].isNodeOperator = true;
-            addNodeOperator();
+            nodeOperators.push(msg.sender);
+            emit LogCPACancelled(msg.sender);
+        }
+    }
+
+    function toggleCPA( ) public {
+
+        if (nodeOpStruct[msg.sender].isCPA){
+            nodeOpStruct[msg.sender].isCPA = false;
+            removeCPA();
+            //TODO:  add remove cohort 
+            emit LogNodeOperatorCreated(msg.sender);
+        }
+        else{
+            nodeOpStruct[msg.sender].isCPA = true;
+            CPAs.push(msg.sender);
             emit LogNodeOperatorCancelled(msg.sender);
         }
     }
 
+    function toggleNoDelegate( ) public {
+
+        if (nodeOpStruct[msg.sender].noDelegations){
+            nodeOpStruct[msg.sender].noDelegations = false;
+            removeCPA();
+            emit LogNoFollowRemoved(msg.sender);
+        }
+        else{
+            removeAlldelegations();
+            nodeOpStruct[msg.sender].noDelegations = true;
+            emit LogNoFollowSet(msg.sender);
+        }
+    }
+
+
+    function removeCPA() internal {
+
+        for (uint256 i= 0; i < CPAs.length; i++) {
+
+            if (CPAs[i] == msg.sender){
+
+                CPAs[i] = CPAs[CPAs.length - 1];
+                CPAs.pop();
+                i = CPAs.length;
+            }
+        }
+    }
 
     function removeNodeOperator() internal {
 
@@ -208,29 +213,17 @@ contract NodeOperations is AccessControl {
         }
     }
 
-    
-
-
-    function addNodeOperator() internal {
-
-        nodeOperators.push(msg.sender);
-
-    } 
 
     function returnNodeOperators() public view returns (address[] memory) {
 
         return nodeOperators;
     }
 
-    // function removeAlldelegations() public {
+    function returnCPAs() public view returns (address[] memory) {
 
-    //     for (uint256 i = delegations[msg.sender].length  ; i > 0; i--) {
-    //         address delegating = delegations[msg.sender][i-1];
-    //         delegations[msg.sender].pop();   
-    //         isDelegating[msg.sender][delegating] = false;
-    //         delegatorLink[delegating] = address(0x0);
-    //     }
-    // }
+        return CPAs;
+    }
+    
 
     function removeAlldelegations() public {
 
@@ -241,26 +234,6 @@ contract NodeOperations is AccessControl {
             nodeOpStruct[delegating].delegatorLink = address(0x0);
         }
     }
-
-    // function removeDelegation() public {
-
-    //     address oldDelegatee = delegatorLink[msg.sender];
-
-    //     require(oldDelegatee != address(0x0), "MemberHelpers:removeDelegation You are not delegating your stake yet.");
-
-
-    //     for (uint256 i = 0; i < delegations[oldDelegatee].length; i++) {
-    //         if (delegations[oldDelegatee][i] == msg.sender) {
-    //             delegations[oldDelegatee][i] = delegations[oldDelegatee][delegations[oldDelegatee].length - 1];
-    //             delegations[oldDelegatee].pop();
-    //             isDelegating[oldDelegatee][msg.sender] = false;
-    //             delegatorLink[msg.sender] = address(0x0);
-    //             i= delegations[oldDelegatee].length;
-    //         }
-    //     }
-
-    //     emit LogRemoveDelegation(msg.sender, oldDelegatee);
-    // }
 
 
      function removeDelegation() public {
@@ -283,21 +256,6 @@ contract NodeOperations is AccessControl {
         emit LogRemoveDelegation(msg.sender, oldDelegatee);
     }
 
-    // function delegate(address delegatee) public {
-    //     require(
-    //         !isDelegating[delegatee][msg.sender],
-    //         "MemberHelpers:delegatge - You are already delegating to this member."
-    //     );
-
-    //     if (delegatorLink[msg.sender] != address(0x0)) 
-    //         removeDelegation();
-
-    //     delegations[delegatee].push(msg.sender);
-    //     delegatorLink[msg.sender] = delegatee;
-    //     isDelegating[delegatee][msg.sender] = true;
-
-    //     emit LogDelegation(msg.sender, delegatee);
-    // }
 
      function delegate(address delegatee) public {
 
@@ -317,32 +275,10 @@ contract NodeOperations is AccessControl {
     }
 
 
-
-    // function increasePOWRewards(address validator, uint256 amount) public isController() {
-    //         POWAmount[validator] = POWAmount[validator].add(amount);
-    // }
-
     function increasePOWRewards(address validator, uint256 amount) public isController() {
             nodeOpStruct[validator].POWAmount = nodeOpStruct[validator].POWAmount.add(amount);
     }
 
-    // function increaseDelegatedStakeRewards(address validator) public isController() {
-    //     uint256 referringReward;
-
-    //     for (uint256 i = 0; i < delegations[validator].length; i++) {
-    //         address delegating = delegations[validator][i];
-    //         uint256 amount = memberHelpers.returnDepositAmount(delegating).div(stakeRatioDelegating);
-    //         stakeAmount[delegating] = stakeAmount[delegating].add(amount);
-    //         referringReward = referringReward.add(memberHelpers.returnDepositAmount(delegating).div(stakingRatioReferral)
-    //         );
-    //         emit LogDelegatedStakeRewardsIncreased(delegating, amount);
-    //     }
-
-    //     if (referringReward > 0) {
-    //         referralAmount[validator] = referralAmount[validator].add(referringReward);
-    //         emit LogReferralStakeRewardsIncreased(validator, referringReward);
-    //     }
-    // }
 
     function increaseDelegatedStakeRewards(address validator) public isController() {
         uint256 referringReward;
@@ -361,26 +297,6 @@ contract NodeOperations is AccessControl {
             emit LogReferralStakeRewardsIncreased(validator, referringReward);
         }
     }
-
-    // function claimStakeRewards(bool deliver) public {
-    //     uint256 stakeRewards = stakeAmount[msg.sender];
-    //     uint256 powRewards = POWAmount[msg.sender];
-    //     uint256 refRewards = referralAmount[msg.sender];
-
-    //     uint256 payment = stakeRewards.add(powRewards).add(refRewards);
-    //     stakeAmount[msg.sender] = 0;
-    //     POWAmount[msg.sender] = 0;
-    //     referralAmount[msg.sender] = 0;
-
-    //     if (deliver) {
-    //         IAuditToken(auditToken).mint(msg.sender, payment);
-    //         emit LogStakingRewardsTransferredOut(msg.sender, payment);
-    //     } else {
-    //         memberHelpers.increaseDeposit(msg.sender, payment);
-    //         IAuditToken(auditToken).mint(address(this), payment);
-    //         emit LogStakingRewardsClaimed(msg.sender, payment);
-    //     }
-    // }
 
 
     function claimStakeRewards(bool deliver) public {
@@ -403,12 +319,6 @@ contract NodeOperations is AccessControl {
         }
     }
 
-    // function increaseStakeRewards(address validator) public isController {
-    //     uint256 amount = memberHelpers.returnDepositAmount(validator).div(stakeRatio);
-
-    //     stakeAmount[validator] = stakeAmount[validator].add(amount);
-    //     emit LogStakeRewardsIncreased(validator, amount);
-    // }
 
      function increaseStakeRewards(address validator) public isController {
         uint256 amount = memberHelpers.returnDepositAmount(validator).div(stakeRatio);
