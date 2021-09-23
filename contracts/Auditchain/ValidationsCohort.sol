@@ -72,7 +72,7 @@ contract ValidationsCohort is Validations {
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
         (bool ivited, bool accepted) = cohortFactory.isValidatorInvited(validation.requestor, msg.sender, uint256(validation.auditType));
-        require(ivited && accepted, "Cohort:validate - validator is not part of the cohort.");
+        require(ivited && accepted, "ValidationsCohort:validate - validator is not part of the cohort.");
 
         super.validate(documentHash, validationTime, decision, valUrl);
         
