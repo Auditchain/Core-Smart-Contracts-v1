@@ -239,7 +239,7 @@ contract CohortFactory is  AccessControl {
         address[] memory validatorsList = new address[](returnInvitationCount(enterprise, AuditTypes(audit)));
         uint k;
         for (uint i=0; i < invitations[enterprise].length; ++i ){
-            if (invitations[enterprise][i].audits == AuditTypes(audit) && invitations[enterprise][i].acceptanceDate > 0){
+            if (uint256(invitations[enterprise][i].audits) == audit && invitations[enterprise][i].acceptanceDate > 0){
                 validatorsList[k] = invitations[enterprise][i].validator;
                 k++;
             }
