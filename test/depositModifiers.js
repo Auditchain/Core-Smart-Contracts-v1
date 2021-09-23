@@ -221,7 +221,7 @@ contract("Member Helper contract", (accounts) => {
             await token.approve(memberHelpers.address, accessFee, { from: dataSubscriber });
 
             const balanceBefore = await token.balanceOf(platformAccount);
-            let result = await memberHelpers.dataSubscriberPayment(enterprise1, 0, { from: dataSubscriber });
+            let result = await depositMo.dataSubscriberPayment(enterprise1, 0, { from: dataSubscriber });
             assert.lengthOf(result.logs, 4);
 
             let event = result.logs[3];
