@@ -81,7 +81,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
      * @param url - locatoin of the file on IPFS or other decentralized file storage
      * @param auditType - type of auditing 
      */
-    function initializeValidation(bytes32 documentHash, string memory url, AuditTypes auditType, bool isCohort) public virtual {
+    function initializeValidation(bytes32 documentHash, string memory url, AuditTypes auditType, bool isCohort) internal virtual {
         require(documentHash.length > 0, "NoCohort:initializeValidation - Document hash value can't be 0");
 
         uint256 validationTime = block.timestamp;
