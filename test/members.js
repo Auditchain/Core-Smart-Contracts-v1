@@ -297,7 +297,7 @@ contract("Member contract", (accounts) => {
         it("It should succeed. Reward per validation was updated by authorized user.", async () => {
 
             await members.grantRole(SETTER_ROLE, admin, { from: admin });
-            await members.updateRewards(auditTokenMin, { from: admin });
+            await members.updateTokensPerValidation(auditTokenMin, { from: admin });
             let newReward = await members.amountTokensPerValidation();
             assert.strictEqual(newReward.toString(), auditTokenMin.toString());
         })
@@ -306,7 +306,7 @@ contract("Member contract", (accounts) => {
         it("It should fail. Reward per validation was updated by unauthorized user.", async () => {
 
             try {
-                await members.updateRewards(auditTokenMin, { from: enterprise1 });
+                await members.updateTokensPerValidation(auditTokenMin, { from: enterprise1 });
             }
             catch (error) {
                 ensureException(error);
