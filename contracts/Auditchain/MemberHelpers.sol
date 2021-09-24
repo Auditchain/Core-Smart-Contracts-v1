@@ -94,9 +94,7 @@ contract MemberHelpers is AccessControl {
      */
     function redeem(uint256 amount) public {
         if (members.userMap(msg.sender, Members.UserType(0))) {
-            uint256 outstandingVal = validations.outstandingValidations(
-                msg.sender
-            );
+            uint256 outstandingVal = validations.outstandingValidations(msg.sender);
 
             if (outstandingVal > 0)
                 // div(1e4) to adjust for four decimal points
