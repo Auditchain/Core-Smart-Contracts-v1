@@ -10,7 +10,7 @@ let ipfsAPI = require("ipfs-api");
 let BN = require("big-number");
 
 let HDWalletProvider = require('@truffle/hdwallet-provider');
-let dotenv = require('dotenv').config({ path: './.env' })
+require('dotenv').config({ path: '../.env' }); // update process.env
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
 const MEMBER_HELPERS = require('../build/contracts/MemberHelpers.json');
@@ -35,9 +35,7 @@ const nonCohortAddress = process.env.VALIDATIONS_NO_COHORT_ADDRESS;
 const memberHelpersAddress = process.env.MEMBER_HELPERS_ADDRESS;
 const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
 
-
-
-const provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
+const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
 
 const providerForUpdate = new HDWalletProvider(mnemonic, local_host); // change to main_infura_server or another testnet. 
@@ -218,6 +216,7 @@ async function awardRewards() {
 async function startProcess() {
 
     let myArgs = process.argv.slice(2);
+
     const owner = providerForUpdate.addresses[Number(myArgs[0])];
 
     // const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call();
@@ -238,7 +237,6 @@ async function startProcess() {
                 depositAmountBefore = validationStruct.POWAmount;
 
                 // depositAmountBefore = await nodeOperations.methods.POWAmount(owner).call();
-                let myArgs = process.argv.slice(2);
                 console.log('myArgs: ', myArgs);
                 // console.log("transaction hash:", event.transactionHash);
                 const trxHash = event.transactionHash;
@@ -253,8 +251,6 @@ async function startProcess() {
         // Wait for completion of validation and determine earnings 
         nonCohort.events.RequestExecuted({})
             .on('data', async function (event) {
-                const owner = providerForUpdate.addresses[Number(myArgs[0])];
-
                 const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
                 // console.log("validation Struct:", validationStruct);
                 let balanceAfter = validationStruct.POWAmount;
