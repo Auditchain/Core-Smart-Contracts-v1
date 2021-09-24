@@ -77,7 +77,7 @@ contract("Member Helper contract", (accounts) => {
         await depositModifiers.grantRole(CONTROLLER_ROLE, validation.address, { from: admin });
         await token.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
 
-        await memberHelpers.setValidation(validation.address);
+        // await memberHelpers.setValidation(validation.address, {from:admin});
 
         tokenPerValidation = await members.amountTokensPerValidation();
 

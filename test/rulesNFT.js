@@ -1,5 +1,8 @@
+require('source-map-support').install();
 import { assert } from 'chai';
 import { en } from 'ethers/wordlists';
+
+
 
 
 const NFT = artifacts.require('./RulesERC721Token.sol');

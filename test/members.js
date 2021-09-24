@@ -332,6 +332,27 @@ contract("Member contract", (accounts) => {
             }
         })
 
+        it("It should succeed. Quorum amount was updated by authorized user.", async () => {
+
+
+            await members.grantRole(SETTER_ROLE, admin, { from: admin });
+            await members.updateQuorum("20", { from: admin });
+            let newQuorum = await members.requiredQuorum();
+            assert.strictEqual(newQuorum.toString(), "20");
+        })
+
+
+        it("It should fail. Quorum amount was updated by unauthorized user.", async () => {
+
+            try {
+                await members.updateQuorum("20", { from: admin });
+                expectRevert();
+            }
+            catch (error) {
+                ensureException(error);
+            }
+        })
+
 
 
     })
