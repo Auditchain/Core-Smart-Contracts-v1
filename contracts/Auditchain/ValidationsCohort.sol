@@ -37,11 +37,10 @@ contract ValidationsCohort is Validations {
    function checkIfRequestorHasFunds(address requestor) public override view returns (bool) {
 
        if (outstandingValidations[requestor] > 0 )
-        return ( memberHelpers.deposits(requestor) > members
-                    .amountTokensPerValidation()
+        return ( memberHelpers.deposits(requestor) > members.amountTokensPerValidation()
                     .mul(outstandingValidations[requestor])
                     .mul(members.enterpriseMatch())
-                    .div(1e4));
+                    .div(1e2));
         else if (memberHelpers.deposits(requestor) == 0)
             return false;
         else
@@ -72,7 +71,7 @@ contract ValidationsCohort is Validations {
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
         (bool ivited, bool accepted) = cohortFactory.isValidatorInvited(validation.requestor, msg.sender, uint256(validation.auditType));
-        require(ivited && accepted, "ValidationsCohort:validate - validator is not part of the cohort.");
+        require(ivited && accepted, "Cohort:validate - Validator is not part of the cohort or document Hash is invalid.");
 
         super.validate(documentHash, validationTime, decision, valUrl);
         
