@@ -3,7 +3,7 @@ const pacioli = function(){
     const os = require('os');
     const fs = require('fs');
     const https = require('https');
-    const { execSync } = require('child_process');
+    const { exec } = require('child_process');
 
     // make sure to have axios installed in your node_modules directory:
     const axios = require("axios");
@@ -59,11 +59,30 @@ const pacioli = function(){
             ];
             var theCommand = ENV.PROLOG_COMMAND+" "+ARGS.join(" ");
             // console.log("theCommand: "+theCommand);
-            var S = execSync(theCommand, {cwd:ENV.PACIOLI_DIRECTORY, env:Object.assign(ENV,{'PUBLIC_URL_ROOT':PUBLIC_URL_ROOT})});
+
+            return new Promise(function(resolve,reject){
+                const P = exec(theCommand, {cwd:ENV.PACIOLI_DIRECTORY, env:Object.assign(ENV,{'PUBLIC_URL_ROOT':PUBLIC_URL_ROOT})});
+                P.on('close', function(code,stdout,stderr){
+                    //console.log("Exit code: "+code);console.log("stdout: "+stdout);console.log("stderr: "+stderr);
+                    if (code!=0) 
+                        reject(code + stderr)
+                    else {
+                        var result = JSON.parse(fs.readFileSync(tmpFile));
+                        fs.unlink(tmpFile,function(){});
+                        resolve(result); 
+                    }
+                });
+                P.on('error', function(err){
+                    reject(err);
+                })
+            });
+
+            // var S = execSync(theCommand, {cwd:ENV.PACIOLI_DIRECTORY, env:Object.assign(ENV,{'PUBLIC_URL_ROOT':PUBLIC_URL_ROOT})});
+            
             // console.log("Output: "+S);
-            var result = JSON.parse(fs.readFileSync(tmpFile));
-            fs.unlink(tmpFile,function(){});
-            return result;
+            // var result = {foo:"bar"};
+            
+            // return result;
         },
         callRemote: async function(REPORT_URL,MY_ADDRESS='someAddress',SaveToIPFS=false){
             var axiosToCall = ENV.PACIOLI_HOST+
