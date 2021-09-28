@@ -20,7 +20,7 @@ if (!MNEMONIC || !INFURA_KEY) {
 module.exports = {
   networks: {
     development: {
-      host: "localhost",
+      host: "127.0.0.1",
       port: 8545,
       gas: 0x6691b7,
       gasPrice: 0x01,

@@ -1,7 +1,6 @@
 const util = require('util')
 
 const TOKEN = artifacts.require('../AuditToken');
-const MIGRATION_AGENT = artifacts.require('../MigrationAgentMock');
 
 import {
     ensureException,
@@ -123,62 +122,6 @@ contract("ERC20 Auditchain Token", (accounts) => {
     }
     )
 
-    describe("Migrate", async () => {
-
-        it('MigrationAgent: Should migrate all tokens of holder1. ', async () => {
-
-            let migrationAgent = await MIGRATION_AGENT.new({
-                from: owner
-            });
-
-            await token.setMigrationAgent(migrationAgent.address);
-
-            let result = await token.migrate({
-                from: holder1
-            })
-
-            let oldBalance = await token.balanceOf(holder1);
-
-            assert.equal(oldBalance, 0);
-
-            let newBalance = await migrationAgent.balances(holder1, {
-                from: holder1
-            });
-            assert.equal(newBalance, transferFunds);
-        })
-
-
-
-        it('MigrationAgent: Should fail migrating because Migration Agent is not configured. ', async () => {
-
-            try {
-
-                await token.migrate({
-                    from: holder1
-                })
-
-            } catch (error) {
-                ensureException(error);
-            }
-
-        })
-
-        it('MigrationAgent: Should fail setting new Migration Agent due to unautharized attempt. ', async () => {
-
-            try {
-
-                let migrationAgent = await MIGRATION_AGENT.new({
-                    from: holder1
-                });
-
-                await token.setMigrationAgent(migrationAgent.address, { from: holder1 });
-
-            } catch (error) {
-                ensureException(error);
-            }
-
-        })
-    })
 
 
     describe("transfer", async () => {
@@ -962,27 +905,6 @@ contract("ERC20 Auditchain Token", (accounts) => {
         })
 
 
-
-        it('should log Migrate after migrate()', async () => {
-
-            let migrationAgent = await MIGRATION_AGENT.new({
-                from: owner
-            });
-
-            await token.setMigrationAgent(migrationAgent.address);
-
-            let result = await token.migrate({
-                from: holder1
-            })
-
-            assert.lengthOf(result.logs, 4);
-
-            let event1 = result.logs[3];
-            assert.equal(event1.event, 'Migrate');
-            assert.equal(event1.args.from, holder1);
-            assert.equal(event1.args.to, migrationAgent.address);
-            assert.equal(event1.args.value, transferFunds);
-        })
 
         it('should log AddedLock after addLock()', async () => {
 

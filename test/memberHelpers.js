@@ -28,12 +28,12 @@ contract("Member Helper contract", (accounts) => {
 
     const admin = accounts[0];
     const enterprise1 = accounts[1];
-    const validator1 = accounts[2];
-    const validator2 = accounts[3];
-    const validator3 = accounts[4];
-    const dataSubscriber = accounts[5];
-    const platformAccount = accounts[6];
-    const validator4 = accounts[7];
+    const validator1 = accounts[3];
+    const validator2 = accounts[4];
+    const validator3 = accounts[5];
+    const dataSubscriber = accounts[6];
+    const platformAccount = accounts[7];
+    const validator4 = accounts[8];
 
 
     let members;
@@ -62,7 +62,7 @@ contract("Member Helper contract", (accounts) => {
         memberHelpers = await MEMBER_HELPERS.new(members.address, token.address)
 
         cohortFactory = await COHORTFACTORY.new(members.address, memberHelpers.address);
-        nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address);
+        nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address, members.address);
         depositModifiers = await DEPOSIT_MODIFIERS.new(members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address)
         validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address)
 
@@ -71,13 +71,15 @@ contract("Member Helper contract", (accounts) => {
         await nodeOperations.grantRole(CONTROLLER_ROLE, validation.address, { from: admin });
         await memberHelpers.grantRole(CONTROLLER_ROLE, validation.address, { from: admin });
         await memberHelpers.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
+        await memberHelpers.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
+
         await token.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
+        await depositModifiers.grantRole(CONTROLLER_ROLE, validation.address, { from: admin });
+        await token.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
+        await token.grantRole(CONTROLLER_ROLE, memberHelpers.address, { from: admin });
 
 
-
-
-
-        await memberHelpers.setValidation(validation.address);
+        await memberHelpers.setValidation(validation.address, {from:admin});
 
         tokenPerValidation = await members.amountTokensPerValidation();
 
@@ -89,141 +91,141 @@ contract("Member Helper contract", (accounts) => {
     })
 
 
-    // describe("Deploy", async () => {
+    describe("Deploy", async () => {
 
-    //     it("Should succeed. Initialize members with Audit token", async () => {
-    //         let tokenAddress = await memberHelpers.auditToken();
-    //         assert.strictEqual(tokenAddress, token.address);
+        it("Should succeed. Initialize members with Audit token", async () => {
+            let tokenAddress = await memberHelpers.auditToken();
+            assert.strictEqual(tokenAddress, token.address);
 
-    //     })
-    // })
+        })
+    })
 
-    // describe("Set Validation ", async () => {
+    describe("Set Validation ", async () => {
 
-    //     it("Should succeed. Validation address has been set", async () => {
+        it("Should succeed. Validation address has been set", async () => {
 
-    //         await memberHelpers.setValidation(validation.address);
-    //         let validationAddress = await memberHelpers.validations();
-    //         assert.strictEqual(validationAddress, validation.address);
-    //     })
+            await memberHelpers.setValidation(validation.address);
+            let validationAddress = await memberHelpers.validations();
+            assert.strictEqual(validationAddress, validation.address);
+        })
 
-    //     it("Should fail. Validation address has been set by not authorized user", async () => {
+        it("Should fail. Validation address has been set by not authorized user", async () => {
 
-    //         try {
-    //             await memberHelpers.setValidation(validation.address, { from: validator2 });
+            try {
+                await memberHelpers.setValidation(validation.address, { from: validator2 });
 
-    //             expectRevert()
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-    //     })
+                expectRevert()
+            } catch (error) {
+                ensureException(error);
+            }
+        })
 
-    //     it("Should fail. Validation address has been set by authorized user, but with address 0", async () => {
+        it("Should fail. Validation address has been set by authorized user, but with address 0", async () => {
 
-    //         try {
-    //             await memberHelpers.setValidation("0x0000000000000000000000000000000000000000", { from:admin });
+            try {
+                await memberHelpers.setValidation("0x0000000000000000000000000000000000000000", { from:admin });
 
-    //             expectRevert()
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-    //     })
-    // })
-
-
-    // describe("Stake by validators", async () => {
-
-    //     beforeEach(async () => {
-
-    //         // await members.addValidatorUser(validator1, "Validators 1", { from: admin });
-    //         const result = await members.addUser(validator1, "Validator 1", 1, { from: admin });
-
-    //         await token.transfer(validator1, auditTokenMin, { from: admin });
-    //         await token.approve(memberHelpers.address, auditTokenMin, { from: validator1 });
-    //     })
-
-    //     it("Should succeed. Validator stakes tokens.", async () => {
-
-    //         let result = await memberHelpers.stake(auditTokenMin, { from: validator1 });
-    //         assert.lengthOf(result.logs, 1);
-
-    //         let event = result.logs[0];
-    //         assert.equal(event.event, 'LogDepositReceived');
-    //         assert.strictEqual(event.args.from, validator1);
-    //         assert.strictEqual(event.args.amount.toString(), auditTokenMin);
-    //     })
-
-    //     it("Should fail. User hasn't been registered as validator.", async () => {
-    //         try {
-    //             await memberHelpers.stake(auditTokenMin, { from: validator2 });
-    //             expectRevert()
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-    //     })
-
-    //     it("Should fail. User contributed less than required amount.", async () => {
-
-    //         try {
-    //             let result = await memberHelpers.stake(auditTokenLesMin, { from: validator1 });
-    //             expectRevert()
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-
-    //     })
-
-    //     it("Should fail. User contributed more than required amount.", async () => {
-
-    //         await members.addUser(validator2, "Validator 2", 1, { from: admin });
-    //         await token.transfer(validator2, auditTokenMorMax, { from: admin });
-    //         await token.approve(memberHelpers.address, auditTokenMorMax, { from: validator2 });
-
-    //         try {
-    //             let result = await memberHelpers.stake(auditTokenMorMax, { from: validator2 });
-    //             expectRevert()
-
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-
-    //     })
-
-    // })
-
-    // describe("Deposit by Enterprise", async () => {
-
-    //     beforeEach(async () => {
-
-    //         await members.addUser(enterprise1, "Enterprise 1", 0, { from: admin });
-
-    //         await token.transfer(enterprise1, auditTokenMin, { from: admin });
-    //         await token.approve(memberHelpers.address, auditTokenMin, { from: enterprise1 });
-    //     })
-
-    //     it("Should succeed. Enterprise deposits tokens.", async () => {
-
-    //         let result = await memberHelpers.stake(auditTokenMin, { from: enterprise1 });
-    //         assert.lengthOf(result.logs, 1);
-
-    //         let event = result.logs[0];
-    //         assert.equal(event.event, 'LogDepositReceived');
-    //         assert.strictEqual(event.args.from, enterprise1);
-    //         assert.strictEqual(event.args.amount.toString(), auditTokenMin);
-    //     })
-
-    //     it("Should fail. User hasn't been registered as enterprise.", async () => {
-    //         try {
-    //             result = await memberHelpers.stake(auditTokenMin, { from: admin });
-    //             expectRevert()
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-    //     })
-    // })
+                expectRevert()
+            } catch (error) {
+                ensureException(error);
+            }
+        })
+    })
 
 
-    describe("Process daily earnings", async () => {
+    describe("Stake by validators", async () => {
+
+        beforeEach(async () => {
+
+            // await members.addValidatorUser(validator1, "Validators 1", { from: admin });
+            const result = await members.addUser(validator1, "Validator 1", 1, { from: admin });
+
+            await token.transfer(validator1, auditTokenMin, { from: admin });
+            await token.approve(memberHelpers.address, auditTokenMin, { from: validator1 });
+        })
+
+        it("Should succeed. Validator stakes tokens.", async () => {
+
+            let result = await memberHelpers.stake(auditTokenMin, { from: validator1 });
+            assert.lengthOf(result.logs, 1);
+
+            let event = result.logs[0];
+            assert.equal(event.event, 'LogDepositReceived');
+            assert.strictEqual(event.args.from, validator1);
+            assert.strictEqual(event.args.amount.toString(), auditTokenMin);
+        })
+
+        it("Should fail. User hasn't been registered as validator.", async () => {
+            try {
+                await memberHelpers.stake(auditTokenMin, { from: validator2 });
+                expectRevert()
+            } catch (error) {
+                ensureException(error);
+            }
+        })
+
+        it("Should fail. User contributed less than required amount.", async () => {
+
+            try {
+                let result = await memberHelpers.stake(auditTokenLesMin, { from: validator1 });
+                expectRevert()
+            } catch (error) {
+                ensureException(error);
+            }
+
+        })
+
+        it("Should fail. User contributed more than required amount.", async () => {
+
+            await members.addUser(validator2, "Validator 2", 1, { from: admin });
+            await token.transfer(validator2, auditTokenMorMax, { from: admin });
+            await token.approve(memberHelpers.address, auditTokenMorMax, { from: validator2 });
+
+            try {
+                let result = await memberHelpers.stake(auditTokenMorMax, { from: validator2 });
+                expectRevert()
+
+            } catch (error) {
+                ensureException(error);
+            }
+
+        })
+
+    })
+
+    describe("Deposit by Enterprise", async () => {
+
+        beforeEach(async () => {
+
+            await members.addUser(enterprise1, "Enterprise 1", 0, { from: admin });
+
+            await token.transfer(enterprise1, auditTokenMin, { from: admin });
+            await token.approve(memberHelpers.address, auditTokenMin, { from: enterprise1 });
+        })
+
+        it("Should succeed. Enterprise deposits tokens.", async () => {
+
+            let result = await memberHelpers.stake(auditTokenMin, { from: enterprise1 });
+            assert.lengthOf(result.logs, 1);
+
+            let event = result.logs[0];
+            assert.equal(event.event, 'LogDepositReceived');
+            assert.strictEqual(event.args.from, enterprise1);
+            assert.strictEqual(event.args.amount.toString(), auditTokenMin);
+        })
+
+        it("Should fail. User hasn't been registered as enterprise.", async () => {
+            try {
+                result = await memberHelpers.stake(auditTokenMin, { from: admin });
+                expectRevert()
+            } catch (error) {
+                ensureException(error);
+            }
+        })
+    })
+
+
+    describe("Process earnings", async () => {
 
         let cohortAddress;
         let cohortContract;
@@ -252,60 +254,64 @@ contract("Member Helper contract", (accounts) => {
             await memberHelpers.stake(auditTokenMin, { from: validator3 });
             await memberHelpers.stake(auditTokenMin, { from: enterprise1 });
 
+            await nodeOperations.toggleNodeOperator({ from: validator1 });
+            await nodeOperations.toggleNodeOperator({ from: validator2 });
+            await nodeOperations.toggleNodeOperator({ from: validator3 });
 
+            // await cohortFactory.inviteValidator(validator1, 1, { from: enterprise1 });
+            // await cohortFactory.inviteValidator(validator2, 1, { from: enterprise1 });
+            // await cohortFactory.inviteValidator(validator3, 1, { from: enterprise1 });
 
-            await cohortFactory.inviteValidator(validator1, 1, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator2, 1, { from: enterprise1 });
-            await cohortFactory.inviteValidator(validator3, 1, { from: enterprise1 });
+            await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3], 1, { from: enterprise1 });
+
 
             await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
             await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
             await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
 
             await cohortFactory.createCohort(1, { from: enterprise1 });
+            let validatorList = await cohortFactory.returnValidatorList(enterprise1, 1);
 
+            const isInvited = await cohortFactory.isValidatorInvited(enterprise1, validator1, 1);
 
             let documentHash = web3.utils.soliditySha3("2+1=4");
-            let result = await validation.initializeValidation(documentHash, '', 1, true, { from: enterprise1 });
+            let result = await validation.initializeValidationCohort(documentHash, '', 1, { from: enterprise1 });
+
 
             let event = result.logs[0];
             let validationInitTime = event.args.initTime;
 
-            await validation.validate(documentHash, validationInitTime, 1, { from: validator1, gas: 200000 });
-            // let outstandingValidations = await validation.outstandingValidations(enterprise1);
-            // console.log("outstandingValidations", outstandingValidations.toString())
-            let logs =  await validation.validate(documentHash, validationInitTime, 1, { from: validator2, gas: 200000 });
-            // outstandingValidations = await validation.outstandingValidations(enterprise1);
-            // console.log("outstandingValidations", outstandingValidations.toString())
-            await validation.validate(documentHash, validationInitTime, 1, { from: validator3, gas: 200000 });
-            // outstandingValidations = await validation.outstandingValidations(enterprise1);
-            // console.log("outstandingValidations", logs)
+
+
+            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
 
         })
 
-        // it("Should succeed. Claim rewards by validator who has earned some funds. ", async () => {
+        it("Should succeed. Claim rewards by validator who has earned some funds. ", async () => {
 
-        //     let balanceBefore = await memberHelpers.returnDepositAmount(validator1);
-        //     let enterpriseMatch = await members.enterpriseMatch();
-        //     let enterprisePortion = new BigNumber(tokenPerValidation.toString()).mult(enterpriseMatch.toString()).div(10000);
-        //     let stakeAmount = await nodeOperations.stakeAmount(validator1);
+            let balanceBefore = await memberHelpers.returnDepositAmount(validator1);
+            let enterpriseMatch = await members.enterpriseMatch();
+            let enterprisePortion = new BigNumber(tokenPerValidation.toString()).mult(enterpriseMatch.toString()).div(10000);
+            let stakeAmount = (await nodeOperations.nodeOpStruct(validator1)).stakeAmount;
 
-        //     let stakeRatio = await nodeOperations.stakeRatio();
-        //     let stake = await  memberHelpers.returnDepositAmount(validator3);
+            let stakeRatio = await nodeOperations.stakeRatio();
+            let stake = await  memberHelpers.returnDepositAmount(validator3);
 
 
-        //     await nodeOperations.claimStakeRewards(false, {from:validator1});
+            await nodeOperations.claimStakeRewards(false, {from:validator1});
 
-        //     let balanceBeforeRedeem = await memberHelpers.returnDepositAmount(validator1);
+            let balanceBeforeRedeem = await memberHelpers.returnDepositAmount(validator1);
 
-        //     let result = await memberHelpers.redeem(new BigNumber(stakeAmount.toString()).add(auditTokenMin), { from: validator1 });
+            let result = await memberHelpers.redeem(new BigNumber(stakeAmount.toString()).add(auditTokenMin), { from: validator1 });
 
-        //     let event = result.logs[0];
-        //     let amount = event.args.amount;
+            let event = result.logs[0];
+            let amount = event.args.amount;
 
-        //     let balanceAfter = await memberHelpers.returnDepositAmount(validator1);
-        //     assert.strictEqual(balanceAfter.toString(), new BigNumber(balanceBefore.toString()).add(stakeAmount.toString()).subtract(amount.toString()).toString());
-        // })
+            let balanceAfter = await memberHelpers.returnDepositAmount(validator1);
+            assert.strictEqual(balanceAfter.toString(), new BigNumber(balanceBefore.toString()).add(stakeAmount.toString()).subtract(amount.toString()).toString());
+        })
 
         it("Should fail. Claim rewards by validator who has no funds. ", async () => {
 
@@ -318,38 +324,38 @@ contract("Member Helper contract", (accounts) => {
             }
         })
 
-        // it("Should succeed. Enterprise can withdraw funds minus obligation to cover payments since recent update. ", async () => {
+        it("Should succeed. Enterprise can withdraw funds minus obligation to cover payments since recent update. ", async () => {
 
-        //     let documentHash = web3.utils.soliditySha3("2+1=4");
-        //     let result = await validation.initializeValidation(documentHash, '', 1, true, { from: enterprise1 });
+            let documentHash = web3.utils.soliditySha3("2+1=4");
+            await validation.initializeValidationCohort(documentHash, '', 1, { from: enterprise1 });
 
-        //     let balanceBefore = await memberHelpers.returnDepositAmount(enterprise1);
-        //     let outstandingValidations = await validation.outstandingValidations(enterprise1);
-        //     console.log("outstandingValidations", outstandingValidations.toString())
-        //     let enterpriseMatch = await members.enterpriseMatch();
 
-        //     let fundsForOutstandingValidations = new BigNumber(tokenPerValidation.toString()).mult(enterpriseMatch.toString()).mult(outstandingValidations.toString()).div(10000);
+            let balanceBefore = await memberHelpers.returnDepositAmount(enterprise1);
+            let outstandingValidations = await validation.outstandingValidations(enterprise1);
+            let enterpriseMatch = await members.enterpriseMatch();
 
-        //     let fundsAvailableForWithdrawal = new BigNumber(balanceBefore.toString()).subtract(fundsForOutstandingValidations.toString());
-        //     await memberHelpers.redeem(fundsAvailableForWithdrawal, { from: enterprise1 });
+            let fundsForOutstandingValidations = new BigNumber(tokenPerValidation.toString()).mult(enterpriseMatch.toString()).mult(outstandingValidations.toString()).div(10000);
 
-        //     let balanceAfter = await memberHelpers.returnDepositAmount(enterprise1);
-        //     assert.strictEqual(balanceAfter.toString(), fundsForOutstandingValidations.toString());
+            let fundsAvailableForWithdrawal = new BigNumber(balanceBefore.toString()).subtract(fundsForOutstandingValidations.toString());
+            await memberHelpers.redeem(fundsAvailableForWithdrawal, { from: enterprise1 });
 
-        // })
+            let balanceAfter = await memberHelpers.returnDepositAmount(enterprise1);
+            assert.strictEqual(balanceAfter.toString(), fundsForOutstandingValidations.toString());
 
-        // it("Should fail. Enterprise withdraws funds above obligation to cover payments since recent update. ", async () => {
+        })
 
-        //     let balanceBefore = await memberHelpers.returnDepositAmount(enterprise1);
-        //     console.log("balance", balanceBefore.toString())
+        it("Should fail. Enterprise withdraws funds above obligation to cover payments since recent update. ", async () => {
 
-        //     try {
-        //         await memberHelpers.redeem(balanceBefore, { from: enterprise1 });
-        //         expectRevert()
-        //     } catch (error) {
-        //         console.log("error", error)
-        //         ensureException(error);
-        //     }
-        // })
+            let balanceBefore = await memberHelpers.returnDepositAmount(enterprise1);
+            let documentHash = web3.utils.soliditySha3("2+1=4");
+            await validation.initializeValidationCohort(documentHash, '', 1, { from: enterprise1 });
+
+            try {
+                await memberHelpers.redeem(balanceBefore, { from: enterprise1 });
+                expectRevert()
+            } catch (error) {
+                ensureException(error);
+            }
+        })
     })
 })

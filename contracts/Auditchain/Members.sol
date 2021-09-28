@@ -163,11 +163,11 @@ contract Members is  AccessControl {
     }
 
    
-    /*
+    /** 
     * @dev add new platform user
-    * @param user to add
+    * @param newUser to add
     * @param name name of the user
-    * @param userType  
+    * @param userType  type of the user, enterprise, validator or data subscriber
     */
     function addUser(address newUser, string memory name, UserType userType) public isController() {
 
@@ -194,5 +194,7 @@ contract Members is  AccessControl {
 
         return validators;
     }
+
+   
 
 }

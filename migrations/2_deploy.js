@@ -65,7 +65,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await deployer.deploy(CohortFactory, members.address, memberHelpers.address);
   let cohortFactory = await CohortFactory.deployed();
 
-  await deployer.deploy(NodeOperations, memberHelpers.address, token.address);
+  await deployer.deploy(NodeOperations, memberHelpers.address, token.address, members.address);
   let nodeOperations = await NodeOperations.deployed();
 
 
@@ -243,7 +243,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   let documentURL = "http://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml"
   documentHash = web3.utils.soliditySha3(documentURL);
 
-  result = await cohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
+  result = await cohort.initializeValidationCohort(documentHash, documentURL, 1, { from: enterprise1 });
 
 
 
@@ -261,7 +261,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   timeMachine.advanceTimeAndBlock(10);
 
   // await cohortFactory.createCohort(2, { from: enterprise1 });
-  result = await cohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
+  result = await cohort.initializeValidationCohort(documentHash, documentURL, 1, { from: enterprise1 });
 
   event = result.logs[0];
   validationInitTime = event.args.initTime;
@@ -277,7 +277,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   timeMachine.advanceTimeAndBlock(10);
 
   // await cohortFactory.createCohort(2, { from: enterprise1 });
-  result = await cohort.initializeValidation(documentHash, documentURL, 1, true, { from: enterprise1 });
+  result = await cohort.initializeValidationCohort(documentHash, documentURL, 1, { from: enterprise1 });
 
   event = result.logs[0];
   validationInitTime = event.args.initTime;
@@ -288,13 +288,13 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   result = await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
 
 
-  event = result.logs[0];
-  let event1 = result.logs[1];
-  let event2 = result.logs[2]
+  // event = result.logs[0];
+  // let event1 = result.logs[1];
+  // let event2 = result.logs[2]
 
-  console.log("event", event.event);
-  console.log("event1", event1.event);
-  console.log("event2", event2.event);
+  // console.log("event", event.event);
+  // console.log("event1", event1.event);
+  // console.log("event2", event2.event);
 
 
 
@@ -302,12 +302,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
   await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
-
-
-
   await token.approve(depositModifiers.address, subscriberFee, { from: dataSubscriber });
-
-
   await depositModifiers.dataSubscriberPayment(enterprise1, 1, { from: dataSubscriber });
 
   // const isSubscribed = await memberHelpers.dataSubscriberCohortMap(dataSubscriber, enterprise1, audits);
@@ -321,7 +316,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   documentURL = "QmNhaANyYwWmfrRBfMbXyogPhBSTQdzFL8TiWbqjBmNuoc/Auditchain.json";
 
   documentHash = web3.utils.soliditySha3(documentURL);
-  result = await cohort.initializeValidation(documentHash, documentURL, 3, true, { from: enterprise1, gas: 6000000 });
+  result = await cohort.initializeValidationCohort(documentHash, documentURL, 3,  { from: enterprise1, gas: 6000000 });
 
   event = result.logs[0];
   validationInitTime = event.args.initTime;
@@ -339,11 +334,11 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   //*****************************************No Cohort cases start */
 
-  result = await noCohort.initializeValidation(documentHash, documentURL, 1, true, { from: dataSubscriber });
+  result = await noCohort.initializeValidationNoCohort(documentHash, documentURL, 1, { from: dataSubscriber });
   event = result.logs[0];
   validationInitTime = event.args.initTime;
 
-  // await memberHelpers.delegate(validator1, {from:delegating});
+  await nodeOperations.delegate(validator1, {from:delegating});
 
   await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
   await noCohort.validate(documentHash, validationInitTime, 2, "", { from: validator2, gas: 800000 });
@@ -362,7 +357,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
     }
   )
 
-  console.log("events", eventsMember)
+  // console.log("events", eventsMember)
 
 
   // let stakingRewards = await nodeOperations.stakeAmount(validator1);

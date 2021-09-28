@@ -81,8 +81,8 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
      * @param url - locatoin of the file on IPFS or other decentralized file storage
      * @param auditType - type of auditing 
      */
-    function initializeValidation(bytes32 documentHash, string memory url, AuditTypes auditType, bool isCohort) public virtual {
-        require(documentHash.length > 0, "NoCohort:initializeValidation - Document hash value can't be 0");
+    function initializeValidation(bytes32 documentHash, string memory url, AuditTypes auditType, bool isCohort) internal virtual {
+        require(documentHash.length > 0, "Validation:initializeValidation - Document hash value can't be 0");
 
         uint256 validationTime = block.timestamp;
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
@@ -101,6 +101,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
     }
 
     function returnValidatorList(bytes32 validationHash) internal view virtual returns (address[] memory);
+    
 
     
     
@@ -170,7 +171,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         address[] memory validatorsList = returnValidatorList(validationHash);
 
         Validation storage validation = validations[validationHash];
-        require(validation.validationTime > 0, "Cohort:calculateVoteQuorum - Validation hash doesn't exist");
+        require(validation.validationTime > 0, "Validation:calculateVoteQuorum - Validation hash doesn't exist");
 
         for (uint256 i = 0; i < validatorsList.length; i++) {
             totalStaked += memberHelpers.returnDepositAmount(validatorsList[i]);
@@ -207,9 +208,6 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
     function processPayments(bytes32 validationHash, address[] memory validators) internal virtual {
     }
 
-    function processRewards(bytes32 validationHash, address[] memory validators, uint256[] memory stake) internal virtual {
-
-    }
 
     /**
      * @dev to mark validation as executed. This happens when participation level reached "requiredQuorum"
@@ -308,10 +306,9 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
 
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
-        require(members.userMap(msg.sender, Members.UserType(1)), "Cohort:validate - Validator is not authorized.");
-        require(validation.validationTime == validationTime, "Cohort:validate - the validation params don't match.");
-        require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Cohort:validate - This document has been validated already.");
-        // require(nodeOperations.nodeOpStruct(msg.sender).delegatorLink == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
+        require(members.userMap(msg.sender, Members.UserType(1)), "Validation:validate - Validator is not authorized.");
+        require(validation.validationTime == validationTime, "Validation:validate - the validation params don't match.");
+        require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Validation:validate - This document has been validated already.");
         require(nodeOperations.returnDelegatorLink(msg.sender) == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
         require(nodeOperations.isNodeOperator(msg.sender), "Validations:validate - you are not a node operator");
         validation.validatorChoice[msg.sender] = decision;
