@@ -21,8 +21,8 @@ contract ValidationsNoCohort is Validations {
     */
     function initializeValidationNoCohort(bytes32 documentHash, string memory url, AuditTypes auditType) public {
 
-        require(checkIfRequestorHasFunds(msg.sender), "NoCohort:initializeValidation - Not sufficient funds. Deposit additional funds.");
-        require(members.userMap(msg.sender, Members.UserType(2)), "MemberHelpers:dataSubscriberPayment - You have to register as data subscriber");
+        require(checkIfRequestorHasFunds(msg.sender), "ValidationsNoCohort:initializeValidationNoCohort - Not sufficient funds. Deposit additional funds.");
+        require(members.userMap(msg.sender, Members.UserType(2)), "ValidationsNoCohort:initializeValidationNoCohort - You have to register as data subscriber");
         super.initializeValidation(documentHash, url, auditType, false);
         
     }

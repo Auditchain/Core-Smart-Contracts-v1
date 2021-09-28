@@ -75,7 +75,7 @@ contract("NFT rules contract", (accounts) => {
 
         cohortFactory = await COHORTFACTORY.new(members.address, memberHelpers.address);
 
-        nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address);
+        nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address, members.address);
         depositModifiers = await DEPOSIT_MODIFIERS.new(members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address)
         validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address)
 

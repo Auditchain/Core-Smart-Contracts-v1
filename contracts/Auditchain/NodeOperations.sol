@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./../IAuditToken.sol";
 import "./MemberHelpers.sol";
-import "./../IAuditToken.sol";
 
 
 
@@ -19,6 +18,7 @@ contract NodeOperations is AccessControl {
 
     MemberHelpers public memberHelpers;
     address public auditToken;          
+    Members public members;
 
     address[] public nodeOperators;
     address[] public CPAs;
@@ -35,6 +35,7 @@ contract NodeOperations is AccessControl {
         address[] delegations;
         mapping(address => bool) isDelegating;
         uint256 stakeAmount;
+        uint256 delegateAmount;
         uint256 referralAmount;
         uint256 POWAmount;
         address delegatorLink;
@@ -50,12 +51,9 @@ contract NodeOperations is AccessControl {
     bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
 
 
-    event LogNodeOperatorCreated(address indexed user);
-    event LogNodeOperatorCancelled(address indexed user);
-    event LogCPACreated(address indexed user);
-    event LogCPACancelled(address indexed user);
-    event LogNoFollowSet(address indexed user);
-    event LogNoFollowRemoved(address indexed user);
+    event LogNodeOperatorToggled(address indexed user, string action);
+    event LogCPAToggled(address indexed user, string action);
+    event LogNoDelegateToggled(address indexed user, string action);
     event LogRemoveDelegation(address indexed delegating, address indexed delegatee);
     event LogDelegation(address indexed delegating, address indexed newDelegatee);
     event LogDelegatedStakeRewardsIncreased(address indexed delegating, uint256 amount);
@@ -65,25 +63,38 @@ contract NodeOperations is AccessControl {
     event LogStakeRewardsIncreased(address indexed validator, uint256 amount);
     event LogGovernanceUpdate(uint256 params, string indexed action);
 
-    constructor(address _memberHelpers, address _auditToken) {
+    constructor(address _memberHelpers, address _auditToken, address _members) {
         require(_memberHelpers != address(0), "NodeOperations:constructor - MemberHelpers address can't be 0");
         require( _auditToken != address(0), "MemberHelpers:setCohort - Cohort address can't be 0");
         memberHelpers = MemberHelpers(_memberHelpers);
         auditToken = _auditToken;
+        members = Members(_members);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
 
+
     /// @dev check if caller is a controller
-    modifier isController() {
-        require(hasRole(CONTROLLER_ROLE, msg.sender), "NodeOperations:IsController - Caller is not a controller");
+    modifier isController(string memory source) {
+        string memory msgError = string(abi.encodePacked("NodeOperations(isController - Modifier):", source, "- Caller is not a controller"));
+        require(hasRole(CONTROLLER_ROLE, msg.sender),msgError);
 
         _;
     }
 
+
     /// @dev check if caller is a setter     
     modifier isSetter {
         require(hasRole(SETTER_ROLE, msg.sender), "NodeOperations:isSetter - Caller is not a setter");
+
+        _;
+    }
+
+    /// @dev check if user is validator
+    modifier isValidator(string memory source) {
+
+        string memory msgError = string(abi.encodePacked("NodeOperations(isValidator- Modifier):", source, "- You are not a validator"));
+        require( members.userMap(msg.sender, Members.UserType(1)), msgError);
 
         _;
     }
@@ -125,8 +136,15 @@ contract NodeOperations is AccessControl {
     function isNodeOperator(address operator) public view returns (bool) {
 
         return nodeOpStruct[operator].isNodeOperator;
+
     }
 
+    /*** 
+    * @dev return members of the staking pool
+    * @param poolOperator - owner of the pool
+    * @param name name of the user
+    * @return array of users with their deposit values
+    */
 
     function returnPoolList(address poolOperator)public view returns (address[] memory, uint256[] memory) {
 
@@ -141,52 +159,53 @@ contract NodeOperations is AccessControl {
         return (poolUsers, poolUsersStakes);
     }
 
-
-    function toggleNodeOperator( ) public {
+    
+    /// @dev change Node operator status from on to off or the vice versa 
+    function toggleNodeOperator( ) public isValidator("toggleNodeOperator") {
 
         if (nodeOpStruct[msg.sender].isNodeOperator){
             nodeOpStruct[msg.sender].isNodeOperator = false;
             removeNodeOperator();
             removeAlldelegations();
-            emit LogCPACreated(msg.sender);
+            emit LogNodeOperatorToggled(msg.sender, "OFF");
         }
         else{
             nodeOpStruct[msg.sender].isNodeOperator = true;
             nodeOperators.push(msg.sender);
-            emit LogCPACancelled(msg.sender);
+            emit LogNodeOperatorToggled(msg.sender, "ON");
         }
     }
 
-    function toggleCPA( ) public {
+    /// @dev change CPA status from on to off or vice versa
+    function toggleCPA( ) public isValidator("toggleCPA") {
 
         if (nodeOpStruct[msg.sender].isCPA){
             nodeOpStruct[msg.sender].isCPA = false;
             removeCPA();
-            //TODO:  add remove cohort 
-            emit LogNodeOperatorCreated(msg.sender);
+            emit LogCPAToggled(msg.sender,"OFF");
         }
         else{
             nodeOpStruct[msg.sender].isCPA = true;
             CPAs.push(msg.sender);
-            emit LogNodeOperatorCancelled(msg.sender);
+            emit LogCPAToggled(msg.sender,"ON");
         }
     }
 
-    function toggleNoDelegate( ) public {
+    /// @dev change no delegate flag from on to off or vice versa
+    function toggleNoDelegate( ) isValidator("toggleNoDelegate") public {
 
         if (nodeOpStruct[msg.sender].noDelegations){
             nodeOpStruct[msg.sender].noDelegations = false;
-            removeCPA();
-            emit LogNoFollowRemoved(msg.sender);
+            emit LogNoDelegateToggled(msg.sender, "OFF");
         }
         else{
             removeAlldelegations();
             nodeOpStruct[msg.sender].noDelegations = true;
-            emit LogNoFollowSet(msg.sender);
+            emit LogNoDelegateToggled(msg.sender, "ON");
         }
     }
 
-
+    /// @dev remove CPA status
     function removeCPA() internal {
 
         for (uint256 i= 0; i < CPAs.length; i++) {
@@ -200,6 +219,7 @@ contract NodeOperations is AccessControl {
         }
     }
 
+    /// @dev remove Node operator status 
     function removeNodeOperator() internal {
 
         for (uint256 i= 0; i < nodeOperators.length; i++) {
@@ -213,18 +233,19 @@ contract NodeOperations is AccessControl {
         }
     }
 
-
+    /// return all node operators
     function returnNodeOperators() public view returns (address[] memory) {
 
         return nodeOperators;
     }
 
+    /// return all CPAs
     function returnCPAs() public view returns (address[] memory) {
 
         return CPAs;
     }
     
-
+    /// remove all delegations for specific pool operator
     function removeAlldelegations() public {
 
         for (uint256 i = nodeOpStruct[msg.sender].delegations.length  ; i > 0; i--) {
@@ -235,8 +256,8 @@ contract NodeOperations is AccessControl {
         }
     }
 
-
-     function removeDelegation() public {
+    /// remove delegation for pool member 
+    function removeDelegation() public isValidator("removeDelegation") {
 
         address oldDelegatee = nodeOpStruct[msg.sender].delegatorLink;
 
@@ -256,13 +277,15 @@ contract NodeOperations is AccessControl {
         emit LogRemoveDelegation(msg.sender, oldDelegatee);
     }
 
+    /*** 
+    * @dev delegate stake to the pool 
+    * @param delegatee - owner of the pool 
+    */
 
-     function delegate(address delegatee) public {
+     function delegate(address delegatee) public isValidator("Delegate") {
 
         require(!nodeOpStruct[msg.sender].isNodeOperator, "NodeOperations:delegagte - You are a node operator, first cancel this role and then delegate again. ");
-        require(!nodeOpStruct[delegatee].isDelegating[msg.sender], 
-          "NodeOperations:delegate - You are already delegating to this member."
-        );
+        require(!nodeOpStruct[delegatee].isDelegating[msg.sender], "NodeOperations:delegate - You are already delegating to this member.");
 
         if (nodeOpStruct[msg.sender].delegatorLink != address(0x0)) 
             removeDelegation();
@@ -275,20 +298,28 @@ contract NodeOperations is AccessControl {
     }
 
 
-    function increasePOWRewards(address validator, uint256 amount) public isController() {
+    /*** 
+    * @dev called by the Validations contract to increase POW amount of winning validator
+    * @param validator - winner of the validation task
+    * @param amount to aword to validator
+    */
+    function increasePOWRewards(address validator, uint256 amount) public isController("increasePOWRewards") {
             nodeOpStruct[validator].POWAmount = nodeOpStruct[validator].POWAmount.add(amount);
     }
 
 
-    function increaseDelegatedStakeRewards(address validator) public isController() {
+    /*** 
+    * @dev called by the Validations contract to increase delegated stake rewards and referral rewards
+    * @param validator - validator for whom values are increased
+    */
+    function increaseDelegatedStakeRewards(address validator) public isController("increaseDelegatedStakeRewards") {
         uint256 referringReward;
 
         for (uint256 i = 0; i < nodeOpStruct[validator].delegations.length ; i++) {
             address delegating = nodeOpStruct[validator].delegations[i];
             uint256 amount = memberHelpers.returnDepositAmount(delegating).div(stakeRatioDelegating);
-            nodeOpStruct[delegating].stakeAmount = nodeOpStruct[delegating].stakeAmount.add(amount);
-            referringReward = referringReward.add(memberHelpers.returnDepositAmount(delegating).div(stakingRatioReferral)
-            );
+            nodeOpStruct[delegating].delegateAmount = nodeOpStruct[delegating].delegateAmount.add(amount);
+            referringReward = referringReward.add(memberHelpers.returnDepositAmount(delegating).div(stakingRatioReferral));
             emit LogDelegatedStakeRewardsIncreased(delegating, amount);
         }
 
@@ -298,16 +329,34 @@ contract NodeOperations is AccessControl {
         }
     }
 
+    /*** 
+    * @dev called by the Validations contract to increase pool operator stake reward amount
+    * @param validator - validator for whom values are increased
+    */
+    function increaseStakeRewards(address validator) public isController("increaseStakeRewards") {
+        uint256 amount = memberHelpers.returnDepositAmount(validator).div(stakeRatio);
+        nodeOpStruct[validator].stakeAmount = nodeOpStruct[validator].stakeAmount.add(amount);
+        emit LogStakeRewardsIncreased(validator, amount);
+    }
 
+
+    /*** 
+    * @dev called by the Validator to claim their reward
+    * @param deliver - true if amount should be delivered into the wallet or stake deposit
+    */
     function claimStakeRewards(bool deliver) public {
         uint256 stakeRewards = nodeOpStruct[msg.sender].stakeAmount;
+        uint256 delegateRewards = nodeOpStruct[msg.sender].delegateAmount;
         uint256 powRewards = nodeOpStruct[msg.sender].POWAmount;
         uint256 refRewards = nodeOpStruct[msg.sender].referralAmount;
 
-        uint256 payment = stakeRewards.add(powRewards).add(refRewards);
+
+        uint256 payment = stakeRewards.add(powRewards).add(refRewards).add(delegateRewards);
         nodeOpStruct[msg.sender].stakeAmount= 0;
+        nodeOpStruct[msg.sender].delegateAmount = 0;
         nodeOpStruct[msg.sender].POWAmount = 0;
         nodeOpStruct[msg.sender].referralAmount = 0;
+
 
         if (deliver) {
             IAuditToken(auditToken).mint(msg.sender, payment);
@@ -317,15 +366,6 @@ contract NodeOperations is AccessControl {
             IAuditToken(auditToken).mint(address(this), payment);
             emit LogStakingRewardsClaimed(msg.sender, payment);
         }
-    }
-
-
-     function increaseStakeRewards(address validator) public isController {
-        uint256 amount = memberHelpers.returnDepositAmount(validator).div(stakeRatio);
-
-        // [validator] = stakstakeAmounteAmount[validator].add(amount);
-        nodeOpStruct[validator].stakeAmount = nodeOpStruct[validator].stakeAmount.add(amount);
-        emit LogStakeRewardsIncreased(validator, amount);
     }
 
 }

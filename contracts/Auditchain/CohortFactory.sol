@@ -217,7 +217,7 @@ contract CohortFactory is  AccessControl {
         return (false, false);
     }
 
-     /**
+    /**
     * @dev Returns true for audit types for which enterprise has created cohorts.
     * @param enterprise inviting party
     * @return list of boolean variables with value true for audit types enterprise has initiated cohort, 
@@ -234,6 +234,13 @@ contract CohortFactory is  AccessControl {
         return (audits);
     }
 
+
+    /**
+    * @dev Returns list of validators 
+    * @param enterprise to get list for
+    * @param audit type of audits
+    * @return list of boolean variables with value true for audit types enterprise has initiated cohort, 
+    */
     function returnValidatorList(address enterprise, uint256 audit)public view returns(address[] memory){
 
         address[] memory validatorsList = new address[](returnInvitationCount(enterprise, AuditTypes(audit)));
@@ -260,11 +267,11 @@ contract CohortFactory is  AccessControl {
         }
     }
 
-    // function returnCohortsForDataSubscriber(address dataSubscriber)
 
    /**
     * @dev Used to determine cohorts count for given validator
     * @param validator address of the validator
+    * @return number of cohorts
     */ 
     function returnValidatorCohortsCount(address validator, address enterprise) public view returns (uint256){
 

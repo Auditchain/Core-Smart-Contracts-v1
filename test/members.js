@@ -60,6 +60,7 @@ contract("Member contract", (accounts) => {
 
             try {
                 await members.addUser(enterprise1, "Enterprise 1", 0, { from: enterprise1 });
+                expectRevert();
             } catch (error) {
                 ensureException(error);
             }
@@ -86,7 +87,8 @@ contract("Member contract", (accounts) => {
         it("Should fail. Add validator user from unauthorized account", async () => {
 
             try {
-                await members.addUser(validator1, "Validator 1", 1, { from: enterprise1 });
+                await members.addUser(validator1, "Validator 1", 1, { from: enterprise1 })
+                expectRevert();
             } catch (error) {
                 ensureException(error);
             }
@@ -107,190 +109,6 @@ contract("Member contract", (accounts) => {
 
     })
 
-    // describe("Stake by validators", async () => {
-
-    //     beforeEach(async () => {
-
-    //         await members.addValidatorUser(validator1, "Validators 1", { from: admin });
-    //         await token.transfer(validator1, auditTokenMin, { from: admin });
-    //         await token.approve(members.address, auditTokenMin, { from: validator1 });
-    //     })
-
-    //     it("Should succeed. Validator stakes tokens.", async () => {
-
-    //         let result = await members.stake(auditTokenMin, { from: validator1 });
-    //         assert.lengthOf(result.logs, 1);
-
-    //         let event = result.logs[0];
-    //         assert.equal(event.event, 'LogDepositReceived');
-    //         assert.strictEqual(event.args.from, validator1);
-    //         assert.strictEqual(event.args.amount.toString(), auditTokenMin);
-    //     })
-
-    //     it("Should fail. User hasn't been registered as validator.", async () => {
-    //         try {
-    //             let result = await members.stake(auditTokenMin, { from: validator2 });
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-    //     })
-
-    //     it("Should fail. User contributed less than required amount.", async () => {
-
-    //         try {
-    //             let result = await members.stake(auditTokenLesMin, { from: validator1 });
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-
-    //     })
-
-    //     it("Should fail. User contributed more than required amount.", async () => {
-
-    //         await members.addValidatorUser(validator2, "Validators 2", { from: admin });
-    //         await token.transfer(validator2, auditTokenMorMax, { from: admin });
-    //         await token.approve(members.address, auditTokenMorMax, { from: validator2 });
-
-    //         try {
-    //             let result = await members.stake(auditTokenMorMax, { from: validator2 });
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-
-    //     })
-
-    // })
-
-    // describe("Deposit by Enterprise", async () => {
-
-    //     beforeEach(async () => {
-
-    //         await members.addEnterpriseUser(enterprise1, "Enterprise 1", { from: admin });
-    //         await token.transfer(enterprise1, auditTokenMin, { from: admin });
-    //         await token.approve(members.address, auditTokenMin, { from: enterprise1 });
-    //     })
-
-    //     it("Should succeed. Enterprise deposits tokens.", async () => {
-
-    //         let result = await members.stake(auditTokenMin, { from: enterprise1 });
-    //         assert.lengthOf(result.logs, 1);
-
-    //         let event = result.logs[0];
-    //         assert.equal(event.event, 'LogDepositReceived');
-    //         assert.strictEqual(event.args.from, enterprise1);
-    //         assert.strictEqual(event.args.amount.toString(), auditTokenMin);
-    //     })
-
-    //     it("Should fail. User hasn't been registered as enterprise.", async () => {
-    //         try {
-    //             let result = await members.stake(auditTokenMin, { from: admin });
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-    //     })
-    // })
-
-    // describe("Data subscriber subscribes to cohorts", async () => {
-
-    //     let cohortAddress;
-
-    //     beforeEach(async () => {
-
-    //         await members.addEnterpriseUser(enterprise1, "Enterprise 1", { from: admin });
-    //         await members.addValidatorUser(validator1, "Validators 1", { from: admin });
-    //         await members.addValidatorUser(validator2, "Validators 2", { from: admin });
-    //         await members.addValidatorUser(validator3, "Validators 3", { from: admin });
-
-    //         await token.transfer(validator1, auditTokenMax, { from: admin });
-    //         await token.transfer(validator2, auditTokenMin, { from: admin });
-    //         await token.transfer(validator3, auditTokenMin, { from: admin });
-
-    //         await token.approve(members.address, auditTokenMax, { from: validator1 });
-    //         await token.approve(members.address, auditTokenMin, { from: validator2 });
-    //         await token.approve(members.address, auditTokenMin, { from: validator3 });
-
-    //         await members.stake(auditTokenMax, { from: validator1 });
-    //         await members.stake(auditTokenMin, { from: validator2 });
-    //         await members.stake(auditTokenMin, { from: validator3 });
-
-
-    //         await cohortFactory.inviteValidator(validator1, 0, { from: enterprise1 });
-    //         await cohortFactory.inviteValidator(validator2, 0, { from: enterprise1 });
-    //         await cohortFactory.inviteValidator(validator3, 0, { from: enterprise1 });
-
-    //         await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
-    //         await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
-    //         await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
-
-            
-
-    //         let result = await cohortFactory.createCohort(0, { from: enterprise1 });
-    //         assert.lengthOf(result.logs, 2);
-
-    //         let event = result.logs[1];
-    //         assert.equal(event.event, 'CohortCreated');
-    //         cohortAddress = event.args.cohort;
-
-    //     })
-
-    //     it("Should succeed. Data subscriber subscribed to view data feeds.", async () => {
-
-
-
-    //         let accessFee = await members.accessFee();
-    //         await token.transfer(dataSubscriber, auditTokenMin, { from: admin });
-    //         await token.approve(members.address, accessFee, { from: dataSubscriber });
-
-    //         const balanceBefore = await token.balanceOf(platformAccount);
-    //         let result = await members.dataSubscriberPayment(cohortAddress, 0, { from: dataSubscriber });
-    //         assert.lengthOf(result.logs, 4);
-
-    //         let event = result.logs[3];
-    //         assert.equal(event.event, 'LogDataSubscriberPaid');
-    //         cohortAddress = event.args.cohort;
-    //         let enterpriseBalance = await members.deposits(enterprise1);
-    //         let validator1Balance = await members.deposits(validator1);
-    //         let validator2Balance = await members.deposits(validator2);
-    //         let validator3Balance = await members.deposits(validator3);
-
-    //         let totalValidatorAmt = (validator1Balance - auditTokenMax) + (validator2Balance - auditTokenMin) + (validator3Balance - auditTokenMin);
-
-    //         const platformBalance = await token.balanceOf(platformAccount);
-    //         assert.strictEqual(enterpriseBalance.toString(), (accessFee * 40 / 100).toString());
-    //         assert.strictEqual(totalValidatorAmt.toString(), (accessFee * 40 / 100).toString());
-    //         assert.strictEqual(platformBalance.toString(), (accessFee * 20 / 100).toString());
-
-    //     })
-
-    //     it("Should fail. Data subscriber didn't authorize members contract to withdraw funds.", async () => {
-
-    //         await token.transfer(dataSubscriber, auditTokenMin, { from: admin });
-
-    //         try {
-    //             await members.dataSubscriberPayment(cohortAddress, 0, { from: dataSubscriber });
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-
-
-    //     })
-
-    //     it("Should fail. Data subscriber doesn't have sufficient funds.", async () => {
-
-    //         await token.approve(members.address, auditTokenMin, { from: dataSubscriber });
-
-    //         try {
-    //             await members.dataSubscriberPayment(cohortAddress, 0, { from: dataSubscriber });
-    //         } catch (error) {
-    //             ensureException(error);
-    //         }
-
-
-    //     })
-    // })
-
-
-    
 
     describe("Test governance updates", async () => {
 
@@ -307,6 +125,7 @@ contract("Member contract", (accounts) => {
 
             try {
                 await members.updateTokensPerValidation(auditTokenMin, { from: enterprise1 });
+                expectRevert();
             }
             catch (error) {
                 ensureException(error);
@@ -326,6 +145,7 @@ contract("Member contract", (accounts) => {
 
             try {
                 await members.updateEnterpriseMatch(2340, { from: enterprise1 });
+                expectRevert();
             }
             catch (error) {
                 ensureException(error);

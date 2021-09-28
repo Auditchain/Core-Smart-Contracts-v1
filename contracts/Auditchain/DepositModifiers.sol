@@ -4,7 +4,6 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
 import "./Members.sol";
 import "./MemberHelpers.sol";
 import "./ICohortFactory.sol";
@@ -24,7 +23,7 @@ contract DepositModifiers is  AccessControl {
 
 
 
-    address public auditToken;                       //AUDT token 
+    address public auditToken;                  
     Members members;
     MemberHelpers public memberHelpers;
     ICohortFactory public cohortFactory;
@@ -52,7 +51,7 @@ contract DepositModifiers is  AccessControl {
 
 
     constructor(address  _members, address _auditToken, address _memberHelpers, address _cohortFactory, address _nodeOperations ) {
-        require(_members != address(0), "MemberHelpers:constructor - Member address can't be 0");
+        require(_members != address(0), "DepositModifier:constructor - Member address can't be 0");
         members = Members(_members);
         auditToken = _auditToken;
         memberHelpers = MemberHelpers(_memberHelpers);
@@ -61,9 +60,10 @@ contract DepositModifiers is  AccessControl {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    /// @dev check if caller is a controller     
-    modifier isController {
-        require(hasRole(CONTROLLER_ROLE, msg.sender), "DepositModifiers:IsController - Caller is not a controller");
+    /// @dev check if caller is a controller
+    modifier isController(string memory source) {
+        string memory msgError = string(abi.encodePacked("DepositModifier - (isController-Modifier):", source, "- Caller is not a controller"));
+        require(hasRole(CONTROLLER_ROLE, msg.sender),msgError);
 
         _;
     }
@@ -76,14 +76,14 @@ contract DepositModifiers is  AccessControl {
     */
     function dataSubscriberPayment(address enterpriseAddress, uint256 audits) public  {
 
-        require(enterpriseAddress != address(0), "MemberHelpers:dataSubscriberPayment - Enterprise address can't be 0");
-        require(audits >=0 && audits <=5, "MemberHelpers:dataSubscriberPayment - Audit type is not in the required range");
-        require(!dataSubscriberCohortMap[msg.sender][enterpriseAddress][audits], "MemberHelpers:dataSubscriberPayment - You are already subscribed");
-        require(members.userMap(msg.sender, Members.UserType(2)), "MemberHelpers:dataSubscriberPayment - You have to register as data subscriber");
+        require(enterpriseAddress != address(0), "DepositModifier:dataSubscriberPayment - Enterprise address can't be 0");
+        require(audits >=0 && audits <=5, "DepositModifier:dataSubscriberPayment - Audit type is not in the required range");
+        require(!dataSubscriberCohortMap[msg.sender][enterpriseAddress][audits], "DepositModifier:dataSubscriberPayment - You are already subscribed");
+        require(members.userMap(msg.sender, Members.UserType(2)), "DepositModifier:dataSubscriberPayment - You have to register as data subscriber");
 
         uint256 accessFee = members.accessFee();
 
-        require(memberHelpers.returnDepositAmount(msg.sender) >= accessFee, "MemberHelpers:dataSubscriberPayment - You don't have enough AUDT to complet this tranasction.");
+        require(memberHelpers.returnDepositAmount(msg.sender) >= accessFee, "DepositModifier:dataSubscriberPayment - You don't have enough AUDT to complet this tranasction.");
         IERC20(auditToken).safeTransferFrom(msg.sender, address(this), accessFee);
         uint platformShare = 100 - members.enterpriseShareSubscriber() -members.validatorShareSubscriber();
         IERC20(auditToken).safeTransfer(members.platformAddress(), accessFee.mul(platformShare).div(100));
@@ -133,7 +133,7 @@ contract DepositModifiers is  AccessControl {
     function dataSubscriberPaymentMultiple(address[] memory enterprise, uint256[] memory audits) public {
 
         uint256 length = enterprise.length;
-        require(length <= 256, "MemberHelpers:dataSubscriberPaymentMultiple - List too long");
+        require(length <= 256, "DepositModifiers:dataSubscriberPaymentMultiple - List too long");
         for (uint256 i = 0; i < length; i++) {
             dataSubscriberPayment(enterprise[i], audits[i]);
         }
@@ -141,8 +141,13 @@ contract DepositModifiers is  AccessControl {
         emit LogSubscriptionCompleted(msg.sender, length);
     }
 
-
-    function processPayment(address[] memory _validators, address _requestor, bytes32 validationHash) public isController() {
+    /**
+    * @dev To process payment for cohort validation
+    * @param _validators - array of validators
+    * @param _requestor - requesting party
+    * @param validationHash -  hash identifying validation
+    */
+    function processPayment(address[] memory _validators, address _requestor, bytes32 validationHash) public isController("processPayment") {
 
         uint256 enterprisePortion =  members.amountTokensPerValidation().mul(members.enterpriseMatch()).div(100);
         uint256 platformFee = members.amountTokensPerValidation().mul(members.platformShareValidation()).div(100);
@@ -161,8 +166,13 @@ contract DepositModifiers is  AccessControl {
     }
 
 
-
-    function processNonChortPayment(address[] memory _validators, address _requestor, bytes32 validationHash) public isController() {
+     /**
+    * @dev To process payment for no cohort validation
+    * @param _validators - array of validators
+    * @param _requestor - requesting party
+    * @param validationHash -  hash identifying validation
+    */
+    function processNonChortPayment(address[] memory _validators, address _requestor, bytes32 validationHash) public isController("processNonChortPayment") {
 
         uint256 POWFee = nodeOperations.POWFee();
 
@@ -176,9 +186,6 @@ contract DepositModifiers is  AccessControl {
 
         emit LogNonCohortValidationPaid(_requestor, _validators, validationHash, POWFee);
     }
-
-    
-
 
     /**
     * @dev To return all cohorts to which data subscriber is subscribed to 

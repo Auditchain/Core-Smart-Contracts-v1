@@ -69,7 +69,7 @@ contract("NoCohort Validations contract", (accounts) => {
         members = await MEMBERS.new(platformAccount);
         memberHelpers = await MEMBER_HELPERS.new(members.address, token.address);
         cohortFactory = await COHORTFACTORY.new(members.address, memberHelpers.address);
-        nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address);
+        nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address, members.address);
         depositModifiers = await DEPOSIT_MODIFIERS.new(members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address)
         validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address)
 
@@ -291,7 +291,7 @@ contract("NoCohort Validations contract", (accounts) => {
             let earned4 = BN(depositAmountAfter4.toString()).minus(BN(depositAmountBefore4.toString()));
 
             let fee = await nodeOperations.POWFee();
-            let total = BN(earned1.toString()).add(BN(earned2.toString()).add(BN(earned3.toString()).add(BN(earned4.toString()).add("1"))));
+            let total = BN(earned1.toString()).add(BN(earned2.toString()).add(BN(earned3.toString()).add(BN(earned4.toString()))));
             assert.strictEqual(total.toString(), fee.toString());
 
         })

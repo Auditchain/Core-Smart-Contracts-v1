@@ -38,8 +38,19 @@ contract MemberHelpers is AccessControl {
     }
 
     /// @dev check if caller is a controller
-    modifier isController() {
-        require(hasRole(CONTROLLER_ROLE, msg.sender), "MemberHelpers:IsController - Caller is not a controller");
+    modifier isController(string memory source) {
+        string memory msgError = string(abi.encodePacked("MemberHelpers(isController - Modifier):", source, "- Caller is not a controller"));
+        require(hasRole(CONTROLLER_ROLE, msg.sender),msgError);
+
+        _;
+    }
+
+
+     /// @dev check if user is validator
+    modifier isValidator(string memory source) {
+
+        string memory msgError = string(abi.encodePacked("NodeOperations(Modifier):", source, "- You are not a validator"));
+        require( members.userMap(msg.sender, Members.UserType(1)), msgError);
 
         _;
     }
@@ -50,12 +61,12 @@ contract MemberHelpers is AccessControl {
 
    
 
-    function increaseDeposit(address user, uint256 amount) public isController {
+    function increaseDeposit(address user, uint256 amount) public isController("increaseDeposit") {
         deposits[user] = deposits[user].add(amount);
         emit LogIncreaseDeposit(user, amount);
     }
 
-    function decreaseDeposit(address user, uint256 amount) public isController {
+    function decreaseDeposit(address user, uint256 amount) public isController("decreaseDepoist") {
         deposits[user] = deposits[user].sub(amount);
         emit LogDecreaseDeposit(user, amount);
     }
@@ -119,12 +130,9 @@ contract MemberHelpers is AccessControl {
      * @dev to be called by administrator to set Validation address
      * @param _validations validation contract address
      */
-    function setValidation(address _validations) public isController {
+    function setValidation(address _validations) public isController("setValidation") {
         require( _validations != address(0), "MemberHelpers:setValidation - Validation address can't be 0");
         validations = IValidatinos(_validations);
     }
-
-    
-
 
 }

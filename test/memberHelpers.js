@@ -62,7 +62,7 @@ contract("Member Helper contract", (accounts) => {
         memberHelpers = await MEMBER_HELPERS.new(members.address, token.address)
 
         cohortFactory = await COHORTFACTORY.new(members.address, memberHelpers.address);
-        nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address);
+        nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address, members.address);
         depositModifiers = await DEPOSIT_MODIFIERS.new(members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address)
         validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address)
 
@@ -76,8 +76,10 @@ contract("Member Helper contract", (accounts) => {
         await token.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
         await depositModifiers.grantRole(CONTROLLER_ROLE, validation.address, { from: admin });
         await token.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
+        await token.grantRole(CONTROLLER_ROLE, memberHelpers.address, { from: admin });
 
-        // await memberHelpers.setValidation(validation.address, {from:admin});
+
+        await memberHelpers.setValidation(validation.address, {from:admin});
 
         tokenPerValidation = await members.amountTokensPerValidation();
 
@@ -223,7 +225,7 @@ contract("Member Helper contract", (accounts) => {
     })
 
 
-    describe("Process daily earnings", async () => {
+    describe("Process earnings", async () => {
 
         let cohortAddress;
         let cohortContract;
