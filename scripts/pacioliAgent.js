@@ -113,7 +113,7 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     console.log("[3 " + trxHash + "]" + "  Pacioli report saved at: " + ipfsBase + pacioliIPFS);
 
     //TODO: Until reading isValid flag from Pacioli report is fixed.
-    let isValid = true;
+    let isValid;
     try {
         isValid = JSON.parse(jsonStringFromObject)["isValid"];
     } catch (error) {
