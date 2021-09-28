@@ -10,12 +10,14 @@ let ipfsAPI = require("ipfs-api");
 let BN = require("big-number");
 
 let HDWalletProvider = require('@truffle/hdwallet-provider');
-let dotenv = require('dotenv').config({ path: './.env' })
+require('dotenv').config({ path: '../.env' }); // update process.env
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
 const MEMBER_HELPERS = require('../build/contracts/MemberHelpers.json');
 const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
 
+//TODO: this module is still copied from https://github.com/Auditchain/Reporting-Validation-Engine/tree/main/clientExamples/pacioliClient:
+const pacioli = require('./pacioliClient'); 
 
 // import ethereum connection strings. 
 const ropsten_infura_server = process.env.ROPSTEN_INFURA_SERVER;
@@ -33,9 +35,7 @@ const nonCohortAddress = process.env.VALIDATIONS_NO_COHORT_ADDRESS;
 const memberHelpersAddress = process.env.MEMBER_HELPERS_ADDRESS;
 const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
 
-
-
-const provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
+const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
 
 const providerForUpdate = new HDWalletProvider(mnemonic, local_host); // change to main_infura_server or another testnet. 
@@ -69,11 +69,11 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
 
-    const pacioliUrl = "https://pacioli.auditchain.finance/analyseReport_";
-    const formatString = "?format=json&apiToken=dummyToken&isLinkbase=false&url=";
-    const axiosToCall = pacioliUrl + formatString + reportUrl;
-    const reportContent = (await axios.get(axiosToCall)).data;
+    const reportContent = await pacioli.callRemote(reportUrl,trxHash,true);
+    //const reportContent = await pacioli.callLocal(reportUrl,trxHash,true); 
+
     const jsonStringFromObject = JSON.stringify(reportContent);
+
     const bufRule = Buffer.from(jsonStringFromObject);
 
     console.log("[2 " + trxHash + "]" + "  Saving Pacioli Results to IPFS");
@@ -83,7 +83,29 @@ async function verifyPacioli(metadatatUrl, trxHash) {
             path: "Pacioli.json",
             content: bufRule
         }];
-    const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true });
+    const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true }); // incompatible with callLocal!!!
+        /*BUG: somehow callLocal is causing the following to be thrown in the line ABOVE:
+        [2 0x4baa71c73c76876d8a6441b082aede53c9ed7259d7a32d1895cac17313144742]  Saving Pacioli Results to IPFS
+        Error: CONNECTION ERROR: The connection got closed with the close code `1006` and the following reason string `Socket Error: read ECONNRESET`
+            at Object.ConnectionError (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-helpers/lib/errors.js:66:23)
+            at Object.ConnectionCloseError (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-helpers/lib/errors.js:53:25)
+            at /Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-requestmanager/lib/index.js:119:50
+            at Map.forEach (<anonymous>)
+            at WebsocketProvider.disconnect (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-requestmanager/lib/index.js:118:37)
+            at WebsocketProvider.emit (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/eventemitter3/index.js:181:35)
+            at WebsocketProvider._onClose (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-providers-ws/lib/index.js:152:10)
+            at W3CWebSocket._dispatchEvent [as dispatchEvent] (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/yaeti/lib/EventTarget.js:115:12)
+            at W3CWebSocket.onClose (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/websocket/lib/W3CWebSocket.js:228:10)
+            at WebSocketConnection.<anonymous> (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/websocket/lib/W3CWebSocket.js:201:17)
+            at WebSocketConnection.emit (events.js:314:20)
+            at WebSocketConnection.handleSocketClose (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/websocket/lib/WebSocketConnection.js:389:14)
+            at Socket.emit (events.js:314:20)
+            at TCP.<anonymous> (net.js:676:12) {
+        code: 1006,
+        reason: 'Socket Error: read ECONNRESET'
+        }
+    */
+
     const pacioliIPFS = resultPacioli[1].hash + '/' + resultPacioli[0].path;
 
     console.log("[3 " + trxHash + "]" + "  Pacioli report saved at: " + ipfsBase + pacioliIPFS);
@@ -194,6 +216,7 @@ async function awardRewards() {
 async function startProcess() {
 
     let myArgs = process.argv.slice(2);
+
     const owner = providerForUpdate.addresses[Number(myArgs[0])];
 
     // const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call();
@@ -214,7 +237,6 @@ async function startProcess() {
                 depositAmountBefore = validationStruct.POWAmount;
 
                 // depositAmountBefore = await nodeOperations.methods.POWAmount(owner).call();
-                let myArgs = process.argv.slice(2);
                 console.log('myArgs: ', myArgs);
                 // console.log("transaction hash:", event.transactionHash);
                 const trxHash = event.transactionHash;
@@ -229,8 +251,6 @@ async function startProcess() {
         // Wait for completion of validation and determine earnings 
         nonCohort.events.RequestExecuted({})
             .on('data', async function (event) {
-                const owner = providerForUpdate.addresses[Number(myArgs[0])];
-
                 const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
                 // console.log("validation Struct:", validationStruct);
                 let balanceAfter = validationStruct.POWAmount;
