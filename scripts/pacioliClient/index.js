@@ -32,7 +32,7 @@ const pacioli = function(){
          * @param {*} REPORT_URL web URL of XBRL instance report or taxonomy file 
          * @param {*} MY_ADDRESS wallet or transaction string
          * @param {*} SaveToIPFS whether to save the resulting report to a IPFS directory
-         * @returns 
+         * @returns Promise resolved with PacioliTrace.json payload, or rejected with a string error
          */
         callLocal: async function(REPORT_URL,MY_ADDRESS='someAddress',SaveToIPFS=false){
             const tmpFile = os.tmpdir()+"/"+process.pid+"_"+(fileCounter++)+".json";
@@ -57,33 +57,28 @@ const pacioli = function(){
                 "'extendedJSON(true,[default(false)])'",
                 "'apiToken(dummyToken,[optional(true)])'"
             ];
-            var theCommand = ENV.PROLOG_COMMAND+" "+ARGS.join(" ");
+            var theCommand = ENV.PROLOG_COMMAND+" "+ARGS.join(" "); // 
             // console.log("theCommand: "+theCommand);
 
             return new Promise(function(resolve,reject){
-                const P = exec(theCommand, {cwd:ENV.PACIOLI_DIRECTORY, env:Object.assign(ENV,{'PUBLIC_URL_ROOT':PUBLIC_URL_ROOT})});
-                P.on('close', function(code,stdout,stderr){
-                    //console.log("Exit code: "+code);console.log("stdout: "+stdout);console.log("stderr: "+stderr);
-                    if (code!=0) 
-                        reject(code + stderr)
+                exec(theCommand, {cwd:ENV.PACIOLI_DIRECTORY, env:Object.assign(ENV,{'PUBLIC_URL_ROOT':PUBLIC_URL_ROOT})}, function(error,stdout,stderr){
+                    if (error) 
+                        reject(error.code+"\nSTDERR:"+stderr);
                     else {
                         var result = JSON.parse(fs.readFileSync(tmpFile));
                         fs.unlink(tmpFile,function(){});
                         resolve(result); 
                     }
                 });
-                P.on('error', function(err){
-                    reject(err);
-                })
             });
-
-            // var S = execSync(theCommand, {cwd:ENV.PACIOLI_DIRECTORY, env:Object.assign(ENV,{'PUBLIC_URL_ROOT':PUBLIC_URL_ROOT})});
-            
-            // console.log("Output: "+S);
-            // var result = {foo:"bar"};
-            
-            // return result;
         },
+        /**
+         * 
+         * @param {*} REPORT_URL 
+         * @param {*} MY_ADDRESS 
+         * @param {*} SaveToIPFS 
+         * @returns Promise with PacioliTrace.json payload, or rejetion with a string error
+         */
         callRemote: async function(REPORT_URL,MY_ADDRESS='someAddress',SaveToIPFS=false){
             var axiosToCall = ENV.PACIOLI_HOST+
                 "/analyseReport_?format=json&apiToken=dummyToken&isLinkbase=false&extendedJSON=true&generateHiddenHTML=true&address="+MY_ADDRESS+
@@ -93,7 +88,14 @@ const pacioli = function(){
             const agent = new https.Agent({  
                 rejectUnauthorized: false // HACK to avoid certificate error
               });
-            var X = await axios.get(axiosToCall, { httpsAgent: agent });
+
+            return new Promise(function(resolve,reject){
+                axios.get(axiosToCall, { httpsAgent: agent })
+                    .then((response) => resolve(response.data) )
+                    .catch((error) => {
+                        reject((error.response? error.response.data : error.message))
+                    });
+            });
             return X.data;
         }
 

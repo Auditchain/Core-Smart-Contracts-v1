@@ -70,9 +70,12 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     const reportUrl = JSON.parse(result)["reportUrl"];
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true);
-
-    //const reportContent = await pacioli.callLocal(reportUrl,trxHash,true); 
+    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
+        .catch(error => console.log("ERROR: "+error));
+    //const reportContent = await pacioli.callLocal(reportUrl,trxHash,true)
+    //  .catch(error => console.log("ERROR: "+error));; 
+    
+    if (!reportContent) return [null,false];
 
     const jsonStringFromObject = JSON.stringify(reportContent);
 
@@ -85,44 +88,16 @@ async function verifyPacioli(metadatatUrl, trxHash) {
             path: "Pacioli.json",
             content: bufRule
         }];
-    const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true }); // incompatible with callLocal!!!
-    /*BUG: somehow callLocal is causing the following to be thrown in the line ABOVE:
-    [2 0x4baa71c73c76876d8a6441b082aede53c9ed7259d7a32d1895cac17313144742]  Saving Pacioli Results to IPFS
-    Error: CONNECTION ERROR: The connection got closed with the close code `1006` and the following reason string `Socket Error: read ECONNRESET`
-        at Object.ConnectionError (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-helpers/lib/errors.js:66:23)
-        at Object.ConnectionCloseError (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-helpers/lib/errors.js:53:25)
-        at /Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-requestmanager/lib/index.js:119:50
-        at Map.forEach (<anonymous>)
-        at WebsocketProvider.disconnect (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-core-requestmanager/lib/index.js:118:37)
-        at WebsocketProvider.emit (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/eventemitter3/index.js:181:35)
-        at WebsocketProvider._onClose (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/web3-providers-ws/lib/index.js:152:10)
-        at W3CWebSocket._dispatchEvent [as dispatchEvent] (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/yaeti/lib/EventTarget.js:115:12)
-        at W3CWebSocket.onClose (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/websocket/lib/W3CWebSocket.js:228:10)
-        at WebSocketConnection.<anonymous> (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/websocket/lib/W3CWebSocket.js:201:17)
-        at WebSocketConnection.emit (events.js:314:20)
-        at WebSocketConnection.handleSocketClose (/Users/mc/git/Core-Smart-Contracts-v1/node_modules/web3/node_modules/websocket/lib/WebSocketConnection.js:389:14)
-        at Socket.emit (events.js:314:20)
-        at TCP.<anonymous> (net.js:676:12) {
-    code: 1006,
-    reason: 'Socket Error: read ECONNRESET'
-    }
-*/
+    const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true }); 
 
     const pacioliIPFS = resultPacioli[1].hash + '/' + resultPacioli[0].path;
 
     console.log("[3 " + trxHash + "]" + "  Pacioli report saved at: " + ipfsBase + pacioliIPFS);
 
-    //TODO: Until reading isValid flag from Pacioli report is fixed.
-    let isValid;
-    try {
-        isValid = JSON.parse(jsonStringFromObject)["isValid"];
-    } catch (error) {
 
-        console.log("isvalid", error);
-    }
+    //console.log("isvalid:"+reportContent.isValid);
 
-
-    return [pacioliIPFS, isValid];
+    return [pacioliIPFS, reportContent.isValid];
 }
 
 
@@ -245,6 +220,11 @@ async function startProcess() {
                 const trxHash = event.transactionHash;
                 const [reportPacioliIPFSUrl, isValid] = await verifyPacioli(event.returnValues.url, trxHash);
                 // const isValid = await getReportResult(reportPacioliIPFSUrl, trxHash);
+
+                if (!reportPacioliIPFSUrl) {
+                    console.log("FAILED execution of verifyPacioli for "+event.returnValues.url);
+                    return; //TODO: what to do here?
+                }
 
                 const metaDataLink = await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash, isValid);
                 await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, owner, trxHash, metaDataLink)
