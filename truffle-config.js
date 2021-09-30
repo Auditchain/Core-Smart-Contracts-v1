@@ -50,17 +50,25 @@ module.exports = {
       gas: 4500000,
       gasPrice: 1000000000
     },
-    rinkeby: {
+    kovan: {
       provider: function () {
         return new HDWalletProvider(
           MNEMONIC,
-          "https://rinkeby.infura.io/v3/" + INFURA_KEY
+          "https://kovan.infura.io/v3/" + INFURA_KEY
         );
       },
       network_id: "*",
-      gas: 10000000
-
-
+      gas: 0x989680
+    },
+    goerli: {
+      provider: function () {
+        return new HDWalletProvider(
+          MNEMONIC,
+          "https://goerli.infura.io/v3/" + INFURA_KEY
+        );
+      },
+      network_id: "*",
+      gas: 0x989680
     },
     coverage: {
       host: 'localhost',
