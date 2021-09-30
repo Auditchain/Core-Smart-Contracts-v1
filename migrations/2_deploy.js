@@ -24,15 +24,15 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   let admin = accounts[0];
   // let admin = "0x67794670742BA1E53FD04d8bA22a9b4487CE65B4";
 
-  let delegating = accounts[1];
-  let dataSubscriber = accounts[2];
-  let validator1 = accounts[3];
-  let validator2 = accounts[4];
-  let validator3 = accounts[5];
-  let validator4 = accounts[6];
-  let enterprise1 = accounts[7];
-  let enterprise2 = accounts[8];
-  let platformAddress = accounts[9];
+  let delegating = "0x4311eD2826C3D4E7c82149fAAEe9FB7f40e05568";
+  let dataSubscriber = "0xd431134b507d3B6F2742687e14cD9CbA5b6BE0F4";
+  let validator1 = "0x5A8bbBdE5bF85Ba241641403001eef87D90087f6";
+  let validator2 = "0x162e952B2F0363613F905abC8c93B519e670Fa4f";
+  let validator3 = "0x06997173F50DDD017a5f0A87480Ed7220039B46e";
+  let validator4 = "0x79b39D5893382ee75e101bFC9c79708ADD480370";
+  let enterprise1 = "0xd3956b952a78C7E6C700883924D52CC776F9E4F2";
+  let enterprise2 = "0x2e5dCB0bdC76d25f8D8349C88e87B44F467171c7";
+  let platformAddress = "0xB96C9E9e6A3042d107402cc88c73Bf501aacd49d";
   let validatorAmountMin = "5000000000000000000000";
   let validatorAmountMax = "8000000000000000000000";
   let subscriberFee = "1000000000000000000000";
@@ -81,424 +81,19 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await deployer.deploy(NoCohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address);
   let noCohort = await NoCohort.deployed();
 
-  await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
-  await memberHelpers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
-  await memberHelpers.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
-  await memberHelpers.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
-  await nodeOperations.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
-  await nodeOperations.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
-  await nodeOperations.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
-
-
-
-
-
-
-
-  // await memberHelpers.setCohortFactory(cohortFactory.address, { from: admin });
-
-
-  await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
-  await token.grantRole(CONTROLLER_ROLE, admin, { from: admin });
-
 
   await deployer.deploy(Timelock, admin, 5);
   let timelock = await Timelock.deployed();
-
+  
   await deployer.deploy(GovernorAlpha, timelock.address, token.address, admin);
   let gov = await GovernorAlpha.deployed();
 
-
-
-
-  await deployer.deploy(NFT, "Test", "Test", cohort.address);
+  await deployer.deploy(NFT, "AuditChain", "Rules", cohort.address);
   let nft = await NFT.deployed();
 
-  await timelock.setPendingAdmin(gov.address, { from: admin });
-  await timelock.acceptAdmin({ from: admin });
 
-  // await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
-  await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
-  // await token.grantRole(CONTROLLER_ROLE, admin, { from: admin });
 
-  await cohortFactory.grantRole(SETTER_ROLE, timelock.address, { from: admin });
-  await members.grantRole(SETTER_ROLE, timelock.address, { from: admin });
-
-  await cohortFactory.grantRole(SETTER_ROLE, timelock.address, { from: admin });
-
-  await token.grantRole(CONTROLLER_ROLE, members.address, { from: admin });
-  await token.grantRole(CONTROLLER_ROLE, memberHelpers.address, { from: admin });
-  await token.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
-
-
-  await depositModifiers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
-  await depositModifiers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
-
-
-
-
-
-  await members.addUser(enterprise1, "Enterprise 1", 0, { from: admin });
-  await members.addUser(enterprise2, "Enterprise 2", 0, { from: admin });
-
-  await members.addUser(validator1, "Validator 1", 1, { from: admin });
-  await members.addUser(validator2, "Validator 2", 1, { from: admin });
-  await members.addUser(validator3, "Validator 3", 1, { from: admin });
-  await members.addUser(validator4, "Validator 4", 1, { from: admin });
-  await members.addUser(delegating, "delegating", 1, { from: admin });
-
-  await members.addUser(dataSubscriber, "Datasubscriber 1", 2, { from: admin });
-
-
-
-  await token.transfer(accounts[1], tokenAmount1);
-  await token.transfer(accounts[2], tokenAmount2);
-  await token.transfer(accounts[3], tokenAmount3);
-  await token.transfer(accounts[4], tokenAmount4);
-  await token.transfer(accounts[5], tokenAmount5);
-  await token.transfer(accounts[6], tokenAmount2);
-  await token.transfer(accounts[7], tokenAmount2);
-  await token.transfer(accounts[8], tokenAmount3);
-  await token.transfer(delegating, tokenAmount6);
-
-
-
-
-
-  await token.approve(memberHelpers.address, validatorAmountMax, { from: validator1 });
-  await token.approve(memberHelpers.address, validatorAmountMin, { from: validator2 });
-  await token.approve(memberHelpers.address, validatorAmountMin, { from: validator3 });
-  await token.approve(memberHelpers.address, validatorAmountMin, { from: validator4 });
-  await token.approve(memberHelpers.address, validatorAmountMin, { from: enterprise1 });
-  await token.approve(memberHelpers.address, validatorAmountMin, { from: enterprise2 });
-  await token.approve(memberHelpers.address, validatorAmountMin, { from: dataSubscriber });
-  await token.approve(memberHelpers.address, validatorAmountMin, { from: delegating });
-
-
-
-
-
-  await memberHelpers.stake(validatorAmountMax, { from: validator1 });
-  await memberHelpers.stake(validatorAmountMin, { from: validator2 });
-  await memberHelpers.stake(validatorAmountMin, { from: validator3 });
-  await memberHelpers.stake(validatorAmountMin, { from: validator4 });
-  await memberHelpers.stake(validatorAmountMin, { from: enterprise1 });
-  await memberHelpers.stake(validatorAmountMin, { from: enterprise2 });
-  await memberHelpers.stake(validatorAmountMin, { from: delegating });
-
-
-  await memberHelpers.stake(validatorAmountMin, { from: dataSubscriber });
-
-  await nodeOperations.toggleNodeOperator({ from: validator1 });
-  await nodeOperations.toggleNodeOperator({ from: validator2 });
-  await nodeOperations.toggleNodeOperator({ from: validator3 });
-  await nodeOperations.toggleNodeOperator({ from: validator4 });
-
-
-
-
-
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise2 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise2 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 3, { from: enterprise2 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 1, { from: enterprise1 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 2, { from: enterprise1 });
-  await cohortFactory.inviteValidatorMultiple([validator1, validator2, validator3, validator4], 3, { from: enterprise1 });
-
-  await cohortFactory.acceptInvitation(enterprise2, 0, { from: validator1 });
-  await cohortFactory.acceptInvitation(enterprise2, 1, { from: validator2 });
-  await cohortFactory.acceptInvitation(enterprise2, 2, { from: validator3 });
-  await cohortFactory.acceptInvitation(enterprise2, 3, { from: validator4 });
-
-  await cohortFactory.acceptInvitation(enterprise1, 0, { from: validator1 });
-  await cohortFactory.acceptInvitation(enterprise1, 1, { from: validator2 });
-  await cohortFactory.acceptInvitation(enterprise1, 2, { from: validator3 });
-  await cohortFactory.acceptInvitation(enterprise1, 3, { from: validator4 });
-
-  // await cohortFactory.acceptInvitation(enterprise1, 4, { from: validator2 });
-  // await cohortFactory.acceptInvitation(enterprise1, 5, { from: validator3 });
-  // await cohortFactory.acceptInvitation(enterprise1, 6, { from: validator4 });
-  // await cohortFactory.acceptInvitation(enterprise1, 7, { from: validator1 });
-
-
-
-  await cohortFactory.acceptInvitation(enterprise1, 8, { from: validator1 });
-  await cohortFactory.acceptInvitation(enterprise1, 9, { from: validator2 });
-  await cohortFactory.acceptInvitation(enterprise1, 10, { from: validator3 });
-  await cohortFactory.acceptInvitation(enterprise1, 11, { from: validator4 });
-
-
-  let result = await cohortFactory.createCohort(1, { from: enterprise1 });
-
-  let event = result.logs[0];
-
-  await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
-  await memberHelpers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
-
-  await token.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
-
-  await memberHelpers.setValidation(cohort.address, { from: admin });
-  // await memberHelpers.setCohort(cohort.address, { from: admin });
-
-  let documentURL = "http://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml"
-  documentHash = web3.utils.soliditySha3(documentURL);
-
-  result = await cohort.initializeValidationCohort(documentHash, documentURL, 1, { from: enterprise1 });
-
-
-
-  event = result.logs[0];
-  let validationInitTime = event.args.initTime;
-
-
-
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
-
-
-  timeMachine.advanceTimeAndBlock(10);
-
-  // await cohortFactory.createCohort(2, { from: enterprise1 });
-  result = await cohort.initializeValidationCohort(documentHash, documentURL, 1, { from: enterprise1 });
-
-  event = result.logs[0];
-  validationInitTime = event.args.initTime;
-
-
-  await cohort.validate(documentHash, validationInitTime, 1, "",  { from: validator1, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 2, "", { from: validator2, gas: 800000 });
-
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
-
-
-  timeMachine.advanceTimeAndBlock(10);
-
-  // await cohortFactory.createCohort(2, { from: enterprise1 });
-  result = await cohort.initializeValidationCohort(documentHash, documentURL, 1, { from: enterprise1 });
-
-  event = result.logs[0];
-  validationInitTime = event.args.initTime;
-
-
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 2, "",  { from: validator2, gas: 800000 });
-  result = await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
-
-
-  // event = result.logs[0];
-  // let event1 = result.logs[1];
-  // let event2 = result.logs[2]
-
-  // console.log("event", event.event);
-  // console.log("event1", event1.event);
-  // console.log("event2", event2.event);
-
-
-
-  // validationInitTime = event.args.initTime;
-
-
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
-  await token.approve(depositModifiers.address, subscriberFee, { from: dataSubscriber });
-  await depositModifiers.dataSubscriberPayment(enterprise1, 1, { from: dataSubscriber });
-
-  // const isSubscribed = await memberHelpers.dataSubscriberCohortMap(dataSubscriber, enterprise1, audits);
-
-
-
-  // ****************NFT***************************************//
-
-  await cohortFactory.createCohort(3, { from: enterprise1 });
-
-  documentURL = "QmNhaANyYwWmfrRBfMbXyogPhBSTQdzFL8TiWbqjBmNuoc/Auditchain.json";
-
-  documentHash = web3.utils.soliditySha3(documentURL);
-  result = await cohort.initializeValidationCohort(documentHash, documentURL, 3,  { from: enterprise1, gas: 6000000 });
-
-  event = result.logs[0];
-  validationInitTime = event.args.initTime;
-
-
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 900000 });
-
-
-
-
-  //*****************************************Cohort cases end */
-
-  //*****************************************No Cohort cases start */
-
-  result = await noCohort.initializeValidationNoCohort(documentHash, documentURL, 1, { from: dataSubscriber });
-  event = result.logs[0];
-  validationInitTime = event.args.initTime;
-
-  await nodeOperations.delegate(validator1, {from:delegating});
-
-  await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-  await noCohort.validate(documentHash, validationInitTime, 2, "", { from: validator2, gas: 800000 });
-  let resultVal = await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
-  await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
-  // await noCohort.validate(documentHash, validationInitTime, 1, { from: delegating, gas: 800000 });
-
-
-  // console.log("result:", resultVal);
-
-  const eventsMember = await nodeOperations.getPastEvents(
-    "LogReferralStakeRewardsIncreased",
-    {
-      fromBlock: 0,
-      toBlock: "latest",
-    }
-  )
-
-  // console.log("events", eventsMember)
-
-
-  // let stakingRewards = await nodeOperations.stakeAmount(validator1);
-
-  // console.log("staking rewards:", stakingRewards.toString());
-
-
-  // await nodeOperations.toggleNodeOperator({ from: validator1 });
-
-  // await nodeOperations.delegate(validator1, { from: validator3 });
-
-  let list = await nodeOperations.returnPoolList(validator1);
-
-  // console.log("Pool list:", list);
-
-  // await memberHelpers.toggleNodeOperator({from:validator1});
-
-
-
-
-  //*****************************************No Cohort cases end */
-
-
-
-
-
-  // // Governance data
-  // await token.delegate(accounts[1], { from: accounts[1] });
-  // await token.delegate(accounts[2], { from: accounts[2] });
-  // await token.delegate(accounts[4], { from: accounts[4] });
-  // await token.delegate(accounts[3], { from: accounts[3] });
-  // await token.delegate(accounts[4], { from: accounts[5] });
-  // await token.delegate(accounts[1], { from: accounts[0] });
-  // await token.delegate(accounts[6], { from: accounts[6] });
-  // await token.delegate(accounts[7], { from: accounts[7] });
-  // await token.delegate(accounts[8], { from: accounts[8] });
-
-  // values = ["0"];
-  // signatures = ["getBalanceOf(address)", "approve(address)"];
-
-  // let description1 = "# Changing SAI collateral factor to 55%\n" +
-  //   "First proposal that intent to slowly close the SAI market.\n" +
-  //   "The [first](https://compound.finance/governance/proposals/3) proposal in this topic has been successfully executed, continuing with recent analysis of accounts.\n" +
-  //   "**Collateral Factor**\n" +
-  //   "Going from 65% to 55% with the current market prices **would cause** two liquidations on the analyzed accounts.\n" +
-  //   "![Analysis](https://i.imgur.com/KIuG5E2.png)\n" +
-  //   "(The list does not contain accounts that hold less than 50 SAI)\n" +
-  //   "[Analyzed accounts](https://i.imgur.com/KIuG5E2.png)\n" +
-  //   "[Forum discussion!](https://compound.comradery.io/post/1600)\n"
-
-  // let description2 = "# Adjusting Reserve Factors%\n" +
-  //   "Second proposal that intent to slowly close the SAI market.\n"
-
-  // let description3 = "# Uniswap Improvement Strategy\n" +
-  //   "Third proposal that intent to slowly close the SAI market.\n"
-
-
-  // let description4 = "# Upgrade cUSDT Interest Rate Model\n" +
-  //   "Recently, Dharma led the community to release a new upgradable\n" +
-  //   "interest rate model contract for cDAI based on the new JumpRateModelV2.\n" +
-  //   "This proposal updates the cUSDT interest rate model to a recently deployed\n" +
-  //   "JumpRateModelV2 with the same parameters as the current cDAI interest rate model:\n"
-
-  // // let calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
-  // let calldata = [abi.encode(['uint256', 'uint256'], [(5e18).toString(), 0])];
-
-  // let signature = ['updateMinValidatorsPerCohort(uint256,uint256)'];
-
-  // result = await gov.propose([cohortFactory.address], values, signature, calldata, description1, { from: accounts[2] });
-
-  // let test = await gov.getPastEvents('ProposalCreated');
-
-  // event = result.logs[0];
-
-
-  // values = ["0", "0"];
-  // calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
-  // result = await gov.propose([accounts[1], accounts[3]], values, signatures, calldata, description2, { from: accounts[1] });
-
-  // result = await gov.propose([accounts[4], accounts[5]], values, signatures, calldata, description3, { from: accounts[4] });
-
-  // result = await gov.castVote(1, 1, { from: accounts[1] });
-
-  // await gov.castVote(1, 1, { from: accounts[2] });
-  // await gov.castVote(1, 1, { from: accounts[3] });
-  // await gov.castVote(1, 1, { from: accounts[4] });
-  // await gov.castVote(1, 1, { from: accounts[6] });
-  // await gov.castVote(1, 1, { from: accounts[7] });
-
-
-
-  // let receipt = await gov.getReceipt(1, accounts[1]);
-  // blockNumber = await web3.eth.getBlockNumber();
-
-  // let state = await gov.state(1)
-
-  // console.log("state before:", state.toString());
-
-  // for (x = 1; x <= 300; ++x) {
-  //   timeMachine.advanceBlock();
-  // }
-
-  // blockNumber = await web3.eth.getBlockNumber();
-  // console.log("block Number after:" + blockNumber);
-  // state = await gov.state(1)
-  // console.log("state after:", state.toString());
-  // await gov.queue(1, { from: accounts[0] });
-  // timeMachine.advanceTimeAndBlock(60 * 60 * 6);
-  // await gov.execute(1, { from: accounts[0] });
-  // blockNumber = await web3.eth.getBlockNumber();
-
-
-
-  // let newUpdateRewards = await members.amountTokensPerValidation();
-
-  // console.log("updateRewards", newUpdateRewards.toString());
-
-  // values = ["0", "0"];
-  // calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
-
-  // calldata = [abi.encode(['address', 'uint256'], [accounts[0], 2]), abi.encode(['address', 'uint256'], [accounts[1], 2])];
-  // result = await gov.propose([accounts[3], accounts[1]], values, signatures, calldata, description4, { from: accounts[3] });
-  // event = result.logs[0];
-
-  // // state = await gov.state(4);
-  // //  console.log("state:" + state);
-
-  // timeMachine.advanceBlock();
-
-  // await gov.castVote(4, 0, { from: accounts[1] });
-  // await gov.castVote(4, 0, { from: accounts[2] });
-  // await gov.castVote(4, 1, { from: accounts[3] });
-  // await gov.castVote(4, 1, { from: accounts[4] });
-  // await gov.castVote(4, 1, { from: accounts[6] });
-  // await gov.castVote(4, 0, { from: accounts[7] });
-
-
-  // await gov.cancel(2, { from: accounts[0] });
-
-  // result = await gov.propose([accounts[1], accounts[2]], values, signatures, calldata, "Test to cancel", { from: accounts[1] });
-  // await gov.cancel(5, { from: accounts[0] });
+  
 
 
   // front format
@@ -548,6 +143,129 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('governorAlphaAddress:"' + gov.address + '",');
   console.log('timelockAddress:"' + timelock.address + '",');
   console.log('rulesNFTAddress:"' + nft.address + '",' + "\n\n");
+
+
+  
+
+  await timelock.setPendingAdmin(gov.address, { from: admin });
+  console.log('timelock.setPendingAdmin(gov.address, { from: admin })');
+
+  await timelock.acceptAdmin({ from: admin });
+  console.log("timelock.acceptAdmin({ from: admin })");
+
+  
+
+
+  memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
+  console.log("memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin })")
+
+
+  memberHelpers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
+  console.log('memberHelpers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin })')
+
+  memberHelpers.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
+  console.log('memberHelpers.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin })')
+
+
+  memberHelpers.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
+  console.log('memberHelpers.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin })');
+
+  memberHelpers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
+  console.log('memberHelpers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin })')
+
+  
+  nodeOperations.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin }); 
+  console.log('nodeOperations.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });')
+
+  nodeOperations.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
+  console.log('nodeOperations.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });')
+
+  nodeOperations.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
+  console.log('nodeOperations.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });')
+  
+  members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
+  console.log('members.grantRole(CONTROLLER_ROLE, admin, { from: admin });');
+
+
+  members.grantRole(SETTER_ROLE, timelock.address, { from: admin });
+  console.log('members.grantRole(SETTER_ROLE, timelock.address, { from: admin });');
+  
+  cohortFactory.grantRole(SETTER_ROLE, timelock.address, { from: admin });
+  console.log('cohortFactory.grantRole(SETTER_ROLE, timelock.address, { from: admin });');
+
+  nodeOperations.grantRole(SETTER_ROLE, timelock.address, { from: admin });
+  console.log('nodeOperations.grantRole(SETTER_ROLE, timelock.address, { from: admin });');
+  
+  
+  
+  token.grantRole(CONTROLLER_ROLE, admin, { from: admin });
+  console.log('token.grantRole(CONTROLLER_ROLE, admin, { from: admin });')
+
+  token.grantRole(CONTROLLER_ROLE, members.address, { from: admin });
+  console.log('token.grantRole(CONTROLLER_ROLE, members.address, { from: admin });');
+
+  token.grantRole(CONTROLLER_ROLE, memberHelpers.address, { from: admin });
+  console.log('token.grantRole(CONTROLLER_ROLE, memberHelpers.address, { from: admin });')
+
+
+  token.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });
+  console.log('token.grantRole(CONTROLLER_ROLE, nodeOperations.address, { from: admin });');
+
+  token.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });
+  console.log('token.grantRole(CONTROLLER_ROLE, depositModifiers.address, { from: admin });')
+
+
+  depositModifiers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });
+  console.log('depositModifiers.grantRole(CONTROLLER_ROLE, cohort.address, { from: admin });');
+
+  depositModifiers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
+  console.log('epositModifiers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });');
+
+  await memberHelpers.setValidation(cohort.address, { from: admin });
+  console.log('memberHelpers.setValidation(cohort.address, { from: admin });')
+
+  
+
+  
+
+  members.addUser(validator1, "Validator 1", 1, { from: admin });
+  console.log('members.addUser(validator1, "Validator 1", 1, { from: admin });');
+
+  members.addUser(validator2, "Validator 2", 1, { from: admin });
+  console.log('members.addUser(validator2, "Validator 2", 1, { from: admin });');
+
+  members.addUser(validator3, "Validator 3", 1, { from: admin });
+  console.log('members.addUser(validator3, "Validator 3", 1, { from: admin });');
+
+  members.addUser(validator4, "Validator 4", 1, { from: admin });
+  console.log('members.addUser(validator4, "Validator 4", 1, { from: admin });');
+
+  members.addUser(delegating, "delegating", 1, { from: admin });
+  console.log('members.addUser(delegating, "delegating", 1, { from: admin });');
+
+  members.addUser(dataSubscriber, "Datasubscriber 1", 2, { from: admin });
+  console.log('members.addUser(dataSubscriber, "Datasubscriber 1", 2, { from: admin });');
+
+  members.addUser(enterprise1, "Datasubscriber 2", 0, { from: admin });
+  console.log('members.addUser(enterprise1, "Datasubscriber 2", 0, { from: admin });');
+
+  members.addUser(enterprise2, "Datasubscriber 3", 0, { from: admin });
+  console.log('members.addUser(enterprise2, "Datasubscriber 3", 0, { from: admin });');
+
+
+  token.transfer(dataSubscriber, tokenAmount2, { from: admin });
+  token.transfer(validator1, tokenAmount3, { from: admin });
+  token.transfer(validator2, tokenAmount4, { from: admin });
+  token.transfer(validator3, tokenAmount5, { from: admin });
+  token.transfer(validator4, tokenAmount2, { from: admin });
+  token.transfer(enterprise1, tokenAmount2, { from: admin });
+  token.transfer(enterprise2, tokenAmount3, { from: admin });
+  await token.transfer(delegating, tokenAmount6, { from: admin });
+
+  console.log("FINISHED");
+
+
+
 
 
 
