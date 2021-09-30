@@ -23,6 +23,7 @@ const pacioli = require('./pacioliClient');
 const ropsten_infura_server = process.env.ROPSTEN_INFURA_SERVER;
 const rinkeby_infura_server = process.env.RINKEBY_INFURA_SERVER;
 const main_infura_server = process.env.MAINNET_INFURA_SERVER;
+const goerli_infura_server = process.env.GOERLI_INFURA_SERVER
 const local_host = process.env.LOCAL;
 const mnemonic = process.env.MNEMONIC;
 
@@ -51,7 +52,7 @@ let providerForUpdate;
 
 async function setUpContracts(account) {
 
-    providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
+    providerForUpdate = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
@@ -203,12 +204,14 @@ async function startProcess() {
     const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call();
     const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
 
+    console.log("nodeOperator", nodeOperator);
+
     const isNodeOperator = validationStruct.isNodeOperator;
     const isDelegating = validationStruct.isDelegating;
 
     if (isNodeOperator && !isDelegating) {
         console.log("Process started.");
-        console.log("Transaction count:", await web3.eth.getTransactionCount(owner));
+        // console.log("Transaction count:", await web3.eth.getTransactionCount(owner));
 
         // Wait for validation and start the process
         nonCohort.events.ValidationInitialized({})
