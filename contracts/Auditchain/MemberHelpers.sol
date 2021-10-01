@@ -21,6 +21,8 @@ contract MemberHelpers is AccessControl {
     Members members; // Members contract
     IValidatinos public validations; // Validation interface
     mapping(address => uint256) public deposits; //track deposits per user
+    uint256 public minContribution = 5e21;
+    uint256 public maxContribution = 25e21;
     
 
     event LogDepositReceived(address indexed from, uint256 amount);
@@ -80,11 +82,11 @@ contract MemberHelpers is AccessControl {
 
         if (members.userMap(msg.sender, Members.UserType(1))) {
             require(
-                amount + deposits[msg.sender] >= 5e21,
+                amount + deposits[msg.sender] >= minContribution,
                 "MemberHelpers:stake - Minimum contribution amount is 5000 AUDT tokens"
             );
             require(
-                amount + deposits[msg.sender] <= 25e21,
+                amount + deposits[msg.sender] <= maxContribution,
                 "MemberHelpers:stake - Maximum contribution amount is 25000 AUDT tokens"
             );
         }
