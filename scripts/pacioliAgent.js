@@ -72,11 +72,11 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
     const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-        .catch(error => console.log("ERROR: "+error));
+        .catch(error => console.log("ERROR: " + error));
     //const reportContent = await pacioli.callLocal(reportUrl,trxHash,true)
     //  .catch(error => console.log("ERROR: "+error));; 
-    
-    if (!reportContent) return [null,false];
+
+    if (!reportContent) return [null, false];
 
     const jsonStringFromObject = JSON.stringify(reportContent);
 
@@ -89,7 +89,7 @@ async function verifyPacioli(metadatatUrl, trxHash) {
             path: "Pacioli.json",
             content: bufRule
         }];
-    const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true }); 
+    const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true });
 
     const pacioliIPFS = resultPacioli[1].hash + '/' + resultPacioli[0].path;
 
@@ -132,7 +132,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
     const reportHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(reportContent));
 
     console.log("[6 " + trxHash + "]" + "  Creating metadata file.");
-   
+
     let metaDataObject = {
         reportUrl: ipfsBase + url,
         reportHash: reportHash,
@@ -225,7 +225,7 @@ async function startProcess() {
                 // const isValid = await getReportResult(reportPacioliIPFSUrl, trxHash);
 
                 if (!reportPacioliIPFSUrl) {
-                    console.log("FAILED execution of verifyPacioli for "+event.returnValues.url);
+                    console.log("FAILED execution of verifyPacioli for " + event.returnValues.url);
                     return; //TODO: what to do here?
                 }
 
@@ -233,7 +233,7 @@ async function startProcess() {
                 await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, owner, trxHash, metaDataLink)
 
             })
-            .on('error', console.error);
+            .on('error', console.error)
 
         // Wait for completion of validation and determine earnings 
         nonCohort.events.RequestExecuted({})
@@ -254,5 +254,5 @@ async function startProcess() {
 
 }
 
-startProcess();
+    startProcess();
 
