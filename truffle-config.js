@@ -64,11 +64,19 @@ module.exports = {
       provider: function () {
         return new HDWalletProvider(
           MNEMONIC,
-          "https://goerli.infura.io/v3/" + INFURA_KEY
+          // "https://goerli.infura.io/v3/" + INFURA_KEY
+          "wss://goerli.infura.io/ws/v3/2645f5383f544588975db84a58cd9af6"
+          
         );
       },
       network_id: "*",
-      gas: 0x989680
+      gas: 0x989680,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+      websocket: true,
+      timeoutBlocks: 50000,
+      networkCheckTimeout: 1000000
     },
     coverage: {
       host: 'localhost',
