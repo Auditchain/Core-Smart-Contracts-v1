@@ -64,8 +64,8 @@ module.exports = {
       provider: function () {
         return new HDWalletProvider(
           MNEMONIC,
-          // "https://goerli.infura.io/v3/" + INFURA_KEY
-          "wss://goerli.infura.io/ws/v3/2645f5383f544588975db84a58cd9af6"
+          "https://goerli.infura.io/v3/" + INFURA_KEY
+          // "wss://goerli.infura.io/ws/v3/2645f5383f544588975db84a58cd9af6"
           
         );
       },
