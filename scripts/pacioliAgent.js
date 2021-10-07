@@ -52,12 +52,11 @@ let providerForUpdate;
 
 async function setUpContracts(account) {
 
-    providerForUpdate = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
-
 
 /**
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
@@ -242,6 +241,32 @@ async function startProcess() {
                 let balanceAfter = validationStruct.POWAmount;
                 let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
                 console.log("[8  You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
+
+                const trxHash = event.transactionHash;
+
+                const count = event.returnValues.winners.length;
+                const validationHash = event.returnValues.validationHash;
+                console.log("winners", event.returnValues.winners);
+
+                const winnerSelected = Math.floor((Math.random() * count));
+                console.log("winners selected:", winnerSelected);
+                const winnerAddress = event.returnValues.winners[winnerSelected];
+                console.log("winner address", winnerAddress);
+                const validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
+                console.log("validation", validation[4][1]);
+
+
+                for (let i = 0; i < validation[0].length; i++) {
+                    if (validation[0][i] == winnerAddress) {
+                        const url = validation[4][i];
+                        console.log("url", url);
+                        const result = await ipfs.files.cat(url);
+                        const reportHash = JSON.parse(result)["reportHash"];
+                        i = validation[0].length;
+                        console.log("[Verification " + trxHash + "]" + "  Transactions match")
+                    }
+                }
+
             })
             .on('error', console.error);
 
@@ -254,5 +279,5 @@ async function startProcess() {
 
 }
 
-    startProcess();
+startProcess();
 
