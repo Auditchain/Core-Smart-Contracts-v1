@@ -49,7 +49,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
 
     event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
     event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision, string valUrl);
-    event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url);
+    event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url, address[] winners);
     event PaymentProcessed(bytes32 validationHash, address[] validators);
     event LogGovernanceUpdate(uint256 params, string indexed action);
 
@@ -224,7 +224,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
             (address[] memory winners, uint256 consensus) = determineWinners(validationHash);
             validation.consensus = consensus;
             
-            emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp, validation.url);
+            emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp, validation.url, winners);
             processPayments(validationHash, winners);
         }
     }
