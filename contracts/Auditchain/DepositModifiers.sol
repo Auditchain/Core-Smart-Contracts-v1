@@ -46,7 +46,7 @@ contract DepositModifiers is  AccessControl {
     event LogFeesReceived(address indexed validator, uint256 tokens, bytes32 validationHash);
     event LogRewardsDeposited(uint256 tokens, uint256 enterpriseAmount, address indexed enterprise, bytes32 validationHash);
     event LogNonCohortPaymentReceived(address indexed validator, uint256 tokens, bytes32 validationHash);
-    event LogNonCohortValidationPaid(address indexed requestor, address[] validators, bytes32 validationHash, uint256 amount);
+    event LogNonCohortValidationPaid(address indexed requestor, address winner, bytes32 validationHash, uint256 amount);
 
 
 
@@ -143,48 +143,38 @@ contract DepositModifiers is  AccessControl {
 
     /**
     * @dev To process payment for cohort validation
-    * @param _validators - array of validators
+    * @param winner - winner of POW
     * @param _requestor - requesting party
     * @param validationHash -  hash identifying validation
     */
-    function processPayment(address[] memory _validators, address _requestor, bytes32 validationHash) public isController("processPayment") {
+    function processPayment(address winner, address _requestor, bytes32 validationHash) public isController("processPayment") {
 
         uint256 enterprisePortion =  members.amountTokensPerValidation().mul(members.enterpriseMatch()).div(100);
         uint256 platformFee = members.amountTokensPerValidation().mul(members.platformShareValidation()).div(100);
-        uint256 validatorsFee = members.amountTokensPerValidation().add(enterprisePortion).sub(platformFee);
-        uint256 paymentPerValidator = validatorsFee.div(_validators.length);
+        uint256 winnerFee = members.amountTokensPerValidation().add(enterprisePortion).sub(platformFee);
 
         memberHelpers.decreaseDeposit(_requestor, enterprisePortion);
         IAuditToken(auditToken).mint(address(this), members.amountTokensPerValidation());
         memberHelpers.increaseDeposit(members.platformAddress(), platformFee);
 
-        for (uint256 i=0; i< _validators.length; i++){                     
-            memberHelpers.increaseDeposit(_validators[i], paymentPerValidator);
-            emit LogFeesReceived(_validators[i], paymentPerValidator, validationHash);
-        }
-        emit LogRewardsDeposited(validatorsFee, enterprisePortion, _requestor, validationHash);
+        memberHelpers.increaseDeposit(winner, winnerFee);
+        emit LogFeesReceived(winner, winnerFee, validationHash);
+        emit LogRewardsDeposited(winnerFee, enterprisePortion, _requestor, validationHash);
     }
 
 
      /**
     * @dev To process payment for no cohort validation
-    * @param _validators - array of validators
+    * @param _winner - winner of the POW
     * @param _requestor - requesting party
     * @param validationHash -  hash identifying validation
     */
-    function processNonChortPayment(address[] memory _validators, address _requestor, bytes32 validationHash) public isController("processNonChortPayment") {
+    function processNonChortPayment(address _winner, address _requestor, bytes32 validationHash) public isController("processNonChortPayment") {
 
         uint256 POWFee = nodeOperations.POWFee();
-
-        uint paymentPerValidator = POWFee.div(_validators.length);
-
         memberHelpers.decreaseDeposit(_requestor, POWFee);
-        for (uint i=0; i < _validators.length; i++) {
-            nodeOperations.increasePOWRewards(_validators[i], paymentPerValidator);
-            emit LogNonCohortPaymentReceived(_validators[i], paymentPerValidator, validationHash);
-        }
-
-        emit LogNonCohortValidationPaid(_requestor, _validators, validationHash, POWFee);
+        nodeOperations.increasePOWRewards(_winner, POWFee);
+        emit LogNonCohortValidationPaid(_requestor, _winner, validationHash, POWFee);
     }
 
     /**

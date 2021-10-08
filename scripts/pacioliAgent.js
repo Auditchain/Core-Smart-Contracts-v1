@@ -40,7 +40,7 @@ const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROV
 const web3 = new Web3(provider);
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
-let ipfsBase = 'https://ipfs.io/ipfs/';
+let ipfsBase = 'https://ipfs.infura.io/ipfs/';
 
 let ipfs = ipfsAPI('ipfs.infura.io', 5001, {
     protocol: 'https'
@@ -212,6 +212,7 @@ async function startProcess() {
         console.log("Process started.");
         // console.log("Transaction count:", await web3.eth.getTransactionCount(owner));
 
+
         // Wait for validation and start the process
         nonCohort.events.ValidationInitialized({})
             .on('data', async function (event) {
@@ -231,6 +232,7 @@ async function startProcess() {
                 const metaDataLink = await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash, isValid);
                 await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, owner, trxHash, metaDataLink)
 
+                // console.log(`We have ${nonCohort.events.ValidationInitialized().listenerCount('data')} listener(s) for the ValidationInitialized event`);
             })
             .on('error', console.error)
 
@@ -253,19 +255,34 @@ async function startProcess() {
                 const winnerAddress = event.returnValues.winners[winnerSelected];
                 console.log("winner address", winnerAddress);
                 const validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
-                console.log("validation", validation[4][1]);
+                // console.log("validation", validation[4][1]);
 
-
+                let winnerReportUrl, myReportUrl;
                 for (let i = 0; i < validation[0].length; i++) {
                     if (validation[0][i] == winnerAddress) {
-                        const url = validation[4][i];
-                        console.log("url", url);
-                        const result = await ipfs.files.cat(url);
-                        const reportHash = JSON.parse(result)["reportHash"];
-                        i = validation[0].length;
-                        console.log("[Verification " + trxHash + "]" + "  Transactions match")
+                        winnerReportUrl = validation[4][i];
+                        console.log("winner url", winnerReportUrl);
+                        // i = validation[0].length;
+                        // console.log("[Verification " + trxHash + "]" + "  Transactions match")
+                    } else if (validation[0][i] == owner) {
+
+                        myReportUrl = validation[4][i];
+                        console.log("my url", myReportUrl);
                     }
                 }
+
+                const winnerResult = await ipfs.files.cat(winnerReportUrl);
+                const winnerReportHash = JSON.parse(winnerResult)["reportHash"];
+
+                const myResult = await ipfs.files.cat(winnerReportUrl);
+                const myReportHash = JSON.parse(myResult)["reportHash"];
+
+                if (winnerReportHash == myReportHash) {
+                    console.log("hashes match");
+                    await nonCohortValidate.methods.voteWinner([winnerAddress], [true], validationHash).call();
+                }
+                else
+                    console.log("hashes don't match:", winnerReportHash + " " + myReportHash);
 
             })
             .on('error', console.error);
