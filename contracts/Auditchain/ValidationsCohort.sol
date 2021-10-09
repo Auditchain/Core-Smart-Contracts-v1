@@ -57,7 +57,7 @@ contract ValidationsCohort is Validations {
         
     }
 
-    function returnValidatorList(bytes32 validationHash) internal view override returns (address[] memory){
+    function returnValidatorList(bytes32 validationHash) public view override returns (address[] memory){
 
         Validation storage validation = validations[validationHash];
         address[] memory validatorsList = cohortFactory.returnValidatorList(validation.requestor, uint256(validation.auditType));
@@ -76,6 +76,11 @@ contract ValidationsCohort is Validations {
         super.validate(documentHash, validationTime, decision, valUrl);
         
     }
+
+     function returnValidatorCount(bytes32 validationHash) public view override returns (uint256){
+        return 4;
+    }
+
 
 
 
