@@ -239,10 +239,12 @@ async function startProcess() {
         // Wait for completion of validation and determine earnings 
         nonCohort.events.RequestExecuted({})
             .on('data', async function (event) {
+                // const owner = providerForUpdate.addresses[0];
+
                 const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
-                let balanceAfter = validationStruct.POWAmount;
-                let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
-                console.log("[8  You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
+                // let balanceAfter = validationStruct.POWAmount;
+                // let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
+                // console.log("[8  You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
 
                 const trxHash = event.transactionHash;
 
@@ -277,15 +279,43 @@ async function startProcess() {
                 const myResult = await ipfs.files.cat(winnerReportUrl);
                 const myReportHash = JSON.parse(myResult)["reportHash"];
 
+
+
+                let vote = false;
+
                 if (winnerReportHash == myReportHash) {
+                    vote = true;
                     console.log("hashes match");
-                    await nonCohortValidate.methods.voteWinner([winnerAddress], [true], validationHash).call();
                 }
                 else
-                    console.log("hashes don't match:", winnerReportHash + " " + myReportHash);
+                    console.log("hashes don't match");
 
+                // const owner = providerForUpdate.addresses[0];
+                const nonce = await web3.eth.getTransactionCount(owner);
+
+
+                nonCohortValidate.methods.voteWinner([winnerAddress], [vote], validationHash)
+                    .send({ from: owner, gas: 500000, nonce: nonce })
+                    .on("receipt", function (receipt) {
+                        const event = receipt.events.WinnerVoted;
+                        console.log("winner from vote", event.returnValues.winner);
+
+                    })
+                    .on("error", function (error) {
+                        console.log("An error occurred:", error)
+
+                    });
             })
             .on('error', console.error);
+
+
+        nonCohort.events.PaymentProcessed({})
+            .on('data', async function (event) {
+                console.log("winner paid", event.returnValues.winner);
+                // const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
+            })
+            .on('error', console.error);
+
 
     }
     else if (!isDelegating)
