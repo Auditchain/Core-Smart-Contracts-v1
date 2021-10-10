@@ -39,6 +39,11 @@ const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
 const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
 
+const agentBornAT = Date.now();
+setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
+    ()=> (web3.eth.getBlockNumber().then(what=>console.log(`ran ${(Date.now()-agentBornAT)/1000} seconds; current block ${what}`))), 
+    15000);
+
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
 let ipfsBase = 'https://ipfs.io/ipfs/';
 
