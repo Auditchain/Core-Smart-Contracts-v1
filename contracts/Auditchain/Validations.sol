@@ -47,6 +47,7 @@ abstract contract Validations is  ReentrancyGuard{
         mapping(address => uint256) winnerVotesMinus;
         uint64 winnerConfirmations;
         bool paymentSent;
+        address winner;
     }
 
   
@@ -56,7 +57,7 @@ abstract contract Validations is  ReentrancyGuard{
     event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
     event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision, string valUrl);
     event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url, address[] winners);
-    event PaymentProcessed(bytes32 validationHash, address winner);
+    event PaymentProcessed(bytes32 validationHash, address winner, uint256 pointsPlus, uint256 pointsMinus);
     event WinnerVoted(address validator, address winner, bool isValid);
 
 
@@ -132,9 +133,15 @@ abstract contract Validations is  ReentrancyGuard{
 
     }
 
+    function returnValUrl(bytes32 validationHash)public view returns (string memory){
+
+        Validation storage validation = validations[validationHash];
+        return validation.validationUrl[validation.winner];
+    }
+
    
 
-    function selectWinner(Validation storage validation, address[] memory winners) internal view returns (address) {
+    function selectWinner(Validation storage validation, address[] memory winners) internal returns (address) {
 
         address winner = winners[0];
 
@@ -146,6 +153,7 @@ abstract contract Validations is  ReentrancyGuard{
                     )
                     {winner = winners[i];}
         }
+        validation.winner = winner;
         return winner;
     }
 
