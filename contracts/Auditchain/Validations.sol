@@ -4,9 +4,9 @@ pragma solidity =0.8.0;
 import "./INodeOperations.sol";
 import "./Members.sol";
 import "./DepositModifiers.sol";
-import "./CohortFactory.sol";
+import "./ICohortFactory.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+// import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 
@@ -14,12 +14,12 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
  * @title NoCohort
  * Allows on validation without cohort requested by data subscribers. 
  */
-abstract contract Validations is AccessControl, ReentrancyGuard{
+abstract contract Validations is  ReentrancyGuard{
     using SafeMath for uint256;
     Members public members;
     MemberHelpers public memberHelpers;
     DepositModifiers public depositModifiers;
-    CohortFactory public cohortFactory;
+    ICohortFactory public cohortFactory;
     INodeOperations public nodeOperations;
     mapping(address => uint256) public outstandingValidations;
 
@@ -43,25 +43,32 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         mapping(address => ValidationStatus) validatorChoice;
         mapping(address => uint256) validatorTime;
         mapping(address => string) validationUrl;
+        mapping(address => uint256) winnerVotesPlus;
+        mapping(address => uint256) winnerVotesMinus;
+        uint64 winnerConfirmations;
+        bool paymentSent;
+        address winner;
     }
+
+  
 
     mapping(bytes32 => Validation) public validations; // track each validation
 
     event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
     event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision, string valUrl);
-    event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url);
-    event PaymentProcessed(bytes32 validationHash, address[] validators);
-    event LogGovernanceUpdate(uint256 params, string indexed action);
+    event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url, address[] winners);
+    event PaymentProcessed(bytes32 validationHash, address winner, uint256 pointsPlus, uint256 pointsMinus);
+    event WinnerVoted(address validator, address winner, bool isValid);
 
 
     constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations) {
 
         members = Members(_members);
         memberHelpers = MemberHelpers(_memberHelpers);
-        cohortFactory = CohortFactory(_cohortFactory);
+        cohortFactory = ICohortFactory(_cohortFactory);
         depositModifiers = DepositModifiers(_depositModifiers);
         nodeOperations = INodeOperations(_nodeOperations);
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        // _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
     }
 
@@ -100,7 +107,60 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         emit ValidationInitialized(msg.sender, validationHash, validationTime, documentHash, url, auditType);
     }
 
-    function returnValidatorList(bytes32 validationHash) internal view virtual returns (address[] memory);
+
+    function voteWinner(address[] memory winners, bool[] memory vote,  bytes32 validationHash) public {
+
+        Validation storage validation = validations[validationHash];
+
+        for (uint8 i=0; i< winners.length; i++){
+            if (vote[i])
+                validation.winnerVotesPlus[winners[i]] =  validation.winnerVotesPlus[winners[i]].add(1);
+            else
+                validation.winnerVotesMinus[winners[i]] =  validation.winnerVotesMinus[winners[i]].add(1);
+
+                emit WinnerVoted(msg.sender, winners[i], vote[i]);
+        }
+
+        validation.winnerConfirmations++;
+        uint256 operatorCount = returnValidatorCount(validationHash);
+        uint256 currentQuorum = validation.winnerConfirmations * 100 / operatorCount;
+        
+        if (currentQuorum >=members.requiredQuorum() && !validation.paymentSent){
+            address winner = selectWinner(validation, winners);
+            validation.paymentSent = true;
+            processPayments(validationHash, winner);
+        }
+
+    }
+
+    function returnValUrl(bytes32 validationHash)public view returns (string memory){
+
+        Validation storage validation = validations[validationHash];
+        return validation.validationUrl[validation.winner];
+    }
+
+   
+
+    function selectWinner(Validation storage validation, address[] memory winners) internal returns (address) {
+
+        address winner = winners[0];
+
+        for (uint8 i=1; i < winners.length; i++){
+            if (validation.winnerVotesPlus[winners[i]] > validation.winnerVotesMinus[winners[i]])
+                if (
+                    validation.winnerVotesPlus[winners[i]].sub(validation.winnerVotesMinus[winners[i]]) > 
+                    validation.winnerVotesPlus[winners[i-1]].sub(validation.winnerVotesMinus[winners[i-1]])
+                    )
+                    {winner = winners[i];}
+        }
+        validation.winner = winner;
+        return winner;
+    }
+
+
+    function returnValidatorList(bytes32 validationHash) public view virtual returns (address[] memory);
+
+    function returnValidatorCount(bytes32 validationHash) public view virtual returns(uint256);
     
 
     
@@ -205,7 +265,7 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
             return 2; // consensus is tie - should not happen
     }
 
-    function processPayments(bytes32 validationHash, address[] memory validators) internal virtual {
+    function processPayments(bytes32 validationHash, address winner) internal virtual {
     }
 
 
@@ -224,8 +284,8 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
             (address[] memory winners, uint256 consensus) = determineWinners(validationHash);
             validation.consensus = consensus;
             
-            emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp, validation.url);
-            processPayments(validationHash, winners);
+            emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp, validation.url, winners);
+            // processPayments(validationHash, winners);
         }
     }
 
@@ -321,8 +381,8 @@ abstract contract Validations is AccessControl, ReentrancyGuard{
         nodeOperations.increaseStakeRewards(msg.sender);
         nodeOperations.increaseDelegatedStakeRewards(msg.sender);
 
-        if (validation.executionTime == 0 )
-            executeValidation(validationHash, documentHash, validation.executionTime);
+        // if (validation.executionTime == 0 )
+        executeValidation(validationHash, documentHash, validation.executionTime);
         emit ValidatorValidated(msg.sender, documentHash, validationTime, decision, valUrl);
     }
 

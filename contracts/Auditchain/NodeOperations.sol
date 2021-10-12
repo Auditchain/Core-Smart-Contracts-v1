@@ -241,6 +241,11 @@ contract NodeOperations is AccessControl {
         return nodeOperators;
     }
 
+    function returnNodeOperatorsCount() public view returns(uint256){
+
+        return nodeOperators.length;
+    }
+
     /// return all CPAs
     function returnCPAs() public view returns (address[] memory) {
 

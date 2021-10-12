@@ -57,12 +57,11 @@ let providerForUpdate;
 
 async function setUpContracts(account) {
 
-    providerForUpdate = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
-
 
 /**
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
@@ -75,11 +74,13 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     const result = await ipfs.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
 
+
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
     //const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
     //    .catch(error => console.log("ERROR: " + error));
     const reportContent = await pacioli.callLocal(reportUrl,trxHash,true)
       .catch(error => console.log("ERROR: "+error));; 
+
 
     if (!reportContent) return [null, false];
 
@@ -87,7 +88,7 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
     const bufRule = Buffer.from(jsonStringFromObject);
 
-    console.log("[2 " + trxHash + "]" + "  Saving Pacioli Results to IPFS");
+    console.log("[2 " + trxHash + "] Saving Pacioli Results to IPFS");
 
     const reportFile = [
         {
@@ -98,10 +99,7 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
     const pacioliIPFS = resultPacioli[1].hash + '/' + resultPacioli[0].path;
 
-    console.log("[3 " + trxHash + "]" + "  Pacioli report saved at: " + ipfsBase + pacioliIPFS);
-
-
-    //console.log("isvalid:"+reportContent.isValid);
+    console.log("[3 " + trxHash + "] Pacioli report saved at: " + ipfsBase + pacioliIPFS);
 
     return [pacioliIPFS, reportContent.isValid];
 }
@@ -115,7 +113,6 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 async function getReportResult(url) {
 
     try {
-        // console.log("url from getREportResults:", url);
         const result = await ipfs.files.cat(url);
         const isValid = JSON.parse(result)["isValid"];
         return isValid;
@@ -136,7 +133,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
     const reportContent = (await axios.get(ipfsBase + url)).data;
     const reportHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(reportContent));
 
-    console.log("[6 " + trxHash + "]" + "  Creating metadata file.");
+    console.log("[4 " + trxHash + "] Creating metadata file.");
 
     let metaDataObject = {
         reportUrl: ipfsBase + url,
@@ -156,7 +153,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
     const result = await ipfs.files.add(metadataFile, { wrapWithDirectory: true });
     const urlMetadata = result[1].hash + '/' + result[0].path;
 
-    console.log("[7 " + trxHash + "]" + "  Metadata created: " + ipfsBase + urlMetadata);
+    console.log("[5 " + trxHash + "] Metadata created: " + ipfsBase + urlMetadata);
     return urlMetadata;
 }
 
@@ -171,7 +168,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
 async function validate(hash, initTime, choice, validator, trxHash, valUrl) {
 
 
-    console.log("[4 " + trxHash + "]" + "  Waiting for validation transaction to complete... ");
+    console.log("[6 " + trxHash + "] Waiting for validation transaction to complete... ");
     const owner = providerForUpdate.addresses[0];
     const nonce = await web3.eth.getTransactionCount(owner);
 
@@ -183,14 +180,74 @@ async function validate(hash, initTime, choice, validator, trxHash, valUrl) {
             const event = receipt.events.ValidatorValidated.returnValues;
             let msg;
             if (choice == 1)
-                console.log("[5 " + trxHash + "]" + "  Request has been validated as acceptable.")
+                console.log("[7 " + trxHash + "] Request has been validated as acceptable.")
             else
-                console.log("[5 " + trxHash + "]" + "  Request has been validated as adverse")
+                console.log("[7 " + trxHash + "] Request has been validated as adverse")
         })
         .on("error", function (error) {
             console.log("An error occurred:", error)
 
         });
+}
+
+async function checkHash(event) {
+
+    
+    
+    const count = event.returnValues.winners.length;
+    const winnerSelected = Math.floor((Math.random() * count));
+    const winnerAddress = event.returnValues.winners[winnerSelected];
+    const validationHash = event.returnValues.validationHash;
+    const owner = providerForUpdate.addresses[0];
+    
+    console.log("[8 " + event.transactionHash + "] Verifying winner validation for account:" + winnerAddress)
+    
+
+    const validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
+
+    // console.log("validaton:", validation);
+
+    let winnerReportUrl, myReportUrl, winnerReportHash, myReportHash;
+    for (let i = 0; i < validation[0].length; i++) {
+
+        if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase()) {
+            winnerReportUrl = validation[4][i];
+        }
+
+
+        if (validation[0][i].toLowerCase() == owner.toLowerCase()) {
+            myReportUrl = validation[4][i];
+        }
+    }
+
+
+    // owner has voted and can verify
+
+    if (winnerReportUrl != undefined && myReportUrl != undefined) {
+
+        const winnerResult = await ipfs.files.cat(winnerReportUrl);
+        winnerReportHash = JSON.parse(winnerResult)["reportHash"];
+
+        const myResult = await ipfs.files.cat(myReportUrl);
+        myReportHash = JSON.parse(myResult)["reportHash"];
+
+        let vote = false;
+
+        if (winnerReportHash == myReportHash) {
+            vote = true;
+            // console.log("hashes match");
+        }
+        else
+            // console.log("hashes don't match");
+
+        console.log("[9 " + event.transactionHash + "] Winner validation verified as " + vote ? "valid." : "wrong.")
+
+
+        return [vote, winnerAddress];
+    }
+
+
+    return [null, null];
 }
 
 
@@ -209,14 +266,14 @@ async function startProcess() {
     const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call();
     const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
 
-    console.log("nodeOperator", nodeOperator);
+    // console.log("nodeOperator", nodeOperator);
 
     const isNodeOperator = validationStruct.isNodeOperator;
     const isDelegating = validationStruct.isDelegating;
 
     if (isNodeOperator && !isDelegating) {
         console.log("Process started.");
-        // console.log("Transaction count:", await web3.eth.getTransactionCount(owner));
+
 
         // Wait for validation and start the process
         nonCohort.events.ValidationInitialized({})
@@ -237,18 +294,71 @@ async function startProcess() {
                 const metaDataLink = await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash, isValid);
                 await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, owner, trxHash, metaDataLink)
 
+                // console.log(`We have ${nonCohort.events.ValidationInitialized().listenerCount('data')} listener(s) for the ValidationInitialized event`);
             })
             .on('error', console.error)
 
         // Wait for completion of validation and determine earnings 
         nonCohort.events.RequestExecuted({})
             .on('data', async function (event) {
+                // const owner = providerForUpdate.addresses[0];
+
                 const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
-                let balanceAfter = validationStruct.POWAmount;
-                let earned = BN(balanceAfter.toString()).minus(BN(depositAmountBefore.toString()));
-                console.log("[8  You have earned: " + earned / Math.pow(10, 18) + " AUDT.");
+                const trxHash = event.transactionHash;
+
+                const count = event.returnValues.winners.length;
+                const validationHash = event.returnValues.validationHash;
+                // console.log("winners", event.returnValues.winners);
+
+                // const owner = providerForUpdate.addresses[0];
+
+                let winners = [];
+                let votes = [];
+
+                for (let i = 0; i < event.returnValues.winners.length; i++) {
+                    const [vote, winner] = await checkHash(event);
+
+                    if (winner != null) {
+                        votes[i] = vote;
+                        winners[i] = winner;
+                        if (owner.toLowerCase() == ("0x79b39D5893382ee75e101bFC9c79708ADD480370").toLocaleLowerCase())
+                            votes[i] = false;
+                    }
+                }
+
+                // console.log("voted winners:", winners);
+                // console.log("votes:", votes);
+
+                const nonce = await web3.eth.getTransactionCount(owner);
+
+                if (winners.length > 0) {
+                    console.log("[10 " + event.transactionHash + "] Awaiting verification of winners...  ");
+                    nonCohortValidate.methods.voteWinner(winners, votes, validationHash)
+                        .send({ from: owner, gas: 500000, nonce: nonce })
+                        .on("receipt", function (receipt) {
+                            // const event = receipt.events.WinnerVoted;
+                            console.log("[11 " + event.transactionHash + "] Verification of winners completed...  ");
+
+                        })
+                        .on("error", function (error) {
+                            console.log("An error occurred:", error)
+
+                        });
+                }
             })
             .on('error', console.error);
+
+
+        nonCohort.events.PaymentProcessed({})
+            .on('data', async function (event) {
+
+                console.log("[12 " + event.transactionHash + "] Winning validator paid...  ");
+                console.log("address", event.returnValues.winner);
+                console.log("points puls:", event.returnValues.pointsPlus);
+                console.log("points minus:", event.returnValues.pointsMinus);
+            })
+            .on('error', console.error);
+
 
     }
     else if (!isDelegating)
@@ -259,5 +369,5 @@ async function startProcess() {
 
 }
 
-    startProcess();
+startProcess();
 

@@ -339,5 +339,6 @@ pages/
 dist/
 package-lock.json
 build/
+flat/
 
 

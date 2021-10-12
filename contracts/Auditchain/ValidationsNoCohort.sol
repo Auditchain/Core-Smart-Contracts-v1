@@ -40,17 +40,16 @@ contract ValidationsNoCohort is Validations {
     }
 
 
-    function processPayments(bytes32 validationHash, address[] memory validators) internal override{
+    function processPayments(bytes32 validationHash, address winner) internal override { 
 
         Validation storage validation = validations[validationHash];
         outstandingValidations[validation.requestor] = outstandingValidations[validation.requestor].sub(1);
-        depositModifiers.processNonChortPayment(validators, validation.requestor, validationHash);
-        emit PaymentProcessed(validationHash, validators);
-        
+        depositModifiers.processNonChortPayment(winner, validation.requestor, validationHash);
+        emit PaymentProcessed(validationHash, winner, validation.winnerVotesPlus[winner], validation.winnerVotesMinus[winner]);
     }
 
 
-    function returnValidatorList(bytes32 validationHash) internal view override  returns (address[] memory){
+    function returnValidatorList(bytes32 validationHash) public view override  returns (address[] memory){
 
         address[] memory validatorsList = nodeOperations.returnNodeOperators();
         return validatorsList;
@@ -60,6 +59,9 @@ contract ValidationsNoCohort is Validations {
         super.validate(documentHash, validationTime, decision, valUrl);
     }
 
+    function returnValidatorCount(bytes32 validationHash) public view override returns (uint256){
+        return nodeOperations.returnNodeOperatorsCount();
+    }
 
 
 }

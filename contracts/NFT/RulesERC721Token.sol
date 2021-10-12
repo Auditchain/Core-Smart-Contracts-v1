@@ -58,7 +58,7 @@ contract RulesERC721Token is ERC721, ERC721URIStorage, ERC721Enumerable
         public
         returns (uint256)
     {
-        (,address enterprise,, uint256 executionTime , string memory url, uint256 consensus, , ) = cohort.validations(_hash);
+        (,address enterprise,, uint256 executionTime , string memory url, uint256 consensus, , , , , ) = cohort.validations(_hash);
         require(enterprise != address(0), "RulesERC721Token:mintTo - Recipient address can't be 0");
         require(executionTime > 0 , "RulesERC721Token:mintTo - This rule hasn't been approved yet");
         require(consensus == 1,  "RulesERC721Token:mintTo - This rule hasn't received sufficient quorum yet");
