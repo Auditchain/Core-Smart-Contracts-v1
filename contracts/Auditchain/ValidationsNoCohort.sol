@@ -45,8 +45,7 @@ contract ValidationsNoCohort is Validations {
         Validation storage validation = validations[validationHash];
         outstandingValidations[validation.requestor] = outstandingValidations[validation.requestor].sub(1);
         depositModifiers.processNonChortPayment(winner, validation.requestor, validationHash);
-        emit PaymentProcessed(validationHash, winner);
-        
+        emit PaymentProcessed(validationHash, winner, validation.winnerVotesPlus[winner], validation.winnerVotesMinus[winner]);
     }
 
 
