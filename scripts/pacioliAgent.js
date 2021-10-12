@@ -27,7 +27,7 @@ const goerli_infura_server = process.env.GOERLI_INFURA_SERVER
 const local_host = process.env.LOCAL;
 const mnemonic = process.env.MNEMONIC;
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0; // required only for accessing Pacioli via callRemote(..)
 
 let depositAmountBefore;
 
