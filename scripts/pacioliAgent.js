@@ -27,7 +27,7 @@ const goerli_infura_server = process.env.GOERLI_INFURA_SERVER
 const local_host = process.env.LOCAL;
 const mnemonic = process.env.MNEMONIC;
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0; // required only for accessing Pacioli via callRemote(..)
 
 let depositAmountBefore;
 
@@ -41,8 +41,13 @@ const web3 = new Web3(provider);
 
 const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
+<<<<<<< HEAD
     () => (web3.eth.getBlockNumber().then(what => console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds; current block ${what}`))),
     45000);
+=======
+    ()=> (web3.eth.getBlockNumber().then(what=>console.log(`ran ${(Date.now()-agentBornAT)/1000} seconds; current block ${what}`))), 
+    15000);
+>>>>>>> fd39799fad0788f7a1b08b081c48d824792486a7
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
 let ipfsBase = 'https://ipfs.infura.io/ipfs/';
@@ -85,11 +90,13 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     const result = await ipfs.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
 
-    console.log("[1 " + trxHash + "] Querying Pacioli " + reportUrl);
-    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-        .catch(error => console.log("ERROR: " + error));
-    //const reportContent = await pacioli.callLocal(reportUrl,trxHash,true)
-    //  .catch(error => console.log("ERROR: "+error));; 
+
+    console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
+    //const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
+    //    .catch(error => console.log("ERROR: " + error));
+    const reportContent = await pacioli.callLocal(reportUrl,trxHash,true)
+      .catch(error => console.log("ERROR: "+error));; 
+
 
     if (!reportContent) return [null, false];
 
