@@ -73,7 +73,8 @@ async function setUpNodeOperator(account) {
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
-nodeOperationsPreEvent
+
+
 /**
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
  * @param metadatatUrl contains information about the location of the submitted report on IPFS by the data subscriber 
