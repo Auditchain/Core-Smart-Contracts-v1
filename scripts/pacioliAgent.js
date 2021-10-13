@@ -40,7 +40,6 @@ const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROV
 const web3 = new Web3(provider);
 
 const agentBornAT = Date.now();
-const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
     () => (web3.eth.getBlockNumber().then(what => console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds; current block ${what}`))),
     45000);
