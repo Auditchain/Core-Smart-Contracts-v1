@@ -40,14 +40,10 @@ const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROV
 const web3 = new Web3(provider);
 
 const agentBornAT = Date.now();
+const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
-<<<<<<< HEAD
     () => (web3.eth.getBlockNumber().then(what => console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds; current block ${what}`))),
     45000);
-=======
-    ()=> (web3.eth.getBlockNumber().then(what=>console.log(`ran ${(Date.now()-agentBornAT)/1000} seconds; current block ${what}`))), 
-    15000);
->>>>>>> fd39799fad0788f7a1b08b081c48d824792486a7
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
 let ipfsBase = 'https://ipfs.infura.io/ipfs/';
