@@ -21,8 +21,8 @@ contract ValidationsNoCohort is Validations {
     */
     function initializeValidationNoCohort(bytes32 documentHash, string memory url, AuditTypes auditType) public {
 
-        require(checkIfRequestorHasFunds(msg.sender), "ValidationsNoCohort:initializeValidationNoCohort - Not sufficient funds. Deposit additional funds.");
-        require(members.userMap(msg.sender, Members.UserType(2)), "ValidationsNoCohort:initializeValidationNoCohort - You have to register as data subscriber");
+        // require(checkIfRequestorHasFunds(msg.sender), "ValidationsNoCohort:initializeValidationNoCohort - Not sufficient funds. Deposit additional funds.");
+        // require(members.userMap(msg.sender, Members.UserType(2)), "ValidationsNoCohort:initializeValidationNoCohort - You have to register as data subscriber");
         super.initializeValidation(documentHash, url, auditType, false);
         
     }
@@ -55,9 +55,9 @@ contract ValidationsNoCohort is Validations {
         return validatorsList;
     }
 
-    function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl) public override {
-        super.validate(documentHash, validationTime, decision, valUrl);
-    }
+    // function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl) public override {
+    //     super.validate(documentHash, validationTime, decision, valUrl);
+    // }
 
     function returnValidatorCount(bytes32 validationHash) public view override returns (uint256){
         return nodeOperations.returnNodeOperatorsCount();

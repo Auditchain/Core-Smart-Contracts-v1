@@ -41,11 +41,16 @@ const web3 = new Web3(provider);
 
 const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
+<<<<<<< HEAD
+    () => (web3.eth.getBlockNumber().then(what => console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds; current block ${what}`))),
+    45000);
+=======
     ()=> (web3.eth.getBlockNumber().then(what=>console.log(`ran ${(Date.now()-agentBornAT)/1000} seconds; current block ${what}`))), 
     15000);
+>>>>>>> fd39799fad0788f7a1b08b081c48d824792486a7
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
-let ipfsBase = 'https://ipfs.io/ipfs/';
+let ipfsBase = 'https://ipfs.infura.io/ipfs/';
 
 let ipfs = ipfsAPI('ipfs.infura.io', 5001, {
     protocol: 'https'
@@ -54,15 +59,26 @@ let ipfs = ipfsAPI('ipfs.infura.io', 5001, {
 let nonCohortValidate;
 let nodeOperations;
 let providerForUpdate;
+let nodeOperationsPreEvent;
 
 async function setUpContracts(account) {
 
-    providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
+
+    providerForUpdate = new HDWalletProvider(account, process.env.WEBSOCKET_PROVIDER); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
 
+
+async function setUpNodeOperator(account) {
+
+
+    const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    const web3Update = new Web3(providerForCall);
+    nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
+}
+nodeOperationsPreEvent
 /**
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
  * @param metadatatUrl contains information about the location of the submitted report on IPFS by the data subscriber 
@@ -192,16 +208,16 @@ async function validate(hash, initTime, choice, validator, trxHash, valUrl) {
 
 async function checkHash(event) {
 
-    
-    
+
+
     const count = event.returnValues.winners.length;
     const winnerSelected = Math.floor((Math.random() * count));
     const winnerAddress = event.returnValues.winners[winnerSelected];
     const validationHash = event.returnValues.validationHash;
     const owner = providerForUpdate.addresses[0];
-    
+
     console.log("[8 " + event.transactionHash + "] Verifying winner validation for account:" + winnerAddress)
-    
+
 
     const validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
 
@@ -240,7 +256,7 @@ async function checkHash(event) {
         else
             // console.log("hashes don't match");
 
-        console.log("[9 " + event.transactionHash + "] Winner validation verified as " + vote ? "valid." : "wrong.")
+            console.log("[9 " + event.transactionHash + "] Winner validation verified as " + vote ? "valid." : "wrong.")
 
 
         return [vote, winnerAddress];
@@ -261,12 +277,15 @@ async function startProcess() {
     let myArgs = process.argv.slice(2);
 
     setUpContracts(myArgs[0]);
+    setUpNodeOperator(myArgs[0]);
+
     const owner = providerForUpdate.addresses[0];
 
-    const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call();
-    const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
+    // const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call({from:owner});
+    const validationStruct = await nodeOperationsPreEvent.methods.nodeOpStruct(owner).call();
 
-    // console.log("nodeOperator", nodeOperator);
+
+    // // console.log("nodeOperator", nodeOperator);
 
     const isNodeOperator = validationStruct.isNodeOperator;
     const isDelegating = validationStruct.isDelegating;
@@ -321,8 +340,6 @@ async function startProcess() {
                     if (winner != null) {
                         votes[i] = vote;
                         winners[i] = winner;
-                        if (owner.toLowerCase() == ("0x79b39D5893382ee75e101bFC9c79708ADD480370").toLocaleLowerCase())
-                            votes[i] = false;
                     }
                 }
 

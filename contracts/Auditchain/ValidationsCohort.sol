@@ -50,11 +50,10 @@ contract ValidationsCohort is Validations {
 
     function processPayments(bytes32 validationHash, address winner) internal override {
 
-        Validation storage validation = validations[validationHash];
-        outstandingValidations[validation.requestor] = outstandingValidations[validation.requestor].sub(1);
-        depositModifiers.processPayment(winner, validation.requestor, validationHash);
-        emit PaymentProcessed(validationHash, winner);
-        
+        // Validation storage validation = validations[validationHash];
+        // outstandingValidations[validation.requestor] = outstandingValidations[validation.requestor].sub(1);
+        // depositModifiers.processPayment(winner, validation.requestor, validationHash);
+        // emit PaymentProcessed(validationHash, winner, validation.winnerVotesPlus[winner], validation.winnerVotesMinus[winner]);
     }
 
     function returnValidatorList(bytes32 validationHash) public view override returns (address[] memory){
