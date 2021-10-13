@@ -90,8 +90,8 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
     // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
     //    .catch(error => console.log("ERROR: " + error));
-    const reportContent = await pacioli.callLocal(reportUrl,trxHash,true)
-      .catch(error => console.log("ERROR: "+error));
+    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+        .catch(error => console.log("ERROR: " + error));
 
 
     if (!reportContent) return [null, false];
@@ -184,9 +184,12 @@ async function validate(hash, initTime, choice, validator, trxHash, valUrl) {
         });
 }
 
+/**
+ * @dev Verify if hashes match
+ * @param event containing all details 
+ */
+
 async function checkHash(event) {
-
-
 
     const count = event.returnValues.winners.length;
     const winnerSelected = Math.floor((Math.random() * count));
@@ -196,24 +199,17 @@ async function checkHash(event) {
 
     console.log("[8 " + event.transactionHash + "] Verifying winner validation for account:" + winnerAddress)
 
-
     const validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
-
-    // console.log("validaton:", validation);
 
     let winnerReportUrl, myReportUrl, winnerReportHash, myReportHash;
     for (let i = 0; i < validation[0].length; i++) {
 
-        if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase()) {
+        if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase())
             winnerReportUrl = validation[4][i];
-        }
 
-
-        if (validation[0][i].toLowerCase() == owner.toLowerCase()) {
+        if (validation[0][i].toLowerCase() == owner.toLowerCase())
             myReportUrl = validation[4][i];
-        }
     }
-
 
     // owner has voted and can verify
 
@@ -227,23 +223,16 @@ async function checkHash(event) {
 
         let vote = false;
 
-        if (winnerReportHash == myReportHash) {
+        if (winnerReportHash == myReportHash)
             vote = true;
-            // console.log("hashes match");
-        }
         else
-            // console.log("hashes don't match");
-
             console.log("[9 " + event.transactionHash + "] Winner validation verified as " + vote ? "valid." : "wrong.")
-
 
         return [vote, winnerAddress];
     }
 
-
     return [null, null];
 }
-
 
 /**
  * @dev Start listening to events
@@ -259,18 +248,12 @@ async function startProcess() {
 
     const owner = providerForUpdate.addresses[0];
 
-    // const nodeOperator = await nodeOperations.methods.isNodeOperator(owner).call({from:owner});
     const validationStruct = await nodeOperationsPreEvent.methods.nodeOpStruct(owner).call();
-
-
-    // // console.log("nodeOperator", nodeOperator);
-
     const isNodeOperator = validationStruct.isNodeOperator;
     const isDelegating = validationStruct.isDelegating;
 
     if (isNodeOperator && !isDelegating) {
         console.log("Process started.");
-
 
         // Wait for validation and start the process
         nonCohort.events.ValidationInitialized({})
@@ -297,16 +280,10 @@ async function startProcess() {
         // Wait for completion of validation and determine earnings 
         nonCohort.events.RequestExecuted({})
             .on('data', async function (event) {
-                // const owner = providerForUpdate.addresses[0];
-
                 const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
                 const trxHash = event.transactionHash;
-
                 const count = event.returnValues.winners.length;
                 const validationHash = event.returnValues.validationHash;
-                // console.log("winners", event.returnValues.winners);
-
-                // const owner = providerForUpdate.addresses[0];
 
                 let winners = [];
                 let votes = [];
@@ -319,9 +296,6 @@ async function startProcess() {
                         winners[i] = winner;
                     }
                 }
-
-                // console.log("voted winners:", winners);
-                // console.log("votes:", votes);
 
                 const nonce = await web3.eth.getTransactionCount(owner);
 
@@ -342,7 +316,7 @@ async function startProcess() {
             })
             .on('error', console.error);
 
-
+        // find out result of payment
         nonCohort.events.PaymentProcessed({})
             .on('data', async function (event) {
 
