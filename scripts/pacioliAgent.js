@@ -41,13 +41,8 @@ const web3 = new Web3(provider);
 
 const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
-<<<<<<< HEAD
     () => (web3.eth.getBlockNumber().then(what => console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds; current block ${what}`))),
     45000);
-=======
-    ()=> (web3.eth.getBlockNumber().then(what=>console.log(`ran ${(Date.now()-agentBornAT)/1000} seconds; current block ${what}`))), 
-    15000);
->>>>>>> fd39799fad0788f7a1b08b081c48d824792486a7
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
 let ipfsBase = 'https://ipfs.infura.io/ipfs/';
@@ -78,7 +73,8 @@ async function setUpNodeOperator(account) {
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
-nodeOperationsPreEvent
+
+
 /**
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
  * @param metadatatUrl contains information about the location of the submitted report on IPFS by the data subscriber 
@@ -92,10 +88,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    //const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
+    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
     //    .catch(error => console.log("ERROR: " + error));
     const reportContent = await pacioli.callLocal(reportUrl,trxHash,true)
-      .catch(error => console.log("ERROR: "+error));; 
+      .catch(error => console.log("ERROR: "+error));
 
 
     if (!reportContent) return [null, false];
@@ -118,24 +114,6 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     console.log("[3 " + trxHash + "] Pacioli report saved at: " + ipfsBase + pacioliIPFS);
 
     return [pacioliIPFS, reportContent.isValid];
-}
-
-
-/**
- * @dev Obtain flag from Pacioli report if report is valid or invalid
- * @param url location of Pacioli report on IPFS
- * @returns isValid true or false 
- */
-async function getReportResult(url) {
-
-    try {
-        const result = await ipfs.files.cat(url);
-        const isValid = JSON.parse(result)["isValid"];
-        return isValid;
-    } catch (error) {
-
-        console.log(error)
-    }
 }
 
 
@@ -303,7 +281,6 @@ async function startProcess() {
 
                 const trxHash = event.transactionHash;
                 const [reportPacioliIPFSUrl, isValid] = await verifyPacioli(event.returnValues.url, trxHash);
-                // const isValid = await getReportResult(reportPacioliIPFSUrl, trxHash);
 
                 if (!reportPacioliIPFSUrl) {
                     console.log("FAILED execution of verifyPacioli for " + event.returnValues.url);
@@ -378,7 +355,7 @@ async function startProcess() {
 
 
     }
-    else if (!isDelegating)
+    else if (isDelegating)
         console.log("You can't validate because you are delegating your stake to another member. To become validator, register as Node Operator first.");
 
     else
@@ -387,4 +364,3 @@ async function startProcess() {
 }
 
 startProcess();
-
