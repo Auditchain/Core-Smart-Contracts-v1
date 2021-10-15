@@ -133,10 +133,10 @@ abstract contract Validations is  ReentrancyGuard{
 
     }
 
-    function returnValUrl(bytes32 validationHash)public view returns (string memory){
+    function returnWinnerStruct(bytes32 validationHash)public view returns (string memory, address){
 
         Validation storage validation = validations[validationHash];
-        return validation.validationUrl[validation.winner];
+        return (validation.validationUrl[validation.winner], validation.winner);
     }
 
    
