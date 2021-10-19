@@ -32,7 +32,7 @@ abstract contract Validations is  ReentrancyGuard{
     enum ValidationStatus {Undefined, Yes, No}        
 
     struct Validation {
-        bool cohort;
+   bool cohort;
         address requestor;
         uint256 validationTime;
         uint256 executionTime;
@@ -133,13 +133,6 @@ abstract contract Validations is  ReentrancyGuard{
 
     }
 
-    function returnWinnerStruct(bytes32 validationHash)public view returns (string memory, address){
-
-        Validation storage validation = validations[validationHash];
-        return (validation.validationUrl[validation.winner], validation.winner);
-    }
-
-   
 
     function selectWinner(Validation storage validation, address[] memory winners) internal returns (address) {
 
@@ -181,7 +174,8 @@ abstract contract Validations is  ReentrancyGuard{
             uint256[] memory,
             ValidationStatus[] memory,
             uint256[] memory,
-            string[] memory
+            string[] memory,
+            bytes32[] memory
         )
     {
         uint256 j=0;
@@ -193,6 +187,7 @@ abstract contract Validations is  ReentrancyGuard{
         ValidationStatus[] memory validatorsValues = new ValidationStatus[](validation.validationsCompleted);
         uint256[] memory validationTime = new uint256[] (validation.validationsCompleted);
         string[] memory validationUrl = new string[] (validation.validationsCompleted);
+        bytes32[] memory reportHash = new bytes32[]  (validation.validationsCompleted);
 
 
 
@@ -203,10 +198,11 @@ abstract contract Validations is  ReentrancyGuard{
                 validationTime[j] = validation.validatorTime[validatorsList[i]];
                 validationUrl[j] = validation.validationUrl[validatorsList[i]];
                 validatorListActive[j] = validatorsList[i];
+                reportHash[j] = validation.validationHash[validatorsList[i]];
                 j++;
             }
         }
-        return (validatorListActive, stake, validatorsValues, validationTime, validationUrl);
+        return (validatorListActive, stake, validatorsValues, validationTime, validationUrl, reportHash);
     }
 
     /**
@@ -292,7 +288,7 @@ abstract contract Validations is  ReentrancyGuard{
 
     function insertionSort(bytes32 validationHash) internal view returns (address[] memory, ValidationStatus[] memory, uint256[] memory) {
 
-        (address[] memory validator, ,ValidationStatus[] memory status, uint256[] memory validationTimes,) =  collectValidationResults(validationHash);
+        (address[] memory validator, ,ValidationStatus[] memory status, uint256[] memory validationTimes,,) =  collectValidationResults(validationHash);
 
         uint length = validationTimes.length;
         
@@ -362,7 +358,7 @@ abstract contract Validations is  ReentrancyGuard{
      * @param validationTime - this is the time when validation has been initialized
      * @param decision - one of the ValidationStatus choices cast by validator
      */
-        function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl) public virtual {
+        function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl, bytes32 reportHash) public virtual {
 
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
@@ -374,8 +370,8 @@ abstract contract Validations is  ReentrancyGuard{
         validation.validatorChoice[msg.sender] = decision;
         validation.validatorTime[msg.sender] = block.timestamp;
         validation.validationUrl[msg.sender] = valUrl;
+        validation.validationHash[msg.sender] = reportHash;
 
-    
         validation.validationsCompleted ++;
 
         nodeOperations.increaseStakeRewards(msg.sender);
@@ -388,13 +384,49 @@ abstract contract Validations is  ReentrancyGuard{
 
 
 
-    function isHashAndTimeCorrect( bytes32 documentHash, uint256 validationTime) public view returns (bool){
+    function returnValidationRecord(bytes32 validationHash) public  view
+    returns( bool cohort,
+            address requestor,
+            uint256 validationTime,
+            uint256 executionTime,
+            string memory url,
+            uint256 consensus,
+            uint256 validationsCompleted,
+            uint64 winnerConfirmations,
+            bool paymentSent,
+            address winner) {
 
-        bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
+
+
         Validation storage validation = validations[validationHash];
-        if (validation.validationTime == validationTime)
-            return true;
-        else
-            return false;
+
+        cohort = validation.cohort;
+        requestor = validation.requestor;
+        validationTime = validation.validationTime;
+        executionTime = validation.executionTime;
+        url = validation.url;
+        consensus = validation.consensus;
+        validationsCompleted = validation.validationsCompleted;
+        winnerConfirmations = validation.winnerConfirmations;
+        paymentSent = validation.paymentSent;
+        winner = validation.winner;
+
     }
+
+
+   function returnValidationUrl(bytes32 validationHash, address user) public  view returns(string memory url) {
+
+        Validation storage validation = validations[validationHash];
+        url = validation.validationUrl[user];
+
+    }
+
+     function returnWinnerPoints(bytes32 validationHash, address user) public  view returns(uint256 plus, uint256 minus) {
+
+        Validation storage validation = validations[validationHash];
+        plus = validation.winnerVotesPlus[user];
+        minus = validation.winderVotesMinus[user];
+
+    }
+   
 }

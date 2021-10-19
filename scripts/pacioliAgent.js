@@ -42,7 +42,7 @@ const web3 = new Web3(provider);
 const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
     () => (web3.eth.getBlockNumber().then(what => console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds; current block ${what}`))),
-    45000);
+    60000);
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
 let ipfsBase = 'https://ipfs.infura.io/ipfs/';
@@ -70,6 +70,7 @@ async function setUpNodeOperator(account) {
 
 
     const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
@@ -88,10 +89,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-    //    .catch(error => console.log("ERROR: " + error));
-    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
-        .catch(error => console.log("ERROR: " + error));
+    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
+       .catch(error => console.log("ERROR: " + error));
+    // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    //     .catch(error => console.log("ERROR: " + error));
 
 
     if (!reportContent) return [null, false];
@@ -148,7 +149,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
     const urlMetadata = result[1].hash + '/' + result[0].path;
 
     console.log("[5 " + trxHash + "] Metadata created: " + ipfsBase + urlMetadata);
-    return urlMetadata;
+    return [urlMetadata, reportHash];
 }
 
 
@@ -159,7 +160,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
  * @param choice decision of the validator
  * @param validator address of the validator
  */
-async function validate(hash, initTime, choice, validator, trxHash, valUrl) {
+async function validate(hash, initTime, choice, validator, trxHash, valUrl, reportHash) {
 
 
     console.log("[6 " + trxHash + "] Waiting for validation transaction to complete... ");
@@ -168,7 +169,7 @@ async function validate(hash, initTime, choice, validator, trxHash, valUrl) {
 
     //validate request
     nonCohortValidate.methods
-        .validate(hash, initTime, choice, valUrl)
+        .validate(hash, initTime, choice, valUrl, reportHash)
         .send({ from: owner, gas: 500000, nonce: nonce })
         .on("receipt", function (receipt) {
             const event = receipt.events.ValidatorValidated.returnValues;
@@ -270,8 +271,8 @@ async function startProcess() {
                     return; //TODO: what to do here?
                 }
 
-                const metaDataLink = await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash, isValid);
-                await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, owner, trxHash, metaDataLink)
+                const [metaDataLink, reportHash] = await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash, isValid);
+                await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, owner, trxHash, metaDataLink, reportHash);
 
                 // console.log(`We have ${nonCohort.events.ValidationInitialized().listenerCount('data')} listener(s) for the ValidationInitialized event`);
             })
