@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract ValidationsCohort is Validations {
     using SafeMath for uint256;
 
-    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations) 
-        Validations(_members, _memberHelpers, _cohortFactory, _depositModifiers, _nodeOperations){
+    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations, address _validationHelpers) 
+        Validations(_members, _memberHelpers, _cohortFactory, _depositModifiers, _nodeOperations, _validationHelpers){
 
     }
 
@@ -50,10 +50,10 @@ contract ValidationsCohort is Validations {
 
     function processPayments(bytes32 validationHash, address winner) internal override {
 
-        // Validation storage validation = validations[validationHash];
-        // outstandingValidations[validation.requestor] = outstandingValidations[validation.requestor].sub(1);
-        // depositModifiers.processPayment(winner, validation.requestor, validationHash);
-        // emit PaymentProcessed(validationHash, winner, validation.winnerVotesPlus[winner], validation.winnerVotesMinus[winner]);
+        Validation storage validation = validations[validationHash];
+        outstandingValidations[validation.requestor] = outstandingValidations[validation.requestor].sub(1);
+        depositModifiers.processPayment(winner, validation.requestor, validationHash);
+        emit PaymentProcessed(validationHash, winner, validation.winnerVotesPlus[winner], validation.winnerVotesMinus[winner]);
     }
 
     function returnValidatorList(bytes32 validationHash) public view override returns (address[] memory){
@@ -76,7 +76,7 @@ contract ValidationsCohort is Validations {
         
     }
 
-     function returnValidatorCount(bytes32 validationHash) public view override returns (uint256){
+     function returnValidatorCount() public pure override returns (uint256){
         return 4;
     }
 
