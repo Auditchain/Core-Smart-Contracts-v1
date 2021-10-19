@@ -19,7 +19,7 @@ contract MemberHelpers is AccessControl {
 
     address public auditToken; //AUDT token
     Members members; // Members contract
-    IValidatinos public validations; // Validation interface
+    IValidations public validations; // Validation interface
     mapping(address => uint256) public deposits; //track deposits per user
     uint256 public minContribution = 5e21;
     uint256 public maxContribution = 25e21;
@@ -134,7 +134,7 @@ contract MemberHelpers is AccessControl {
      */
     function setValidation(address _validations) public isController("setValidation") {
         require( _validations != address(0), "MemberHelpers:setValidation - Validation address can't be 0");
-        validations = IValidatinos(_validations);
+        validations = IValidations(_validations);
     }
 
 }
