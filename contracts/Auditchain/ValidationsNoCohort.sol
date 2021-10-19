@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract ValidationsNoCohort is Validations {
     using SafeMath for uint256;
 
-    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations) 
-        Validations(_members, _memberHelpers, _cohortFactory, _depositModifiers, _nodeOperations){
+    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations, address _validationHelpers) 
+        Validations(_members, _memberHelpers, _cohortFactory, _depositModifiers, _nodeOperations, _validationHelpers){
 
     }
 
@@ -59,7 +59,7 @@ contract ValidationsNoCohort is Validations {
     //     super.validate(documentHash, validationTime, decision, valUrl);
     // }
 
-    function returnValidatorCount(bytes32 validationHash) public view override returns (uint256){
+    function returnValidatorCount() public view override returns (uint256){
         return nodeOperations.returnNodeOperatorsCount();
     }
 
