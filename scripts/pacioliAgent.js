@@ -69,8 +69,8 @@ async function setUpContracts(account) {
 async function setUpNodeOperator(account) {
 
 
-    const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
-    // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
+    // const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
@@ -205,22 +205,26 @@ async function checkHash(event) {
     let winnerReportUrl, myReportUrl, winnerReportHash, myReportHash;
     for (let i = 0; i < validation[0].length; i++) {
 
-        if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase())
+        if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase()){
             winnerReportUrl = validation[4][i];
+            winnerReportHash = validation[5][i];
+        }
 
-        if (validation[0][i].toLowerCase() == owner.toLowerCase())
+        if (validation[0][i].toLowerCase() == owner.toLowerCase()){
             myReportUrl = validation[4][i];
+            myReportHash = validation[5][i];
+        }
     }
 
     // owner has voted and can verify
 
     if (winnerReportUrl != undefined && myReportUrl != undefined) {
 
-        const winnerResult = await ipfs.files.cat(winnerReportUrl);
-        winnerReportHash = JSON.parse(winnerResult)["reportHash"];
+        // const winnerResult = await ipfs.files.cat(winnerReportUrl);
+        // winnerReportHash = JSON.parse(winnerResult)["reportHash"];
 
-        const myResult = await ipfs.files.cat(myReportUrl);
-        myReportHash = JSON.parse(myResult)["reportHash"];
+        // const myResult = await ipfs.files.cat(myReportUrl);
+        // myReportHash = JSON.parse(myResult)["reportHash"];
 
         let vote = false;
 
