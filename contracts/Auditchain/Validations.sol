@@ -118,7 +118,7 @@ abstract contract Validations is  ReentrancyGuard{
             else
                 validation.winnerVotesMinus[winners[i]] =  validation.winnerVotesMinus[winners[i]].add(1);
 
-                emit WinnerVoted(msg.sender, winners[i], vote[i]);
+            emit WinnerVoted(msg.sender, winners[i], vote[i]);
         }
 
         validation.winnerConfirmations++;
