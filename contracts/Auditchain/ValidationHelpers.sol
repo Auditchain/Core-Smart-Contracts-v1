@@ -8,25 +8,18 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract ValidationHelpers {
 
-    IValidations validations;
     using SafeMath for uint256;
 
-       // Validation can be approved or disapproved. Initial status is undefined.
+    // Validation can be approved or disapproved. Initial status is undefined.
     enum ValidationStatus {Undefined, Yes, No}   
 
 
-    constructor(address validationsAddress) {
+    function isHashAndTimeCorrect( bytes32 documentHash, uint256 _validationTime) public  view returns (bool){
 
-        validations = IValidations(validationsAddress);
-    }
-
-
-
-    function isHashAndTimeCorrect( bytes32 documentHash, uint256 _validationTime) public view returns (bool){
 
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, _validationTime));
 
-        (,,uint validationTime,,,,,,,) = validations.returnValidationRecord(validationHash);
+        (,,uint validationTime,,,,,,,) = IValidations(msg.sender).returnValidationRecord(validationHash);
         if (validationTime == _validationTime)
             return true;
         else
@@ -34,21 +27,24 @@ contract ValidationHelpers {
     }
 
 
-    function returnWinnerStruct(bytes32 validationHash)public view returns (string memory valUrl, address winner){
+    function returnWinnerStruct(bytes32 validationHash, address contractAddress)public view returns (string memory valUrl, address winner){
 
-        (,,,,,,,,,winner) = validations.returnValidationRecord(validationHash);
-        valUrl = validations.returnValidationUrl(validationHash, winner);
+        
+        (,,,,,,,,,winner) = IValidations(contractAddress).returnValidationRecord(validationHash);
+        valUrl = IValidations(contractAddress).returnValidationUrl(validationHash, winner);
+
+        return (valUrl, winner);
 
     }
 
 
-    function selectWinner(bytes32 validationHash, address[] memory winners) internal view returns (address) {
+    function selectWinner(bytes32 validationHash, address[] memory winners) public view returns (address) {
 
         address winner = winners[0];
 
         for (uint8 i=1; i < winners.length; i++){
-           (uint256 plus, uint256 minus) =  validations.returnWinnerPoints(validationHash, winners[i]);
-           (uint256 plusBefore, uint256 minusBefore) =  validations.returnWinnerPoints(validationHash, winners[i-1]);
+           (uint256 plus, uint256 minus) =  IValidations(msg.sender).returnWinnerPoints(validationHash, winners[i]);
+           (uint256 plusBefore, uint256 minusBefore) =  IValidations(msg.sender).returnWinnerPoints(validationHash, winners[i-1]);
 
             if (plus > minus)
                 if (plus.sub(minus) > plusBefore.sub(minusBefore))
@@ -58,7 +54,7 @@ contract ValidationHelpers {
     }
 
 
-     function determineWinners(bytes32 validationHash) public view returns (address[] memory, uint256){
+     function determineWinners(bytes32 validationHash) public  view returns (address[] memory, uint256){
 
         (address[] memory validator, uint256[] memory status, uint256[] memory validationTimes) = insertionSort (validationHash);
 
@@ -98,7 +94,7 @@ contract ValidationHelpers {
 
  function insertionSort(bytes32 validationHash) internal view returns (address[] memory, uint256[] memory, uint256[] memory) {
 
-        (address[] memory validator, ,uint256[] memory status, uint256[] memory validationTimes,,) =  validations.collectValidationResults(validationHash);
+        (address[] memory validator, ,uint256[] memory status, uint256[] memory validationTimes,,) =  IValidations(msg.sender).collectValidationResults(validationHash);
 
         uint length = validationTimes.length;
         
