@@ -9,6 +9,8 @@ interface IValidations {
     function outstandingValidations(address enterprise) external view returns (uint256);
     function returnValidationUrl(bytes32 validationHash, address user) external  view returns(string memory url);
     function returnWinnerPoints(bytes32 validationHash, address user) external  view returns(uint256 plus, uint256 minus);
+    function selectWinner(bytes32 validationHash, address[] memory winners) external view returns (address);
+
 
      function collectValidationResults(bytes32 validationHash)
         external
