@@ -171,8 +171,10 @@ async function validate(hash, initTime, choice, validator, trxHash, valUrl) {
         .validate(hash, initTime, choice, valUrl)
         .send({ from: owner, gas: 500000, nonce: nonce })
         .on("receipt", function (receipt) {
-            const event = receipt.events.ValidatorValidated.returnValues;
-            let msg;
+            // TODO: check some valid information at this point? 
+            // Commenting out the following, receipt.events.ValidatorValidated is undefined
+            // const event = receipt.events.ValidatorValidated.returnValues;
+            // let msg;
             if (choice == 1)
                 console.log("[7 " + trxHash + "] Request has been validated as acceptable.")
             else
