@@ -3,6 +3,7 @@ pragma solidity =0.8.0;
 
 import "./IValidations.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./MemberHelpers.sol";
 
 
 
@@ -12,6 +13,16 @@ contract ValidationHelpers {
 
     // Validation can be approved or disapproved. Initial status is undefined.
     enum ValidationStatus {Undefined, Yes, No}   
+    MemberHelpers memberHelpers;
+    // address validationCohort;
+    // address validationNoCohort;
+
+    constructor(address _memberHelpers)  {
+
+        memberHelpers = MemberHelpers(_memberHelpers);
+        // validationCohort = _validationCohort;
+        // validationNoCohort = _validationNoCohort;
+    }
 
 
     function isHashAndTimeCorrect( bytes32 documentHash, uint256 _validationTime) public  view returns (bool){
@@ -142,6 +153,39 @@ contract ValidationHelpers {
             return 2; // consensus is to disapprove
         else
             return 2; // consensus is tie - should not happen
+    }
+
+    /**
+     * @dev to calculate state of the quorum for the validation
+     * @param validationHash - consist of hash of hashed document and timestamp
+     * @return number representing current participation level in percentage
+     */
+    function calculateVoteQuorum(bytes32 validationHash, address validationContract)public view returns (uint256)
+    {
+
+
+        uint256 totalStaked;
+        uint256 currentlyVoted;
+
+        // address  contractToCall = determineCaller(chort);
+
+        address[] memory validatorsList = IValidations(validationContract).returnValidatorList(validationHash);
+        // (,,uint validationTime,,,,,,,) = IValidations(validationContract).returnValidationRecord(validationHash);
+        (, ,uint256[] memory choice,,,) =  IValidations(validationContract).collectValidationResults(validationHash);
+
+        // Validation storage validation = validations[validationHash];
+        // require(validationTime> 0, "ValidationHelpers:calculateVoteQuorum - Validation hash doesn't exist");
+
+        for (uint256 i = 0; i < validatorsList.length; i++) {
+            totalStaked += memberHelpers.returnDepositAmount(validatorsList[i]);
+            if (choice.length <= i) 
+                currentlyVoted += memberHelpers.returnDepositAmount(validatorsList[i]);
+        }
+        if (currentlyVoted == 0)
+            return 0;
+        else
+           return (currentlyVoted * 100).div(totalStaked);
+
     }
 
 }
