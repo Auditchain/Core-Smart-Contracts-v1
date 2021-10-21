@@ -16,13 +16,13 @@ contract ValidationsNoCohort is Validations {
     /**
     * @dev to be called by data subscriber to initiate new validation
     * @param documentHash - hash of unique identifier of validated transaction
-    * @param url - locatoin of the file on IPFS or other decentralized file storage
+    * @param url - locatoin of the file on IPFS or   function returnValidatorList(bytes32 validationHash) public view override  returns (address[] memory){
     * @param auditType - type of auditing 
     */
     function initializeValidationNoCohort(bytes32 documentHash, string memory url, AuditTypes auditType) public {
 
-        // require(checkIfRequestorHasFunds(msg.sender), "ValidationsNoCohort:initializeValidationNoCohort - Not sufficient funds. Deposit additional funds.");
-        // require(members.userMap(msg.sender, Members.UserType(2)), "ValidationsNoCohort:initializeValidationNoCohort - You have to register as data subscriber");
+        require(checkIfRequestorHasFunds(msg.sender), "ValidationsNoCohort:initializeValidationNoCohort - Not sufficient funds. Deposit additional funds.");
+        require(members.userMap(msg.sender, Members.UserType(2)), "ValidationsNoCohort:initializeValidationNoCohort - You have to register as data subscriber");
         super.initializeValidation(documentHash, url, auditType, false);
         
     }
@@ -48,19 +48,18 @@ contract ValidationsNoCohort is Validations {
         emit PaymentProcessed(validationHash, winner, validation.winnerVotesPlus[winner], validation.winnerVotesMinus[winner]);
     }
 
+    function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl, bytes32 reportHash) public override {
+        super.validate(documentHash, validationTime, decision, valUrl, reportHash);
+    }
+
+    function returnValidatorCount() public view override returns (uint256){
+        return nodeOperations.returnNodeOperatorsCount();
+    }
 
     function returnValidatorList(bytes32 validationHash) public view override  returns (address[] memory){
 
         address[] memory validatorsList = nodeOperations.returnNodeOperators();
         return validatorsList;
-    }
-
-    // function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl) public override {
-    //     super.validate(documentHash, validationTime, decision, valUrl);
-    // }
-
-    function returnValidatorCount() public view override returns (uint256){
-        return nodeOperations.returnNodeOperatorsCount();
     }
 
 
