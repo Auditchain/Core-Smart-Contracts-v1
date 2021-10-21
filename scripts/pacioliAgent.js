@@ -45,7 +45,7 @@ setInterval( //hack to keep alive our brittle websocket, which tends to close af
     60000);
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
-let ipfsBase = 'https://ipfs.infura.io/ipfs/';
+let ipfsBase = 'https://ipfs.io/ipfs/';
 
 let ipfs = ipfsAPI('ipfs.infura.io', 5001, {
     protocol: 'https'
@@ -90,7 +90,7 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
     const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-       .catch(error => console.log("ERROR: " + error));
+        .catch(error => console.log("ERROR: " + error));
     // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
     //     .catch(error => console.log("ERROR: " + error));
 
@@ -185,6 +185,12 @@ async function validate(hash, initTime, choice, validator, trxHash, valUrl, repo
         });
 }
 
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+
 /**
  * @dev Verify if hashes match
  * @param event containing all details 
@@ -200,43 +206,56 @@ async function checkHash(event) {
 
     console.log("[8 " + event.transactionHash + "] Verifying winner validation for account:" + winnerAddress)
 
-    const validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
+    let validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
 
-    let winnerReportUrl, myReportUrl, winnerReportHash, myReportHash;
+    let winnerReportUrl, myReportUrl, winnerReportHash, myReportHash = 0;
     for (let i = 0; i < validation[0].length; i++) {
 
-        if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase()){
+        if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase()) {
             winnerReportUrl = validation[4][i];
             winnerReportHash = validation[5][i];
         }
 
-        if (validation[0][i].toLowerCase() == owner.toLowerCase()){
+        if (validation[0][i].toLowerCase() == owner) {
             myReportUrl = validation[4][i];
             myReportHash = validation[5][i];
+            console.log("Hash found", myReportHash);
+        }
+
+        if (myReportHash == 0 && i == validation[0].length - 1) {
+
+            console.log("It will wait for 5 sec", i)
+            await sleep(5000);
+            console.log("validation:", validation);
+            validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
+            console.log("owner:", owner);
+            i = 0;
+            console.log("continuing loop")
+
         }
     }
 
     // owner has voted and can verify
 
-    if (winnerReportUrl != undefined && myReportUrl != undefined) {
+    // if (winnerReportUrl != undefined && myReportUrl != undefined) {
 
-        // const winnerResult = await ipfs.files.cat(winnerReportUrl);
-        // winnerReportHash = JSON.parse(winnerResult)["reportHash"];
+    // const winnerResult = await ipfs.files.cat(winnerReportUrl);
+    // winnerReportHash = JSON.parse(winnerResult)["reportHash"];
 
-        // const myResult = await ipfs.files.cat(myReportUrl);
-        // myReportHash = JSON.parse(myResult)["reportHash"];
+    // const myResult = await ipfs.files.cat(myReportUrl);
+    // myReportHash = JSON.parse(myResult)["reportHash"];
 
-        let vote = false;
+    let vote = false;
 
-        if (winnerReportHash == myReportHash)
-            vote = true;
-        else
-            console.log("[9 " + event.transactionHash + "] Winner validation verified as " + vote ? "valid." : "wrong.")
+    if (winnerReportHash == myReportHash)
+        vote = true;
 
-        return [vote, winnerAddress];
-    }
+    console.log("[9 " + event.transactionHash + "] Winner validation verified as " ,  vote ? "valid." : "wrong.")
 
-    return [null, null];
+    return [vote, winnerAddress];
+    // }
+
+    // return [null, null];
 }
 
 /**
