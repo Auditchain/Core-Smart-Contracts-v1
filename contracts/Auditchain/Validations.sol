@@ -125,7 +125,7 @@ abstract contract Validations is  ReentrancyGuard{
         uint256 operatorCount = returnValidatorCount();
         uint256 currentQuorum = validation.winnerConfirmations * 100 / operatorCount;
         
-        if (currentQuorum >=members.requiredQuorum() && !validation.paymentSent){
+        if (currentQuorum >= members.requiredQuorum() && !validation.paymentSent){
             address winner = validationHelpers.selectWinner(validationHash, winners);
             validation.winner = winner;
             validation.paymentSent = true;
@@ -194,33 +194,6 @@ abstract contract Validations is  ReentrancyGuard{
     function isValidated(bytes32 validationHash) public view returns (ValidationStatus){
         return validations[validationHash].validatorChoice[msg.sender];
     }
-
-    /**
-     * @dev to calculate state of the quorum for the validation
-     * @param validationHash - consist of hash of hashed document and timestamp
-     * @return number representing current participation level in percentage
-     */
-    function calculateVoteQuorum(bytes32 validationHash)public view returns (uint256)
-    {
-        uint256 totalStaked;
-        uint256 currentlyVoted;
-
-        address[] memory validatorsList = returnValidatorList(validationHash);
-
-        Validation storage validation = validations[validationHash];
-        require(validation.validationTime > 0, "Validation:calculateVoteQuorum - Validation hash doesn't exist");
-
-        for (uint256 i = 0; i < validatorsList.length; i++) {
-            totalStaked += memberHelpers.returnDepositAmount(validatorsList[i]);
-            if (validation.validatorChoice[validatorsList[i]] != ValidationStatus.Undefined) 
-                currentlyVoted += memberHelpers.returnDepositAmount(validatorsList[i]);
-        }
-        if (currentlyVoted == 0)
-            return 0;
-        else
-           return (currentlyVoted * 100).div(totalStaked);
-    }
-
    
     function processPayments(bytes32 validationHash, address winner) internal virtual {
     }
@@ -271,7 +244,7 @@ abstract contract Validations is  ReentrancyGuard{
 
         emit ValidatorValidated(msg.sender, documentHash, validationTime, decision, valUrl);
 
-        uint256 quorum = calculateVoteQuorum(validationHash);
+        uint256 quorum = validationHelpers.calculateVoteQuorum(validationHash, address(this));
 
         if (quorum >= members.requiredQuorum() && validation.executionTime == 0) {
             executeValidation(validationHash, documentHash, quorum);
