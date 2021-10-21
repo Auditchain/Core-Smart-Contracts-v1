@@ -216,20 +216,27 @@ async function checkHash(event) {
             winnerReportHash = validation[5][i];
         }
 
+        console.log("i:", i);
+        console.log("validator:", validation[0][i].toLowerCase() );
+        console.log("comparison:" , validation[0][i].toLowerCase() == owner);
+
         if (validation[0][i].toLowerCase() == owner) {
             myReportUrl = validation[4][i];
             myReportHash = validation[5][i];
             console.log("Hash found", myReportHash);
+            i = validation[0].length;
         }
 
         if (myReportHash == 0 && i == validation[0].length - 1) {
 
             console.log("It will wait for 5 sec", i)
             await sleep(5000);
-            console.log("validation:", validation);
+            console.log("validation before:", validation);
             validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
+            console.log("validation after:", validation);
+
             console.log("owner:", owner);
-            i = 0;
+            i = -1;
             console.log("continuing loop")
 
         }
