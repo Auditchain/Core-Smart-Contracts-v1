@@ -5,14 +5,14 @@ import "./INodeOperations.sol";
 import "./Members.sol";
 import "./DepositModifiers.sol";
 import "./ICohortFactory.sol";
+import "./IValidationHelpers.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-// import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 
 /**
- * @title NoCohort
- * Allows on validation without cohort requested by data subscribers. 
+ * @title Validations
+ * Allows on validation with and without cohort requested by data subscribers. 
  */
 abstract contract Validations is  ReentrancyGuard{
     using SafeMath for uint256;
@@ -21,6 +21,7 @@ abstract contract Validations is  ReentrancyGuard{
     DepositModifiers public depositModifiers;
     ICohortFactory public cohortFactory;
     INodeOperations public nodeOperations;
+    IValidatinosHelpers public validationHelpers;
     mapping(address => uint256) public outstandingValidations;
 
     // Audit types to be used. Three types added for future expansion
@@ -32,7 +33,7 @@ abstract contract Validations is  ReentrancyGuard{
     enum ValidationStatus {Undefined, Yes, No}        
 
     struct Validation {
-        bool cohort;
+   bool cohort;
         address requestor;
         uint256 validationTime;
         uint256 executionTime;
@@ -45,12 +46,11 @@ abstract contract Validations is  ReentrancyGuard{
         mapping(address => string) validationUrl;
         mapping(address => uint256) winnerVotesPlus;
         mapping(address => uint256) winnerVotesMinus;
+        mapping(address => bytes32) validationHash;
         uint64 winnerConfirmations;
         bool paymentSent;
         address winner;
     }
-
-  
 
     mapping(bytes32 => Validation) public validations; // track each validation
 
@@ -61,13 +61,14 @@ abstract contract Validations is  ReentrancyGuard{
     event WinnerVoted(address validator, address winner, bool isValid);
 
 
-    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations) {
+    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations, address _validationHelpers) {
 
         members = Members(_members);
         memberHelpers = MemberHelpers(_memberHelpers);
         cohortFactory = ICohortFactory(_cohortFactory);
         depositModifiers = DepositModifiers(_depositModifiers);
         nodeOperations = INodeOperations(_nodeOperations);
+        validationHelpers = IValidatinosHelpers(_validationHelpers);
         // _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
     }
@@ -96,7 +97,6 @@ abstract contract Validations is  ReentrancyGuard{
 
         outstandingValidations[msg.sender]++;
         Validation storage newValidation = validations[validationHash];
-        // validations[validationHash].requestor =  msg.sender;
 
         newValidation.url = url; 
         newValidation.validationTime = validationTime;
@@ -118,51 +118,25 @@ abstract contract Validations is  ReentrancyGuard{
             else
                 validation.winnerVotesMinus[winners[i]] =  validation.winnerVotesMinus[winners[i]].add(1);
 
-                emit WinnerVoted(msg.sender, winners[i], vote[i]);
+            emit WinnerVoted(msg.sender, winners[i], vote[i]);
         }
 
         validation.winnerConfirmations++;
-        uint256 operatorCount = returnValidatorCount(validationHash);
+        uint256 operatorCount = returnValidatorCount();
         uint256 currentQuorum = validation.winnerConfirmations * 100 / operatorCount;
         
-        if (currentQuorum >=members.requiredQuorum() && !validation.paymentSent){
-            address winner = selectWinner(validation, winners);
+        if (currentQuorum >= members.requiredQuorum() && !validation.paymentSent){
+            address winner = validationHelpers.selectWinner(validationHash, winners);
+            validation.winner = winner;
             validation.paymentSent = true;
             processPayments(validationHash, winner);
         }
-
-    }
-
-    function returnWinnerStruct(bytes32 validationHash)public view returns (string memory, address){
-
-        Validation storage validation = validations[validationHash];
-        return (validation.validationUrl[validation.winner], validation.winner);
-    }
-
-   
-
-    function selectWinner(Validation storage validation, address[] memory winners) internal returns (address) {
-
-        address winner = winners[0];
-
-        for (uint8 i=1; i < winners.length; i++){
-            if (validation.winnerVotesPlus[winners[i]] > validation.winnerVotesMinus[winners[i]])
-                if (
-                    validation.winnerVotesPlus[winners[i]].sub(validation.winnerVotesMinus[winners[i]]) > 
-                    validation.winnerVotesPlus[winners[i-1]].sub(validation.winnerVotesMinus[winners[i-1]])
-                    )
-                    {winner = winners[i];}
-        }
-        validation.winner = winner;
-        return winner;
     }
 
 
     function returnValidatorList(bytes32 validationHash) public view virtual returns (address[] memory);
 
-    function returnValidatorCount(bytes32 validationHash) public view virtual returns(uint256);
-    
-
+    function returnValidatorCount() public view virtual returns(uint256);
     
     
 
@@ -179,9 +153,10 @@ abstract contract Validations is  ReentrancyGuard{
         returns (
             address[] memory,
             uint256[] memory,
-            ValidationStatus[] memory,
             uint256[] memory,
-            string[] memory
+            uint256[] memory,
+            string[] memory,
+            bytes32[] memory
         )
     {
         uint256 j=0;
@@ -190,23 +165,25 @@ abstract contract Validations is  ReentrancyGuard{
         address[] memory validatorsList = returnValidatorList(validationHash);
         address[] memory validatorListActive = new address[](validation.validationsCompleted);
         uint256[] memory stake = new uint256[](validation.validationsCompleted);
-        ValidationStatus[] memory validatorsValues = new ValidationStatus[](validation.validationsCompleted);
+        uint256[] memory validatorsValues = new uint256[](validation.validationsCompleted);
         uint256[] memory validationTime = new uint256[] (validation.validationsCompleted);
         string[] memory validationUrl = new string[] (validation.validationsCompleted);
+        bytes32[] memory reportHash = new bytes32[]  (validation.validationsCompleted);
 
 
 
         for (uint256 i = 0; i < validatorsList.length; i++) {
             if(validation.validatorChoice[validatorsList[i]] != ValidationStatus.Undefined) {
                 stake[j] = memberHelpers.returnDepositAmount(validatorsList[i]);
-                validatorsValues[j] = validation.validatorChoice[validatorsList[i]];
+                validatorsValues[j] = uint256(validation.validatorChoice[validatorsList[i]]);
                 validationTime[j] = validation.validatorTime[validatorsList[i]];
                 validationUrl[j] = validation.validationUrl[validatorsList[i]];
                 validatorListActive[j] = validatorsList[i];
+                reportHash[j] = validation.validationHash[validatorsList[i]];
                 j++;
             }
         }
-        return (validatorListActive, stake, validatorsValues, validationTime, validationUrl);
+        return (validatorListActive, stake, validatorsValues, validationTime, validationUrl, reportHash);
     }
 
     /**
@@ -217,54 +194,7 @@ abstract contract Validations is  ReentrancyGuard{
     function isValidated(bytes32 validationHash) public view returns (ValidationStatus){
         return validations[validationHash].validatorChoice[msg.sender];
     }
-
-    /**
-     * @dev to calculate state of the quorum for the validation
-     * @param validationHash - consist of hash of hashed document and timestamp
-     * @return number representing current participation level in percentage
-     */
-    function calculateVoteQuorum(bytes32 validationHash)public view returns (uint256)
-    {
-        uint256 totalStaked;
-        uint256 currentlyVoted;
-
-        address[] memory validatorsList = returnValidatorList(validationHash);
-
-        Validation storage validation = validations[validationHash];
-        require(validation.validationTime > 0, "Validation:calculateVoteQuorum - Validation hash doesn't exist");
-
-        for (uint256 i = 0; i < validatorsList.length; i++) {
-            totalStaked += memberHelpers.returnDepositAmount(validatorsList[i]);
-            if (validation.validatorChoice[validatorsList[i]] != ValidationStatus.Undefined) 
-                currentlyVoted += memberHelpers.returnDepositAmount(validatorsList[i]);
-        }
-        if (currentlyVoted == 0)
-            return 0;
-        else
-           return (currentlyVoted * 100).div(totalStaked);
-    }
-
-    function determineConsensus(ValidationStatus[] memory validation) public pure returns(uint256 ) {
-
-        uint256 yes;
-        uint256 no;
-
-        for (uint256 i=0; i< validation.length; i++) {
-
-            if (validation[i] == ValidationStatus.Yes)
-                yes++;
-            else
-                no++;
-        }
-
-        if (yes > no)
-            return 1; // consensus is to approve
-        else if (no > yes)
-            return 2; // consensus is to disapprove
-        else
-            return 2; // consensus is tie - should not happen
-    }
-
+   
     function processPayments(bytes32 validationHash, address winner) internal virtual {
     }
 
@@ -273,88 +203,19 @@ abstract contract Validations is  ReentrancyGuard{
      * @dev to mark validation as executed. This happens when participation level reached "requiredQuorum"
      * @param validationHash - consist of hash of hashed document and timestamp
      * @param documentHash hash of the document
-     * @param executeValidationTime time of the completion of validation
      */
-    function executeValidation(bytes32 validationHash, bytes32 documentHash, uint256 executeValidationTime) internal nonReentrant {
-        uint256 quorum = calculateVoteQuorum(validationHash);
-        if (quorum >= members.requiredQuorum() && executeValidationTime == 0) {
-            Validation storage validation = validations[validationHash];
-            validation.executionTime = block.timestamp;
+    function executeValidation(bytes32 validationHash, bytes32 documentHash, uint256 quorum) internal nonReentrant {
+       
+        Validation storage validation = validations[validationHash];
+        validation.executionTime = block.timestamp;
 
-            (address[] memory winners, uint256 consensus) = determineWinners(validationHash);
-            validation.consensus = consensus;
-            
-            emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp, validation.url, winners);
-            // processPayments(validationHash, winners);
-        }
+        (address[] memory winners, uint256 consensus) = validationHelpers.determineWinners(validationHash);
+        validation.consensus = consensus;
+        
+        emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp, validation.url, winners);
+        
     }
 
-
-    function insertionSort(bytes32 validationHash) internal view returns (address[] memory, ValidationStatus[] memory, uint256[] memory) {
-
-        (address[] memory validator, ,ValidationStatus[] memory status, uint256[] memory validationTimes,) =  collectValidationResults(validationHash);
-
-        uint length = validationTimes.length;
-        
-        for (uint i = 1; i < length; i++) {
-            
-            uint key = validationTimes[i];
-            address user = validator[i];
-            ValidationStatus choice = status[i];
-            uint j = i - 1;
-            while ((int(j) > 0) && (validationTimes[j] > key)) {
-                validationTimes[i] = validationTimes[j];
-                validationTimes[i-1] = key; 
-                validator[i] = validator[j];
-                validator[i-1] = user;
-                status[i] = status[j];
-                status[i-1] =  choice; 
-                j--;
-            }
-            validationTimes[j + 1] = key;
-            validator[j+1] = user;
-            status[j+1] = choice;
-        }
-
-        return (validator, status, validationTimes );
-    }
-
-
-    function determineWinners(bytes32 validationHash) public view returns (address[] memory, uint256){
-
-        (address[] memory validator, ValidationStatus[] memory status, uint256[] memory validationTimes) = insertionSort (validationHash);
-
-        uint256 consensus = determineConsensus(status);
-        bool[] memory isWinner = new bool[](validator.length);
-        bool done;
-        uint256 i=0;
-        uint256 topValidationTime = validationTimes[0];
-        uint256 numFound=0;
-        
-        while (!done) {
-            if (uint256(status[i]) == consensus && validationTimes[i] == topValidationTime){
-                isWinner[i] = true;
-                numFound ++;
-            } 
-         
-            if (i + 1 == validator.length)
-                done = true;
-            else
-                i++;
-          }
-        
-        address[] memory winners = new address[](numFound);
-        uint256 j;
-
-        for (uint256 k = 0; k< validator.length; k++){
-
-            if (isWinner[k]){
-                winners[j] = validator[k];
-                j++;
-            }
-        }
-        return (winners, consensus);
-    }
 
     /**
      * @dev called by validator to approve or disapprove this validation
@@ -362,7 +223,7 @@ abstract contract Validations is  ReentrancyGuard{
      * @param validationTime - this is the time when validation has been initialized
      * @param decision - one of the ValidationStatus choices cast by validator
      */
-        function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl) public virtual {
+        function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl, bytes32 reportHash) public virtual {
 
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
         Validation storage validation = validations[validationHash];
@@ -374,27 +235,67 @@ abstract contract Validations is  ReentrancyGuard{
         validation.validatorChoice[msg.sender] = decision;
         validation.validatorTime[msg.sender] = block.timestamp;
         validation.validationUrl[msg.sender] = valUrl;
+        validation.validationHash[msg.sender] = reportHash;
 
-    
         validation.validationsCompleted ++;
 
         nodeOperations.increaseStakeRewards(msg.sender);
         nodeOperations.increaseDelegatedStakeRewards(msg.sender);
 
-        // if (validation.executionTime == 0 )
-        executeValidation(validationHash, documentHash, validation.executionTime);
         emit ValidatorValidated(msg.sender, documentHash, validationTime, decision, valUrl);
+
+        uint256 quorum = validationHelpers.calculateVoteQuorum(validationHash, address(this));
+
+        if (quorum >= members.requiredQuorum() && validation.executionTime == 0) {
+            executeValidation(validationHash, documentHash, quorum);
+        }
     }
 
 
 
-    function isHashAndTimeCorrect( bytes32 documentHash, uint256 validationTime) public view returns (bool){
+    function returnValidationRecord(bytes32 validationHash) public  view
+    returns( bool cohort,
+            address requestor,
+            uint256 validationTime,
+            uint256 executionTime,
+            string memory url,
+            uint256 consensus,
+            uint256 validationsCompleted,
+            uint64 winnerConfirmations,
+            bool paymentSent,
+            address winner) {
 
-        bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
+
+
         Validation storage validation = validations[validationHash];
-        if (validation.validationTime == validationTime)
-            return true;
-        else
-            return false;
+
+        cohort = validation.cohort;
+        requestor = validation.requestor;
+        validationTime = validation.validationTime;
+        executionTime = validation.executionTime;
+        url = validation.url;
+        consensus = validation.consensus;
+        validationsCompleted = validation.validationsCompleted;
+        winnerConfirmations = validation.winnerConfirmations;
+        paymentSent = validation.paymentSent;
+        winner = validation.winner;
+
     }
+
+
+   function returnValidationUrl(bytes32 validationHash, address user) public  view returns(string memory url) {
+
+        Validation storage validation = validations[validationHash];
+        url = validation.validationUrl[user];
+
+    }
+
+     function returnWinnerPoints(bytes32 validationHash, address user) public  view returns(uint256 plus, uint256 minus) {
+
+        Validation storage validation = validations[validationHash];
+        plus = validation.winnerVotesPlus[user];
+        minus = validation.winnerVotesMinus[user];
+
+    }
+   
 }

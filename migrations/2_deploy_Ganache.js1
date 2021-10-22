@@ -1,5 +1,7 @@
 const Members = artifacts.require('./Members.sol');
 const Token = artifacts.require('./AuditToken.sol');
+const ValidationHelpers = artifacts.require('./ValidationHelpers.sol');
+// const ValidationHelpersNoCohort = artifacts.require('./ValidationHelpers.sol');
 const Cohort = artifacts.require('./ValidationsCohort.sol');
 const NoCohort = artifacts.require('./ValidationsNoCohort.sol');
 const CohortFactory = artifacts.require('..build/contracts/CohortFactory.sol');
@@ -55,12 +57,15 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   console.log("token address:", token.address);
 
-  // await deployer.deploy(Members, token.address, platformAddress);
   await deployer.deploy(Members, platformAddress);
   let members = await Members.deployed();
 
+  
   await deployer.deploy(MemberHelpers, members.address, token.address);
   let memberHelpers = await MemberHelpers.deployed();
+
+  await deployer.deploy(ValidationHelpers, MemberHelpers.address);
+  let validationHelpers = await ValidationHelpers.deployed();
 
   await deployer.deploy(CohortFactory, members.address, memberHelpers.address);
   let cohortFactory = await CohortFactory.deployed();
@@ -68,18 +73,18 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await deployer.deploy(NodeOperations, memberHelpers.address, token.address, members.address);
   let nodeOperations = await NodeOperations.deployed();
 
-
   await deployer.deploy(DepositModifiers, members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address);
   let depositModifiers = await DepositModifiers.deployed();
 
-
-
-
-  await deployer.deploy(Cohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address);
+  await deployer.deploy(Cohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address);
   let cohort = await Cohort.deployed();
 
-  await deployer.deploy(NoCohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address);
+  await deployer.deploy(NoCohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address);
   let noCohort = await NoCohort.deployed();
+
+  // await validationHelpersCohort.setValidationContract(cohort.address);
+  // await validationHelpersNoCohort.setValidationContract(noCohort.address);
+
 
   await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
   await memberHelpers.grantRole(CONTROLLER_ROLE, noCohort.address, { from: admin });
@@ -252,10 +257,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator1, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator2, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator3, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator4, gas: 800000 });
 
 
   timeMachine.advanceTimeAndBlock(10);
@@ -267,11 +272,11 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationInitTime = event.args.initTime;
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, "",  { from: validator1, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 2, "", { from: validator2, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator1, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 2, "", documentHash, { from: validator2, gas: 800000 });
 
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator3, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator4, gas: 800000 });
 
 
   timeMachine.advanceTimeAndBlock(10);
@@ -283,9 +288,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   validationInitTime = event.args.initTime;
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-  await cohort.validate(documentHash, validationInitTime, 2, "",  { from: validator2, gas: 800000 });
-  result = await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator1, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 2, "", documentHash, { from: validator2, gas: 800000 });
+  result = await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator3, gas: 800000 });
 
 
   // event = result.logs[0];
@@ -301,7 +306,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   // validationInitTime = event.args.initTime;
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator4, gas: 800000 });
   await token.approve(depositModifiers.address, subscriberFee, { from: dataSubscriber });
   await depositModifiers.dataSubscriberPayment(enterprise1, 1, { from: dataSubscriber });
 
@@ -316,16 +321,16 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   documentURL = "QmNhaANyYwWmfrRBfMbXyogPhBSTQdzFL8TiWbqjBmNuoc/Auditchain.json";
 
   documentHash = web3.utils.soliditySha3(documentURL);
-  result = await cohort.initializeValidationCohort(documentHash, documentURL, 3,  { from: enterprise1, gas: 6000000 });
+  result = await cohort.initializeValidationCohort(documentHash, documentURL, 3, { from: enterprise1, gas: 6000000 });
 
   event = result.logs[0];
   validationInitTime = event.args.initTime;
 
 
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 900000 });
-  await cohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator1, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator2, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator3, gas: 900000 });
+  await cohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator4, gas: 900000 });
 
 
 
@@ -338,12 +343,12 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   event = result.logs[0];
   validationInitTime = event.args.initTime;
 
-  await nodeOperations.delegate(validator1, {from:delegating});
+  await nodeOperations.delegate(validator1, { from: delegating });
 
-  await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-  await noCohort.validate(documentHash, validationInitTime, 2, "", { from: validator2, gas: 800000 });
-  let resultVal = await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
-  await noCohort.validate(documentHash, validationInitTime, 1, "", { from: validator4, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator1, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, 2, "", documentHash, { from: validator2, gas: 800000 });
+  let resultVal = await noCohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator3, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, 1, "", documentHash, { from: validator4, gas: 800000 });
   // await noCohort.validate(documentHash, validationInitTime, 1, { from: delegating, gas: 800000 });
 
 
@@ -356,6 +361,8 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
       toBlock: "latest",
     }
   )
+
+
 
   // console.log("events", eventsMember)
 
@@ -526,6 +533,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('MEMBER_HELPERS_ADDRESS=' + memberHelpers.address);
   console.log('DEPOSIT_MODIFIERS_ADDRESS=' + depositModifiers.address);
   console.log('COHORT_FACTORY_ADDRESS=' + cohortFactory.address);
+  console.log('VALIDATIONS_HELPERS_ADDRESS=' + validationHelpers.address);
   console.log('VALIDATIONS_COHORT_ADDRESS=' + cohort.address);
   console.log('VALIDATIONS_NO_COHORT_ADDRESS=' + noCohort.address);
   console.log('NODE_OPERATIONS_ADDRESS=' + nodeOperations.address);
@@ -542,6 +550,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('memberHelpersAddress:"' + memberHelpers.address + '",');
   console.log('depositModifiersAddress:"' + depositModifiers.address + '",');
   console.log('cohortFactoryAddress:"' + cohortFactory.address + '",');
+  console.log('validationsHelpersAddress:"' + validationHelpers.address + '",');
   console.log('validationsCohortAddress:"' + cohort.address + '",');
   console.log('validationsNoCohortAddress:"' + noCohort.address + '",')
   console.log('nodeOperationsAddress:"' + nodeOperations.address + '",');

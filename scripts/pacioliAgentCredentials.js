@@ -9,6 +9,23 @@ let axios = require("axios");
 let ipfsAPI = require("ipfs-api");
 let BN = require("big-number");
 
+const ipfsClient = require("ipfs-http-client");
+// const ipfs = new ipfsClient();
+
+
+const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
+const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
+const auth ='Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
+
+const ipfs = ipfsClient({
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+  headers: {
+    authorization: auth
+  }
+})
+
 let HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config({ path: './.env' }); // update process.env
 
@@ -47,7 +64,7 @@ setInterval( //hack to keep alive our brittle websocket, which tends to close af
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
 let ipfsBase = 'https://ipfs.io/ipfs/';
 
-let ipfs = ipfsAPI('ipfs.infura.io', 5001, {
+let ipfs1 = ipfsAPI('ipfs.infura.io', 5001, {
     protocol: 'https'
 }) // Connect to IPFS
 
@@ -69,8 +86,8 @@ async function setUpContracts(account) {
 async function setUpNodeOperator(account) {
 
 
-    // const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
-    const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
+    const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
@@ -84,7 +101,7 @@ async function setUpNodeOperator(account) {
 async function verifyPacioli(metadatatUrl, trxHash) {
 
 
-    const result = await ipfs.files.cat(metadatatUrl);
+    const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
 
 
@@ -108,9 +125,15 @@ async function verifyPacioli(metadatatUrl, trxHash) {
             path: "Pacioli.json",
             content: bufRule
         }];
-    const resultPacioli = await ipfs.files.add(reportFile, { wrapWithDirectory: true });
+    const resultPacioli = await ipfs.add(reportFile, { wrapWithDirectory: true });
 
-    const pacioliIPFS = resultPacioli[1].hash + '/' + resultPacioli[0].path;
+    // console.log("hash:" , resultPacioli.cid.string);
+
+    // const pacioliIPFS = resultPacioli[1].hash + '/' + resultPacioli[0].path;
+
+    const pacioliIPFS = resultPacioli.cid.string + '/' + "Pacioli.json"
+
+
 
     console.log("[3 " + trxHash + "] Pacioli report saved at: " + ipfsBase + pacioliIPFS);
 
@@ -145,8 +168,14 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
             content: buf
         }];
 
-    const result = await ipfs.files.add(metadataFile, { wrapWithDirectory: true });
-    const urlMetadata = result[1].hash + '/' + result[0].path;
+    const result = await ipfs.add(metadataFile, { wrapWithDirectory: true });
+    // console.log("ipfs:" , JSON.stringify(result));
+
+    // console.log("File Hash received __>",  result.cid.string);
+
+    // const urlMetadata = result[1].hash + '/' + result[0].path;
+    const urlMetadata = result.cid.string + '/' + "AuditchainMetadataReport.json";
+
 
     console.log("[5 " + trxHash + "] Metadata created: " + ipfsBase + urlMetadata);
     return [urlMetadata, reportHash];
@@ -172,10 +201,8 @@ async function validate(hash, initTime, choice, validator, trxHash, valUrl, repo
         .validate(hash, initTime, choice, valUrl, reportHash)
         .send({ from: owner, gas: 500000, nonce: nonce })
         .on("receipt", function (receipt) {
-            // TODO: check some valid information at this point? 
-            // Commenting out the following, receipt.events.ValidatorValidated is undefined
-            // const event = receipt.events.ValidatorValidated.returnValues;
-            // let msg;
+            const event = receipt.events.ValidatorValidated.returnValues;
+            let msg;
             if (choice == 1)
                 console.log("[7 " + trxHash + "] Request has been validated as acceptable.")
             else
@@ -211,16 +238,19 @@ async function checkHash(event) {
     let validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
 
     let winnerReportUrl, myReportUrl, winnerReportHash, myReportHash = 0;
+    let times=0;
     for (let i = 0; i < validation[0].length; i++) {
+
+        times ++;
 
         if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase()) {
             winnerReportUrl = validation[4][i];
             winnerReportHash = validation[5][i];
         }
 
-        console.log("i:", i);
-        console.log("validator:", validation[0][i].toLowerCase() );
-        console.log("comparison:" , validation[0][i].toLowerCase() == owner);
+        // console.log("i:", i);
+        // console.log("validator:", validation[0][i].toLowerCase() );
+        // console.log("comparison:" , validation[0][i].toLowerCase() == owner);
 
         if (validation[0][i].toLowerCase() == owner) {
             myReportUrl = validation[4][i];
@@ -231,15 +261,16 @@ async function checkHash(event) {
 
         if (myReportHash == 0 && i == validation[0].length - 1) {
 
-            console.log("It will wait for 5 sec", i)
+            console.log("[8. " + times + "  " + event.transactionHash + "] It will wait for 5 sec", i)
+            
             await sleep(5000);
-            console.log("validation before:", validation);
+            // console.log("validation before:", validation);
             validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
-            console.log("validation after:", validation);
+            // console.log("validation after:", validation);
 
-            console.log("owner:", owner);
+            // console.log("owner:", owner);
             i = -1;
-            console.log("continuing loop")
+            console.log("Attempting Validation again.[" + times + "]");
 
         }
     }
