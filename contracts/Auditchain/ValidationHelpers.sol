@@ -171,15 +171,18 @@ contract ValidationHelpers {
 
         address[] memory validatorsList = IValidations(validationContract).returnValidatorList(validationHash);
         // (,,uint validationTime,,,,,,,) = IValidations(validationContract).returnValidationRecord(validationHash);
-        (, ,uint256[] memory choice,,,) =  IValidations(validationContract).collectValidationResults(validationHash);
+        (address[] memory validatorListActive, ,uint256[] memory choice,,,) =  IValidations(validationContract).collectValidationResults(validationHash);
 
         // Validation storage validation = validations[validationHash];
         // require(validationTime> 0, "ValidationHelpers:calculateVoteQuorum - Validation hash doesn't exist");
 
         for (uint256 i = 0; i < validatorsList.length; i++) {
             totalStaked += memberHelpers.returnDepositAmount(validatorsList[i]);
-            if (choice.length <= i) 
-                currentlyVoted += memberHelpers.returnDepositAmount(validatorsList[i]);
+            // if (choice.length <= i) 
+             for (uint256 j=0; j< choice.length; j++){
+                 if (validatorsList[i] == validatorListActive[j])
+                    currentlyVoted += memberHelpers.returnDepositAmount(validatorsList[i]);
+             }
         }
         if (currentlyVoted == 0)
             return 0;
