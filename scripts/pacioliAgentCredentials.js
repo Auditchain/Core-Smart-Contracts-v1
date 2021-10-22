@@ -86,8 +86,8 @@ async function setUpContracts(account) {
 async function setUpNodeOperator(account) {
 
 
-    // const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
-    const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
+    const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
