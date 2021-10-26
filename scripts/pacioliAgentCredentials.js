@@ -223,15 +223,16 @@ async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
     // const gas = await nonCohortValidate.methods.validate(hash, initTime, choice, valUrl, reportHash).estimateGas({ from: owner, nonce: nonce });
     // console.log("gas:", gas);
 
-    const tempNonce = await web3.eth.getTransactionCount(owner);
+    let tempNonce = await web3.eth.getTransactionCount(owner);
+    tempNonce;
 
     console.log("Actual Nonce from Validate:", nonce);
 
 
-    if (tempNonce > nonce)
-        nonce = tempNonce;
+    // if (tempNonce > nonce)
+    //     nonce = tempNonce;
 
-    console.log("Nonce from Validate:", nonce);
+    // console.log("Nonce from Validate:", nonce);
 
 
     nonCohortValidate.methods
@@ -245,7 +246,7 @@ async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
             else
                 console.log("[7 " + trxHash + "] Request has been validated as adverse");
 
-            nonce++;
+
 
         })
         .on("error", function (error) {
@@ -254,6 +255,9 @@ async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
             console.log("An error occurred:", error)
 
         });
+
+    nonce++;
+    console.log("Nonce from Validate after completion:", nonce);
 }
 
 function sleep(ms) {
@@ -309,23 +313,12 @@ async function checkHash(event) {
             // console.log("validation before:", validation);
             validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
             // console.log("validation after:", validation);
-
             // console.log("owner:", owner);
             i = -1;
-            console.log("Attempting Validation again.[" + times + "]");
-
+            console.log( "[8. " + times + "]" +  event.transactionHash + "Attempting Validation again");
         }
     }
-
     // owner has voted and can verify
-
-    // if (winnerReportUrl != undefined && myReportUrl != undefined) {
-
-    // const winnerResult = await ipfs.files.cat(winnerReportUrl);
-    // winnerReportHash = JSON.parse(winnerResult)["reportHash"];
-
-    // const myResult = await ipfs.files.cat(myReportUrl);
-    // myReportHash = JSON.parse(myResult)["reportHash"];
 
     let vote = false;
 
@@ -333,11 +326,8 @@ async function checkHash(event) {
         vote = true;
 
     console.log("[9 " + event.transactionHash + "] Winner validation verified as ", vote ? "similar." : "different.")
-
     return [vote, winnerAddress];
-    // }
-
-    // return [null, null];
+  
 }
 
 /**
@@ -411,13 +401,13 @@ async function startProcess() {
 
                 const tempNonce = await web3.eth.getTransactionCount(owner);
 
-                console.log("Actual Nonce from RequestExecuted:", nonce);
+                console.log("Actual Nonce from RequestExecuted before:", nonce);
 
 
-                if (tempNonce > nonce)
-                    nonce = tempNonce;
+                // if (tempNonce > nonce)
+                //     nonce = tempNonce;
 
-                console.log("Nonce from RequestExecuted:", nonce);
+                // console.log("Nonce from RequestExecuted before call:", nonce);
 
                 if (winners.length > 0) {
                     console.log("[10 " + event.transactionHash + "] Awaiting verification of winners...  ");
@@ -425,13 +415,18 @@ async function startProcess() {
                         .send({ from: owner, gas: 500000, nonce: nonce })
                         .on("receipt", function (receipt) {
                             // const event = receipt.events.WinnerVoted;
-                            console.log("[11 " + event.transactionHash + "] Verification of winners completed...  ");
-                            nonce++;
+
                         })
                         .on("error", function (error) {
                             console.log("An error occurred:", error)
 
                         });
+                    console.log("[11 " + event.transactionHash + "] Verification of winners completed...  ");
+                    nonce++;
+
+                    console.log("Actual Nonce from RequestExecuted after:", nonce);
+
+
                 }
             })
             .on('error', console.error);
