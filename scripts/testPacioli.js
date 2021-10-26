@@ -169,30 +169,36 @@ async function deploy() {
 
     // let myArgs = process.argv.slice(2);
 
-    let reportURL = "https://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml";;
+    let reportURL = "https://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml";
     let result
 
     await setUpContracts("0x9ca184fa913e7ca5f49b0c89a2665beac582c12cce4308473ef65f4166d58dfa");
     const dataSubscriber1 = providerForUpdate.addresses[0];
     result = await saveToIpfs(reportURL);
-    validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber1, gas:800000 });
+    await validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber1, gas:800000 });
     console.log("Submission for dataSubscriber1");
+
+    reportURL = "https://www.sec.gov/Archives/edgar/data/1318605/000095017021000046/tsla-20210331.htm";
 
     await setUpContracts("0x254198af956f996631d6231743b8578f07c9745330081e28af0e29642e896786");
     const dataSubscriber2 = providerForUpdate.addresses[0];
     result = await saveToIpfs(reportURL);
-    validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber2, gas:800000 });
+    await validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber2, gas:800000 });
     console.log("Submission for dataSubscriber2");
+
+    reportURL = "https://www.sec.gov/Archives/edgar/data/1108524/000110852417000040/crm-20171031.xml";
+
 
     await setUpContracts("0x75e947d1c03407dc87331769842f0c89c915e8a93b480ec055dcafeeca99cac5");
     const dataSubscriber3 = providerForUpdate.addresses[0];
     result = await saveToIpfs(reportURL);
-    validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber3, gas:800000});
+    await validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber3, gas:800000});
     console.log("Submission for dataSubscriber3");
 
 
 
     console.log("FINISHED");
+    process.exit();
 
 
 
