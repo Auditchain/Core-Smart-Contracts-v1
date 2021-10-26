@@ -223,17 +223,10 @@ async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
     // const gas = await nonCohortValidate.methods.validate(hash, initTime, choice, valUrl, reportHash).estimateGas({ from: owner, nonce: nonce });
     // console.log("gas:", gas);
 
-    let tempNonce = await web3.eth.getTransactionCount(owner);
-    tempNonce;
+    // let tempNonce = await web3.eth.getTransactionCount(owner);
+    // tempNonce;
 
-    console.log("Actual Nonce from Validate:", nonce);
-
-
-    // if (tempNonce > nonce)
-    //     nonce = tempNonce;
-
-    // console.log("Nonce from Validate:", nonce);
-
+    // console.log("Actual Nonce from Validate:", nonce);
 
     nonCohortValidate.methods
         .validate(hash, initTime, choice, valUrl, reportHash)
@@ -246,8 +239,6 @@ async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
             else
                 console.log("[7 " + trxHash + "] Request has been validated as adverse");
 
-
-
         })
         .on("error", function (error) {
 
@@ -257,7 +248,7 @@ async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
         });
 
     nonce++;
-    console.log("Nonce from Validate after completion:", nonce);
+    // console.log("Nonce from Validate after completion:", nonce);
 }
 
 function sleep(ms) {
@@ -308,14 +299,10 @@ async function checkHash(event) {
         if (myReportHash == 0 && i == validation[0].length - 1) {
 
             console.log("[8. " + times + "  " + event.transactionHash + "] It will wait for 5 sec", i)
-
             await sleep(5000);
-            // console.log("validation before:", validation);
             validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
-            // console.log("validation after:", validation);
-            // console.log("owner:", owner);
             i = -1;
-            console.log( "[8. " + times + "]" +  event.transactionHash + "Attempting Validation again");
+            console.log("[8. " + times + "]" + event.transactionHash + "Attempting Validation again");
         }
     }
     // owner has voted and can verify
@@ -327,7 +314,7 @@ async function checkHash(event) {
 
     console.log("[9 " + event.transactionHash + "] Winner validation verified as ", vote ? "similar." : "different.")
     return [vote, winnerAddress];
-  
+
 }
 
 /**
@@ -380,7 +367,6 @@ async function startProcess() {
         // Wait for completion of validation and determine earnings 
         nonCohort.events.RequestExecuted({})
             .on('data', async function (event) {
-                // const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
                 const trxHash = event.transactionHash;
                 const count = event.returnValues.winners.length;
                 const validationHash = event.returnValues.validationHash;
@@ -397,35 +383,21 @@ async function startProcess() {
                     }
                 }
 
-                // const nonce = await web3.eth.getTransactionCount(owner);
-
-                const tempNonce = await web3.eth.getTransactionCount(owner);
-
-                console.log("Actual Nonce from RequestExecuted before:", nonce);
-
-
-                // if (tempNonce > nonce)
-                //     nonce = tempNonce;
-
-                // console.log("Nonce from RequestExecuted before call:", nonce);
 
                 if (winners.length > 0) {
                     console.log("[10 " + event.transactionHash + "] Awaiting verification of winners...  ");
                     nonCohortValidate.methods.voteWinner(winners, votes, validationHash)
                         .send({ from: owner, gas: 500000, nonce: nonce })
                         .on("receipt", function (receipt) {
-                            // const event = receipt.events.WinnerVoted;
+                            console.log("[11 " + event.transactionHash + "] Verification of winners completed...  ");
 
                         })
                         .on("error", function (error) {
                             console.log("An error occurred:", error)
 
                         });
-                    console.log("[11 " + event.transactionHash + "] Verification of winners completed...  ");
+
                     nonce++;
-
-                    console.log("Actual Nonce from RequestExecuted after:", nonce);
-
 
                 }
             })
