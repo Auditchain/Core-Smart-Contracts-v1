@@ -15,15 +15,15 @@ const ipfsClient = require("ipfs-http-client");
 
 const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
 const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
-const auth ='Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
+const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
 
 const ipfs = ipfsClient({
-  host: 'ipfs.infura.io',
-  port: 5001,
-  protocol: 'https',
-  headers: {
-    authorization: auth
-  }
+    host: 'ipfs.infura.io',
+    port: 5001,
+    protocol: 'https',
+    headers: {
+        authorization: auth
+    }
 })
 
 let HDWalletProvider = require('@truffle/hdwallet-provider');
@@ -36,7 +36,7 @@ const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
 //TODO: this module is still copied from https://github.com/Auditchain/Reporting-Validation-Engine/tree/main/clientExamples/pacioliClient:
 const pacioli = require('./pacioliClient');
 
-// import ethereum connection strings. 
+// import ethereum connection strings. 500000
 const ropsten_infura_server = process.env.ROPSTEN_INFURA_SERVER;
 const rinkeby_infura_server = process.env.RINKEBY_INFURA_SERVER;
 const main_infura_server = process.env.MAINNET_INFURA_SERVER;
@@ -55,6 +55,7 @@ const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
 
 const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
+let nonce;
 
 const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
@@ -72,6 +73,7 @@ let nonCohortValidate;
 let nodeOperations;
 let providerForUpdate;
 let nodeOperationsPreEvent;
+let owner;
 
 async function setUpContracts(account) {
 
@@ -182,6 +184,24 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
 }
 
 
+async function executeVerification(url, trxHash, documentHash, initTime) {
+
+
+    const [reportPacioliIPFSUrl, isValid] = await verifyPacioli(url, trxHash);
+
+    if (!reportPacioliIPFSUrl) {
+        console.log("FAILED execution of verifyPacioli for " + url);
+        return;
+        //TODO: what to do here?
+    }
+
+    const [metaDataLink, reportHash] = await uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid);
+    await validate(documentHash, initTime, isValid ? 1 : 2, trxHash, metaDataLink, reportHash);
+
+}
+
+
+
 /**
  * @dev Validate the report
  * @param hash hash of the document to validate
@@ -189,26 +209,48 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
  * @param choice decision of the validator
  * @param validator address of the validator
  */
-async function validate(hash, initTime, choice, validator, trxHash, valUrl, reportHash) {
+async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
 
 
     console.log("[6 " + trxHash + "] Waiting for validation transaction to complete... ");
     const owner = providerForUpdate.addresses[0];
-    const nonce = await web3.eth.getTransactionCount(owner);
 
     //validate request
+
+    //    const gas = await web3.eth.estimateGas(nonCohortValidate.methods
+    //          .validate(hash, initTime, choice, valUrl, reportHash));
+
+    // const gas = await nonCohortValidate.methods.validate(hash, initTime, choice, valUrl, reportHash).estimateGas({ from: owner, nonce: nonce });
+    // console.log("gas:", gas);
+
+    const tempNonce = await web3.eth.getTransactionCount(owner);
+
+    console.log("Actual Nonce from Validate:", nonce);
+
+
+    if (tempNonce > nonce)
+        nonce = tempNonce;
+
+    console.log("Nonce from Validate:", nonce);
+
+
     nonCohortValidate.methods
         .validate(hash, initTime, choice, valUrl, reportHash)
-        .send({ from: owner, gas: 500000, nonce: nonce })
+        .send({ from: owner, gas: 800000, nonce: nonce })
         .on("receipt", function (receipt) {
             const event = receipt.events.ValidatorValidated.returnValues;
             let msg;
             if (choice == 1)
                 console.log("[7 " + trxHash + "] Request has been validated as acceptable.")
             else
-                console.log("[7 " + trxHash + "] Request has been validated as adverse")
+                console.log("[7 " + trxHash + "] Request has been validated as adverse");
+
+            nonce++;
+
         })
         .on("error", function (error) {
+
+
             console.log("An error occurred:", error)
 
         });
@@ -238,10 +280,10 @@ async function checkHash(event) {
     let validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
 
     let winnerReportUrl, myReportUrl, winnerReportHash, myReportHash = 0;
-    let times=0;
+    let times = 0;
     for (let i = 0; i < validation[0].length; i++) {
 
-        times ++;
+        times++;
 
         if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase()) {
             winnerReportUrl = validation[4][i];
@@ -262,7 +304,7 @@ async function checkHash(event) {
         if (myReportHash == 0 && i == validation[0].length - 1) {
 
             console.log("[8. " + times + "  " + event.transactionHash + "] It will wait for 5 sec", i)
-            
+
             await sleep(5000);
             // console.log("validation before:", validation);
             validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
@@ -290,7 +332,7 @@ async function checkHash(event) {
     if (winnerReportHash == myReportHash)
         vote = true;
 
-    console.log("[9 " + event.transactionHash + "] Winner validation verified as " ,  vote ? "valid." : "wrong.")
+    console.log("[9 " + event.transactionHash + "] Winner validation verified as ", vote ? "similar." : "different.")
 
     return [vote, winnerAddress];
     // }
@@ -310,7 +352,8 @@ async function startProcess() {
     setUpContracts(myArgs[0]);
     setUpNodeOperator(myArgs[0]);
 
-    const owner = providerForUpdate.addresses[0];
+    owner = providerForUpdate.addresses[0];
+    nonce = await web3.eth.getTransactionCount(owner);
 
     const validationStruct = await nodeOperationsPreEvent.methods.nodeOpStruct(owner).call();
     const isNodeOperator = validationStruct.isNodeOperator;
@@ -323,28 +366,31 @@ async function startProcess() {
         nonCohort.events.ValidationInitialized({})
             .on('data', async function (event) {
 
-                const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
-                depositAmountBefore = validationStruct.POWAmount;
+                // const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
+                // depositAmountBefore = validationStruct.POWAmount;
 
                 const trxHash = event.transactionHash;
-                const [reportPacioliIPFSUrl, isValid] = await verifyPacioli(event.returnValues.url, trxHash);
+                const url = event.returnValues.url;
+                const documentHash = event.returnValues.documentHash;
+                const initTime = event.returnValues.initTime;
 
-                if (!reportPacioliIPFSUrl) {
-                    console.log("FAILED execution of verifyPacioli for " + event.returnValues.url);
-                    return; //TODO: what to do here?
-                }
+                await executeVerification(url, trxHash, documentHash, initTime);
 
-                const [metaDataLink, reportHash] = await uploadMetadataToIpfs(event.returnValues.url, reportPacioliIPFSUrl, trxHash, isValid);
-                await validate(event.returnValues.documentHash, event.returnValues.initTime, isValid ? 1 : 2, owner, trxHash, metaDataLink, reportHash);
 
                 // console.log(`We have ${nonCohort.events.ValidationInitialized().listenerCount('data')} listener(s) for the ValidationInitialized event`);
             })
-            .on('error', console.error)
+
+
+            .on('error', async function (error, event) {
+
+                console.error;
+
+            })
 
         // Wait for completion of validation and determine earnings 
         nonCohort.events.RequestExecuted({})
             .on('data', async function (event) {
-                const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
+                // const validationStruct = await nodeOperations.methods.nodeOpStruct(owner).call();
                 const trxHash = event.transactionHash;
                 const count = event.returnValues.winners.length;
                 const validationHash = event.returnValues.validationHash;
@@ -361,7 +407,17 @@ async function startProcess() {
                     }
                 }
 
-                const nonce = await web3.eth.getTransactionCount(owner);
+                // const nonce = await web3.eth.getTransactionCount(owner);
+
+                const tempNonce = await web3.eth.getTransactionCount(owner);
+
+                console.log("Actual Nonce from RequestExecuted:", nonce);
+
+
+                if (tempNonce > nonce)
+                    nonce = tempNonce;
+
+                console.log("Nonce from RequestExecuted:", nonce);
 
                 if (winners.length > 0) {
                     console.log("[10 " + event.transactionHash + "] Awaiting verification of winners...  ");
@@ -370,7 +426,7 @@ async function startProcess() {
                         .on("receipt", function (receipt) {
                             // const event = receipt.events.WinnerVoted;
                             console.log("[11 " + event.transactionHash + "] Verification of winners completed...  ");
-
+                            nonce++;
                         })
                         .on("error", function (error) {
                             console.log("An error occurred:", error)
