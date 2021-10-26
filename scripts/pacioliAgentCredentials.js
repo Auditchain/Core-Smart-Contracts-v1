@@ -276,6 +276,7 @@ async function checkHash(event) {
 
     let winnerReportUrl, myReportUrl, winnerReportHash, myReportHash = 0;
     let times = 0;
+    let winnerHashFound, ownerHashFound;
     for (let i = 0; i < validation[0].length; i++) {
 
         times++;
@@ -283,6 +284,7 @@ async function checkHash(event) {
         if (validation[0][i].toLowerCase() == winnerAddress.toLowerCase()) {
             winnerReportUrl = validation[4][i];
             winnerReportHash = validation[5][i];
+            winnerHashFound = true;
         }
 
         // console.log("i:", i);
@@ -293,7 +295,7 @@ async function checkHash(event) {
             myReportUrl = validation[4][i];
             myReportHash = validation[5][i];
             console.log("Hash found", myReportHash);
-            i = validation[0].length;
+            ownerHashFound = true;
         }
 
         if (myReportHash == 0 && i == validation[0].length - 1) {
@@ -304,6 +306,9 @@ async function checkHash(event) {
             i = -1;
             console.log("[8. " + times + "]" + event.transactionHash + "Attempting Validation again");
         }
+
+        if (ownerHashFound && winnerHashFound)
+            i = validation[0].length;
     }
     // owner has voted and can verify
 
