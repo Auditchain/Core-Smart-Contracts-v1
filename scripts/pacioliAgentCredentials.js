@@ -56,6 +56,8 @@ const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
 const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
 let nonce;
+let initTimeGlobal;
+let documentHashGlobal;
 
 const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
@@ -356,9 +358,11 @@ async function startProcess() {
                 const documentHash = event.returnValues.documentHash;
                 const initTime = event.returnValues.initTime;
 
-                await executeVerification(url, trxHash, documentHash, initTime);
-
-
+                if (initTimeGlobal != initTime && documentHashGlobal != documentHash) {
+                    initTimeGlobal = initTime;
+                    documentHashGlobal = documentHash
+                    await executeVerification(url, trxHash, documentHash, initTime);
+                }
                 // console.log(`We have ${nonCohort.events.ValidationInitialized().listenerCount('data')} listener(s) for the ValidationInitialized event`);
             })
 
