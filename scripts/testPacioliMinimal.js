@@ -103,9 +103,15 @@ var submissionCounter = 0;
  */
 async function submitReport(myContractObject,reportURL){
     activeSubmissions++; submissionCounter++;
-    let result = await saveToIpfs(reportURL,myContractObject.owner);
-    let outcome = await myContractObject.validator.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: myContractObject.owner, gas:800000 });
-    console.log(`Submission ${submissionCounter} for ${myContractObject.owner} FINISHED`);
+    var result, outcome;
+    try {
+        result = await saveToIpfs(reportURL,myContractObject.owner);
+        outcome = await myContractObject.validator.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: myContractObject.owner, gas:800000 });
+        console.log(`Submission ${submissionCounter} for ${myContractObject.owner} FINISHED`);
+    } catch(e){
+        console.log("Error: "+e);
+        outcome = null;
+    }
     if (outcome) {
         console.log(`${myContractObject.owner} submitted ${reportURL} with ${outcome.transactionHash}`);
         return outcome.transactionHash;
