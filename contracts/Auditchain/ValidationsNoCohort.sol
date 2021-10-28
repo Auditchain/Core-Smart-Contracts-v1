@@ -48,8 +48,8 @@ contract ValidationsNoCohort is Validations {
         emit PaymentProcessed(validationHash, winner, validation.winnerVotesPlus[winner], validation.winnerVotesMinus[winner]);
     }
 
-    function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl, bytes32 reportHash) public override {
-        super.validate(documentHash, validationTime, decision, valUrl, reportHash);
+    function validate(bytes32 documentHash, uint256 validationTime, address subscriber, ValidationStatus decision, string memory valUrl, bytes32 reportHash) public override {
+        super.validate(documentHash, validationTime, subscriber, decision, valUrl, reportHash);
     }
 
     function returnValidatorCount() public view override returns (uint256){

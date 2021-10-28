@@ -9,7 +9,9 @@ let axios = require("axios");
 let ipfsAPI = require("ipfs-api");
 let BN = require("big-number");
 
-const ipfsClient = require("ipfs-http-client");
+// const ipfsClient = require("ipfs-http-client");
+const {create} = require("ipfs-http-client");
+
 // const ipfs = new ipfsClient();
 
 
@@ -17,7 +19,9 @@ const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
 const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
 const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
 
-const ipfs = ipfsClient({
+
+
+const ipfs = create({
     host: 'ipfs.infura.io',
     port: 5001,
     protocol: 'https',
@@ -58,6 +62,7 @@ const web3 = new Web3(provider);
 let nonce;
 let initTimeGlobal;
 let documentHashGlobal;
+let subscriberGlobal;
 
 const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
@@ -76,6 +81,8 @@ let nodeOperations;
 let providerForUpdate;
 let nodeOperationsPreEvent;
 let owner;
+let validationCount = 0;
+
 
 async function setUpContracts(account) {
 
@@ -90,8 +97,8 @@ async function setUpContracts(account) {
 async function setUpNodeOperator(account) {
 
 
-    const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
-    // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
+    // const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
@@ -194,7 +201,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
 }
 
 
-async function executeVerification(url, trxHash, documentHash, initTime) {
+async function executeVerification(url, trxHash, documentHash, initTime, subscriber) {
 
 
     const [reportPacioliIPFSUrl, isValid] = await verifyPacioli1(url, trxHash);
@@ -206,7 +213,7 @@ async function executeVerification(url, trxHash, documentHash, initTime) {
     }
 
     const [metaDataLink, reportHash] = await uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid);
-    await validate(documentHash, initTime, isValid ? 1 : 2, trxHash, metaDataLink, reportHash);
+    await validate(documentHash, initTime, isValid ? 1 : 2, trxHash, metaDataLink, reportHash, subscriber);
 
 }
 
@@ -219,7 +226,7 @@ async function executeVerification(url, trxHash, documentHash, initTime) {
  * @param choice decision of the validator
  * @param validator address of the validator
  */
-async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
+async function validate(documentHash, initTime, choice, trxHash, valUrl, reportHash, subscriber) {
 
 
     console.log("[6 " + trxHash + "] Waiting for validation transaction to complete... ");
@@ -239,7 +246,7 @@ async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
     // console.log("Actual Nonce from Validate:", nonce);
 
     nonCohortValidate.methods
-        .validate(hash, initTime, choice, valUrl, reportHash)
+        .validate(documentHash, initTime, subscriber, choice, valUrl, reportHash)
         .send({ from: owner, gas: 800000, nonce: nonce })
         .on("receipt", function (receipt) {
             const event = receipt.events.ValidatorValidated.returnValues;
@@ -258,6 +265,8 @@ async function validate(hash, initTime, choice, trxHash, valUrl, reportHash) {
         });
 
     nonce++;
+    validationCount++
+    console.log("Total validation count:" + validationCount);
     // console.log("Nonce from Validate after completion:", nonce);
 }
 
@@ -297,7 +306,7 @@ async function checkHash(event) {
             winnerReportUrl = validation[4][i];
             winnerReportHash = validation[5][i];
             winnerHashFound = true;
-            console.log("Hash found winner", winnerReportHash);
+            // console.log("Hash found winner", winnerReportHash);
 
         }
 
@@ -308,7 +317,7 @@ async function checkHash(event) {
         if (validation[0][i].toLowerCase() == owner) {
             myReportUrl = validation[4][i];
             myReportHash = validation[5][i];
-            console.log("Hash found owner", myReportHash);
+            // console.log("Hash found owner", myReportHash);
             ownerHashFound = true;
         }
 
@@ -375,16 +384,18 @@ async function startProcess() {
                 const url = event.returnValues.url;
                 const documentHash = event.returnValues.documentHash;
                 const initTime = event.returnValues.initTime;
+                const subscriber = event.returnValues.user;
 
-                console.log("documentHash:", documentHash);
-                console.log("initTime:", initTime);
-                console.log("trxHash:", trxHash)
+                // console.log("documentHash:", documentHash);
+                // console.log("initTime:", initTime);
+                // console.log("trxHash:", trxHash)
 
-                if (initTimeGlobal != initTime && documentHashGlobal != documentHash ){
+               if (initTimeGlobal != initTime && documentHashGlobal != documentHash && subscriberGlobal != subscriber){
                     initTimeGlobal = initTime;
-                    documentHashGlobal = documentHash
-                    await executeVerification(url, trxHash, documentHash, initTime);
-                }
+                    documentHashGlobal = documentHash;
+                    subscriberGlobal = subscriber;
+                    await executeVerification(url, trxHash, documentHash, initTime, subscriber);
+               }
 
                 // console.log(`We have ${nonCohort.events.ValidationInitialized().listenerCount('data')} listener(s) for the ValidationInitialized event`);
             })
