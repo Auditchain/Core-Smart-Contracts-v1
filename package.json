@@ -36,6 +36,7 @@
     "find-config": "^1.0.0",
     "ganache-time-traveler": "^1.0.15",
     "ipfs-api": "^26.1.2",
+    "ipfs-http-client": "^53.0.1",
     "openzeppelin-test-helpers": "^0.1.2",
     "pm2": "^5.1.2",
     "save": "^2.3.3",
