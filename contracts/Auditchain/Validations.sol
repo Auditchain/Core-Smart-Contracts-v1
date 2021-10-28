@@ -93,7 +93,7 @@ abstract contract Validations is  ReentrancyGuard{
         require(documentHash.length > 0, "Validation:initializeValidation - Document hash value can't be 0");
 
         uint256 validationTime = block.timestamp;
-        bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
+        bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime, msg.sender));
 
         outstandingValidations[msg.sender]++;
         Validation storage newValidation = validations[validationHash];
@@ -223,13 +223,13 @@ abstract contract Validations is  ReentrancyGuard{
      * @param validationTime - this is the time when validation has been initialized
      * @param decision - one of the ValidationStatus choices cast by validator
      */
-        function validate(bytes32 documentHash, uint256 validationTime, ValidationStatus decision, string memory valUrl, bytes32 reportHash) public virtual {
+        function validate(bytes32 documentHash, uint256 validationTime, address subscriber, ValidationStatus decision, string memory valUrl, bytes32 reportHash) public virtual {
 
-        bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime));
+        bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime, subscriber));
         Validation storage validation = validations[validationHash];
         require(members.userMap(msg.sender, Members.UserType(1)), "Validation:validate - Validator is not authorized.");
         require(validation.validationTime == validationTime, "Validation:validate - the validation params don't match.");
-        require(validation.validatorChoice[msg.sender] ==ValidationStatus.Undefined, "Validation:validate - This document has been validated already.");
+        require(validation.validatorChoice[msg.sender] == ValidationStatus.Undefined, "Validation:validate - This document has been validated already.");
         require(nodeOperations.returnDelegatorLink(msg.sender) == address(0x0), "Validations:validate - you can't validated because you have delegated your stake");
         require(nodeOperations.isNodeOperator(msg.sender), "Validations:validate - you are not a node operator");
         validation.validatorChoice[msg.sender] = decision;
