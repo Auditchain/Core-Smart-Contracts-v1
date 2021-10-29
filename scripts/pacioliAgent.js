@@ -1,22 +1,15 @@
 "use strict";
-var express = require('express');
-var bodyParser = require('body-parser');
-var app = express();
 let contract = require('truffle-contract');
 let Web3 = require('web3');
 let ethers = require('ethers');
 let axios = require("axios");
 let ipfsAPI = require("ipfs-api");
-let BN = require("big-number");
 
 const { create } = require("ipfs-http-client");
-
 
 const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
 const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
 const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
-
-
 
 const ipfs = create({
     host: 'ipfs.infura.io',
@@ -31,13 +24,12 @@ let HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config({ path: './.env' }); // update process.env
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
-const MEMBER_HELPERS = require('../build/contracts/MemberHelpers.json');
 const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
 
 //TODO: this module is still copied from https://github.com/Auditchain/Reporting-Validation-Engine/tree/main/clientExamples/pacioliClient:
 const pacioli = require('./pacioliClient');
 
-// import ethereum connection strings. 500000
+// import ethereum connection strings.
 const ropsten_infura_server = process.env.ROPSTEN_INFURA_SERVER;
 const rinkeby_infura_server = process.env.RINKEBY_INFURA_SERVER;
 const main_infura_server = process.env.MAINNET_INFURA_SERVER;
@@ -50,15 +42,12 @@ const mnemonic = process.env.MNEMONIC;
 
 // Address for smart contracts
 const nonCohortAddress = process.env.VALIDATIONS_NO_COHORT_ADDRESS;
-const memberHelpersAddress = process.env.MEMBER_HELPERS_ADDRESS;
 const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
 
 const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
 let nonce;
-let initTimeGlobal;
-let documentHashGlobal;
-let subscriberGlobal;
+
 
 const agentBornAT = Date.now();
 setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
@@ -80,6 +69,10 @@ let owner;
 let validationCount = 0;
 
 
+/**
+ * @dev {initialize smart contracts with the web socket provider}
+ * @param {account of this operator} account 
+*/
 async function setUpContracts(account) {
 
 
@@ -89,12 +82,14 @@ async function setUpContracts(account) {
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
 
-
+/**
+ * @dev {initialize node operator contract with https: to solve the interference of this pre check with listening to events on socket provider}
+ * @param {account of this operator} account 
+ */
 async function setUpNodeOperator(account) {
 
-
-    // const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
-    const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
+    const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
 }
@@ -102,34 +97,26 @@ async function setUpNodeOperator(account) {
 
 /**
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
- * @param metadatatUrl contains information about the location of the submitted report on IPFS by the data subscriber 
- * @param trxHash  transaction hash of the transaction processed
- * @returns location of Pacioli report on IPFS
+ * @param  {contains information about the location of the submitted report on IPFS by the data subscriber } metadatatUrl
+ * @param  {blockchain transaction hash} trxHash
+ * @returns {location of Pacioli report on IPFS and result of validation valid or not}
  */
 async function verifyPacioli(metadatatUrl, trxHash) {
 
-
-    const result = await ipfs.cat(metadatatUrl);
-    let content;
-
-    for await (const item of result) {
-        content = item + "";
-    }
-
+    const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
 
-
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-        .catch(error => console.log("ERROR: " + error));
-    // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
     //     .catch(error => console.log("ERROR: " + error));
+    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+        .catch(error => console.log("ERROR: " + error));
 
 
-    if (!reportContent) return [null, false];
+    if (!reportContent) 
+            return [null, false];
 
     const jsonStringFromObject = JSON.stringify(reportContent);
-
     const bufRule = Buffer.from(jsonStringFromObject);
 
     console.log("[2 " + trxHash + "] Saving Pacioli Results to IPFS");
@@ -140,35 +127,27 @@ async function verifyPacioli(metadatatUrl, trxHash) {
             content: bufRule
         }];
     const resultPacioli = await ipfs.add(reportFile, { wrapWithDirectory: true });
-    const pacioliIPFS = resultPacioli.cid.string + '/' + "Pacioli.json"
+    const pacioliIPFS = resultPacioli.cid + '/' + "Pacioli.json"
 
     console.log("[3 " + trxHash + "] Pacioli report saved at: " + ipfsBase + pacioliIPFS);
 
     return [pacioliIPFS, reportContent.isValid];
 }
 
-
+//TODO:  Use only for testing to bypass calling Pacioli
 // async function verifyPacioli1(metadatatUrl, trxHash) {
 
 //     return ["https://ipfs.io/ipfs/QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-
-
 // }
 
 
 /**
- * @dev {Store the metadata file on IPFS}
- * @param url url of the report to validate
- * @param reportPacioliIPFSUrl Location of Pacioli report
- */
-
-/**
  *  @dev {Store the metadata file on IPFS}
  * @param {url of the report to validate} url 
- * @param {*} reportPacioliIPFSUrl 
- * @param {*} trxHash 
- * @param {*} isValid 
- * @returns 
+ * @param {IFPS link of pacioli report} reportPacioliIPFSUrl 
+ * @param {blockchain transaction hash} trxHash 
+ * @param {if report is valid} isValid 
+ * @returns urlMetadata and reportHash
  */
 async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid) {
 
@@ -193,11 +172,12 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
         }];
 
     const result = await ipfs.add(metadataFile, { wrapWithDirectory: true });
-    const urlMetadata = result.cid.string + '/' + "AuditchainMetadataReport.json";
+    const urlMetadata = result.cid + '/' + "AuditchainMetadataReport.json";
 
     console.log("[5 " + trxHash + "] Metadata created: " + ipfsBase + urlMetadata);
     return [urlMetadata, reportHash];
 }
+
 
 /**
  * @dev call Pacioli and pass isValid result to validation function. Save metadata file on IPFS. 
@@ -210,7 +190,6 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
  */
 async function executeVerification(url, trxHash, documentHash, initTime, subscriber) {
 
-
     const [reportPacioliIPFSUrl, isValid] = await verifyPacioli(url, trxHash);
 
     if (!reportPacioliIPFSUrl) {
@@ -221,8 +200,8 @@ async function executeVerification(url, trxHash, documentHash, initTime, subscri
 
     const [metaDataLink, reportHash] = await uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid);
     await validate(documentHash, initTime, isValid ? 1 : 2, trxHash, metaDataLink, reportHash, subscriber);
-
 }
+
 
 /**
  * @dev Validate the report
@@ -233,7 +212,6 @@ async function executeVerification(url, trxHash, documentHash, initTime, subscri
  */
 async function validate(documentHash, initTime, choice, trxHash, valUrl, reportHash, subscriber) {
 
-
     console.log("[6 " + trxHash + "] Waiting for validation transaction to complete... ");
     const owner = providerForUpdate.addresses[0];
 
@@ -241,15 +219,12 @@ async function validate(documentHash, initTime, choice, trxHash, valUrl, reportH
         .validate(documentHash, initTime, subscriber, choice, valUrl, reportHash)
         .send({ from: owner, gas: 800000, nonce: nonce })
         .on("receipt", function (receipt) {
-            // TODO: check some valid information at this point? 
-            // Commenting out the following, receipt.events.ValidatorValidated is undefined
-            // const event = receipt.events.ValidatorValidated.returnValues;
-            // let msg;
+            const event = receipt.events.ValidatorValidated.returnValues;
+            let msg;
             if (choice == 1)
                 console.log("[7 " + trxHash + "] Request has been validated as acceptable.")
             else
                 console.log("[7 " + trxHash + "] Request has been validated as adverse");
-
         })
         .on("error", function (error) {
             console.log("An error occurred:", error)
@@ -305,7 +280,6 @@ async function checkHash(event) {
             winnerHashFound = true;
         }
 
-
         if (validation[0][i].toLowerCase() == owner) {
             myReportUrl = validation[4][i];
             myReportHash = validation[5][i];
@@ -313,8 +287,7 @@ async function checkHash(event) {
         }
 
         if (myReportHash == 0 && i == validation[0].length - 1) {
-
-            if (times == 20){
+            if (times == 20) {
                 i = validation[0].length;
                 console.log("[8. " + times + "  " + event.transactionHash + "] Gave up on waiting for results of validation. Limit of retries reached.");
             }
@@ -323,7 +296,7 @@ async function checkHash(event) {
                 console.log("[8. " + times + "  " + event.transactionHash + "] It will wait for 5 sec");
                 await sleep(5000);
                 validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
-                console.log("[8. " + times + "]" + event.transactionHash + "Attempting Validation again");
+                console.log("[8. " + times + "]" + event.transactionHash + "] Attempting Validation again");
                 i = -1;
             }
         }
@@ -341,7 +314,6 @@ async function checkHash(event) {
 
     console.log("[9 " + event.transactionHash + "] Winner validation verified as ", vote ? "similar." : "different.")
     return [vote, winnerAddress];
-
 }
 
 /**
@@ -367,7 +339,7 @@ async function startProcess() {
         console.log("Process started.");
 
         // Wait for validation and start the process
-        nonCohort.events.ValidationInitialized({})
+        nonCohort.events.ValidationInitialized({fromBlock:'latest'})
             .on('data', async function (event) {
 
                 const trxHash = event.transactionHash;
@@ -375,18 +347,9 @@ async function startProcess() {
                 const documentHash = event.returnValues.documentHash;
                 const initTime = event.returnValues.initTime;
                 const subscriber = event.returnValues.user;
-
-                if (initTimeGlobal != initTime && documentHashGlobal != documentHash && subscriberGlobal != subscriber) {
-                    initTimeGlobal = initTime;
-                    documentHashGlobal = documentHash;
-                    subscriberGlobal = subscriber;
-                    await executeVerification(url, trxHash, documentHash, initTime, subscriber);
-                }
-
+                await executeVerification(url, trxHash, documentHash, initTime, subscriber);
                 // console.log(`We have ${nonCohort.events.ValidationInitialized().listenerCount('data')} listener(s) for the ValidationInitialized event`);
             })
-
-
             .on('error', async function (error, event) {
 
                 console.error;
@@ -394,7 +357,7 @@ async function startProcess() {
             })
 
         // Wait for completion of validation and determine earnings 
-        nonCohort.events.RequestExecuted({})
+        nonCohort.events.RequestExecuted({fromBlock:'latest'})
             .on('data', async function (event) {
                 const trxHash = event.transactionHash;
                 const count = event.returnValues.winners.length;
@@ -422,9 +385,7 @@ async function startProcess() {
                         })
                         .on("error", function (error) {
                             console.log("An error occurred:", error)
-
                         });
-
                     nonce++;
                 }
             })
@@ -433,15 +394,12 @@ async function startProcess() {
         // find out result of payment
         nonCohort.events.PaymentProcessed({})
             .on('data', async function (event) {
-
                 console.log("[12 " + event.transactionHash + "] Winning validator paid...  ");
                 console.log("address", event.returnValues.winner);
                 console.log("points puls:", event.returnValues.pointsPlus);
                 console.log("points minus:", event.returnValues.pointsMinus);
             })
             .on('error', console.error);
-
-
     }
     else if (isDelegating)
         console.log("You can't validate because you are delegating your stake to another member. To become validator, register as Node Operator first.");
