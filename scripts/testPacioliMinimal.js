@@ -129,7 +129,8 @@ function finishedReport(){
     activeSubmissions --;
     if (activeSubmissions==0) {
         console.log(`Finished processing ${submissionCounter} submissions`);
-        process.exit( submissionErrors );
+        console.log(`  ${submissionErrors} errors`);
+        process.exit( !(submissionErrors==0) );
     }
     else console.log(`${activeSubmissions} submissions pending`);
 }
