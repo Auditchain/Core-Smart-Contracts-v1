@@ -9,6 +9,7 @@ let axios = require("axios");
 let ipfsAPI = require("ipfs-api");
 let BN = require("big-number");
 
+
 let HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config({ path: './.env' }); // update process.env
 
@@ -25,6 +26,29 @@ const ipfs = ipfsAPI({
         authorization: auth
     }
 })
+
+
+
+// const ipfsClient = require("ipfs-http-client");
+const { create } = require("ipfs-http-client");
+
+// const ipfs = new ipfsClient();
+
+
+// const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
+// const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
+// const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
+
+
+
+// const ipfs = create({
+//     host: 'ipfs.infura.io',
+//     port: 5001,
+//     protocol: 'https',
+//     headers: {
+//         authorization: auth
+//     }
+// })
 
 const ipfsBase = 'https://ipfs.infura.io/ipfs/';
 
@@ -53,9 +77,7 @@ let members, token, web3, validation, owner;
 
 
 async function uploadReportToIPFS(url) {
-    // startProgressMessage("Uploading report to IPFS...");
     console.log("Uploading report to IPFS...");
-    // const data = await axios.get(rule);
     const reportContent = (await axios.get(url)).data;
     const bufRule = Buffer.from(reportContent);
     const reportFile = [
@@ -64,6 +86,9 @@ async function uploadReportToIPFS(url) {
             content: bufRule
         }];
     const result = await ipfs.files.add(reportFile, { wrapWithDirectory: true });
+
+    // const reportIPFSUrl = result.cid.string + '/' + "AuditchainReport.json";
+
     const reportIPFSUrl = ipfsBase + result[1].hash + '/' + result[0].path;
     const reportHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(reportContent));
 
@@ -76,7 +101,8 @@ async function uploadReportToIPFS(url) {
 
 
 async function saveToIpfs(url) {
-   const  reportIPFSUrl = await uploadReportToIPFS(url);
+    console.log("Report Submitted:", url)
+    const reportIPFSUrl = await uploadReportToIPFS(url);
 
 
     let metaDataObject = {
@@ -93,8 +119,10 @@ async function saveToIpfs(url) {
         }];
 
 
-    const result = await ipfs.files.add(metadataFile, { wrapWithDirectory: true });
+    const result = await ipfs.add(metadataFile, { wrapWithDirectory: true });
     const urlMetaData = result[1].hash + '/' + result[0].path;
+    // const urlMetaData = result.cid.string + '/' + "AuditchainMetadataReport.json";
+
     console.log("Metadata successfully saved.")
 
     return [reportIPFSUrl[1], urlMetaData];
@@ -111,7 +139,7 @@ async function setUpContracts(account) {
     members = new web3.eth.Contract(Members["abi"], memberAddress);
     token = new web3.eth.Contract(Token["abi"], tokenAddress);
     validation = new web3.eth.Contract(Validation["abi"], validationAddress);
-    
+
     owner = providerForUpdate.addresses[0];
     console.log("address", owner);
 
@@ -175,24 +203,24 @@ async function deploy() {
     await setUpContracts("0x9ca184fa913e7ca5f49b0c89a2665beac582c12cce4308473ef65f4166d58dfa");
     const dataSubscriber1 = providerForUpdate.addresses[0];
     result = await saveToIpfs(reportURL);
-    await validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber1, gas:800000 });
+    validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber1, gas: 800000 });
     console.log("Submission for dataSubscriber1");
 
-    reportURL = "https://www.sec.gov/Archives/edgar/data/1318605/000095017021000046/tsla-20210331.htm";
+    // reportURL = "https://www.sec.gov/Archives/edgar/data/1318605/000095017021000046/tsla-20210331.htm";
 
-    await setUpContracts("0x254198af956f996631d6231743b8578f07c9745330081e28af0e29642e896786");
-    const dataSubscriber2 = providerForUpdate.addresses[0];
-    result = await saveToIpfs(reportURL);
-    await validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber2, gas:800000 });
-    console.log("Submission for dataSubscriber2");
+    // await setUpContracts("0x254198af956f996631d6231743b8578f07c9745330081e28af0e29642e896786");
+    // const dataSubscriber2 = providerForUpdate.addresses[0];
+    // result = await saveToIpfs(reportURL);
+    // validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber2, gas: 800000 });
+    // console.log("Submission for dataSubscriber2");
 
     reportURL = "https://www.sec.gov/Archives/edgar/data/1108524/000110852417000040/crm-20171031.xml";
 
 
     await setUpContracts("0x75e947d1c03407dc87331769842f0c89c915e8a93b480ec055dcafeeca99cac5");
     const dataSubscriber3 = providerForUpdate.addresses[0];
-    result = await saveToIpfs(reportURL);
-    await validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber3, gas:800000});
+    await saveToIpfs(reportURL);
+    await validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber3, gas: 800000 });
     console.log("Submission for dataSubscriber3");
 
 
