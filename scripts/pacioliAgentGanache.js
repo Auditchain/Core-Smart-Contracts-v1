@@ -70,7 +70,7 @@ setInterval( //hack to keep alive our brittle websocket, which tends to close af
     60000);
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
-let ipfsBase = 'https://ipfs.io/ipfs/';
+let ipfsBase = 'https://ipfs.infura.io/ipfs/';
 
 let ipfs1 = ipfsAPI('ipfs.infura.io', 5001, {
     protocol: 'https'
@@ -167,7 +167,10 @@ async function verifyPacioli1(metadatatUrl, trxHash) {
  */
 async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid) {
 
-    const reportContent = (await axios.get(ipfsBase + url)).data;
+    console.log("data for axios:", ipfsBase + url);
+
+    // const reportContent = (await axios.get(ipfsBase + url)).data;
+    const reportContent = "test";
     const reportHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(reportContent));
 
     console.log("[4 " + trxHash + "] Creating metadata file.");
@@ -390,12 +393,12 @@ async function startProcess() {
                 // console.log("initTime:", initTime);
                 // console.log("trxHash:", trxHash)
 
-               if (initTimeGlobal != initTime && documentHashGlobal != documentHash && subscriberGlobal != subscriber){
+            //    if (initTimeGlobal != initTime && documentHashGlobal != documentHash && subscriberGlobal != subscriber){
                     initTimeGlobal = initTime;
                     documentHashGlobal = documentHash;
                     subscriberGlobal = subscriber;
                     await executeVerification(url, trxHash, documentHash, initTime, subscriber);
-               }
+            //    }
 
                 // console.log(`We have ${nonCohort.events.ValidationInitialized().listenerCount('data')} listener(s) for the ValidationInitialized event`);
             })
