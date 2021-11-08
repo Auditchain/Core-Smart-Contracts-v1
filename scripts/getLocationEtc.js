@@ -16,6 +16,10 @@ const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION
 var myLocation;
 
 async function main(){
+    if (!process.env.LOCATION_KEY){
+        console.log("No LOCATION_KEY avaialble for georeferencing");
+        process.exit(1);
+    }
     if (fs.existsSync(CACHE_FILENAME)){
         console.log("Loading geo location from cache...");
         myLocation = JSON.parse(fs.readFileSync(CACHE_FILENAME));
