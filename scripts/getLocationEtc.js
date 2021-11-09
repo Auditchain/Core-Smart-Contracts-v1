@@ -31,7 +31,7 @@ let nonCohort = new web3_reader.eth.Contract(NON_COHORT["abi"], nonCohortAddress
 
 const myArgs = process.argv.slice(2);
 
-const CACHE_FILENAME = ".myLocation.json";
+const GEO_CACHE_FILENAME = ".myLocation.json";
 // cf. https://www.ip2location.com/web-service/ip2location :
 const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION_KEY}&package=WS5`;
 
@@ -39,35 +39,40 @@ const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION
 async function fetchValidatorDetails(key,nickname){
     const myAddress = web3_reader.eth.accounts.privateKeyToAccount(key).address;
     var details = {nickname:nickname, address:myAddress};
-    if (process.env.LOCATION_KEY){
-        var myLocation;
-        if (fs.existsSync(CACHE_FILENAME)){
-            console.log("Loading geo location from cache...");
-            myLocation = JSON.parse(fs.readFileSync(CACHE_FILENAME));
-        } else {
-            console.log(`Querying IP locator service at ${ipLocatorURL}...`);
-            myLocation = (await axios.get(ipLocatorURL)).data;
-            fs.writeFileSync(CACHE_FILENAME,JSON.stringify(myLocation));
-        }   
-        details['country'] = myLocation.country_name;
-        details['city'] = myLocation.city_name;
-        details['latitude'] = myLocation.latitude;
-        details['longitude'] = myLocation.longitude;
-        
+    try{
+        if (process.env.LOCATION_KEY){
+            var myLocation;
+            if (fs.existsSync(GEO_CACHE_FILENAME)){
+                console.log("Loading geo location from cache...");
+                myLocation = JSON.parse(fs.readFileSync(GEO_CACHE_FILENAME));
+            } else {
+                console.log(`Querying IP locator service at ${ipLocatorURL}...`);
+                myLocation = (await axios.get(ipLocatorURL)).data;
+                fs.writeFileSync(GEO_CACHE_FILENAME,JSON.stringify(myLocation));
+            }   
+            details['country'] = myLocation.country_name;
+            details['city'] = myLocation.city_name;
+            details['latitude'] = myLocation.latitude;
+            details['longitude'] = myLocation.longitude;
+            
+        }
+    } catch(e){
+        console.log("Could not georeference: "+e);
     }
     return details;
-
 }
 
 async function main(){
     
     var validatorDetails = await fetchValidatorDetails(myArgs[0],myArgs[1]);
-
     console.log(validatorDetails);
 
     // blockchain discovery:
 
-    //TODO: bound the first block to something more recent
+    var lastBlock = await web3_reader.eth.getBlockNumber();
+    console.log("Last block: "+lastBlock);
+
+    //TODO: bound the first block to something more recent; probably start from a not so recent one, so IPFS propagates.....
     nonCohort.getPastEvents('ValidatorValidated',{fromBlock:"earliest", toBlock:"latest"}).then( async function(events){
         // reverse order by block number:
         events.sort( (a,b) => (a.blockNumber > b.blockNumber) ? -1 : ((b.blockNumber > a.blockNumber) ? 1 : 0));
@@ -75,9 +80,9 @@ async function main(){
         var lastValidations = {}; // map of validator -> its last validation (url,blockNumber)
         for (let e of events) 
             if (!lastValidations[e.returnValues.validator]) {
-                var reportPacioli = JSON.parse(await ipfs.files.cat(e.returnValues.valUrl+''))["reportPacioli"];
+                var validatorDetails = JSON.parse(await ipfs.files.cat(e.returnValues.valUrl+''))["validatorDetails"];
                 lastValidations[e.returnValues.validator] = {
-                    valUrl:e.returnValues.valUrl, blockNumber:e.blockNumber, reportPacioli: reportPacioli
+                    valUrl:e.returnValues.valUrl, blockNumber:e.blockNumber, validatorDetails: validatorDetails
                     };
             }
 

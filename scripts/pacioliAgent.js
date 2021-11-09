@@ -4,6 +4,7 @@ let Web3 = require('web3');
 let ethers = require('ethers');
 let axios = require("axios");
 let ipfsAPI = require("ipfs-api");
+const fs = require('fs');
 
 const { create } = require("ipfs-http-client");
 
@@ -68,6 +69,36 @@ let nodeOperationsPreEvent;
 let owner;
 let validationCount = 0;
 
+
+const GEO_CACHE_FILENAME = ".myLocation.json";
+// cf. https://www.ip2location.com/web-service/ip2location :
+const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION_KEY}&package=WS5`;
+
+async function fetchValidatorDetails(key,nickname){
+    const web3_reader = web3;
+    const myAddress = web3_reader.eth.accounts.privateKeyToAccount(key).address;
+    var details = {nickname:nickname, address:myAddress};
+    try{
+        if (process.env.LOCATION_KEY){
+            var myLocation;
+            if (fs.existsSync(GEO_CACHE_FILENAME)){
+                console.log("Loading geo location from cache...");
+                myLocation = JSON.parse(fs.readFileSync(GEO_CACHE_FILENAME));
+            } else {
+                console.log(`Querying IP locator service at ${ipLocatorURL}...`);
+                myLocation = (await axios.get(ipLocatorURL)).data;
+                fs.writeFileSync(GEO_CACHE_FILENAME,JSON.stringify(myLocation));
+            }   
+            details['country'] = myLocation.country_name;
+            details['city'] = myLocation.city_name;
+            details['latitude'] = myLocation.latitude;
+            details['longitude'] = myLocation.longitude;
+        }
+    } catch(e){
+        console.log("Could not georeference: "+e);
+    }
+    return details;
+}
 
 /**
  * @dev {initialize smart contracts with the web socket provider}
@@ -160,7 +191,8 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
         reportUrl: ipfsBase + url,
         reportHash: reportHash,
         reportPacioli: ipfsBase + reportPacioliIPFSUrl,
-        result: isValid
+        result: isValid,
+        validatorDetails: validatorDetails
     };
 
     const jsonStringFromObject = JSON.stringify(metaDataObject);
@@ -316,6 +348,8 @@ async function checkHash(event) {
     return [vote, winnerAddress];
 }
 
+var validatorDetails = null;
+
 /**
  * @dev Start listening to events
  */
@@ -324,6 +358,10 @@ async function startProcess() {
 
 
     let myArgs = process.argv.slice(2);
+
+    validatorDetails = await fetchValidatorDetails(myArgs[0],myArgs[1]);
+    console.log("Details known about this node:");
+    console.log(validatorDetails);
 
     setUpContracts(myArgs[0]);
     setUpNodeOperator(myArgs[0]);
