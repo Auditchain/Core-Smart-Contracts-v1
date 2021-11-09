@@ -30,43 +30,42 @@ let nonCohort = new web3_reader.eth.Contract(NON_COHORT["abi"], nonCohortAddress
 /////
 
 const myArgs = process.argv.slice(2);
-const nickname = myArgs[1];
-
-const myAddress = web3_reader.eth.accounts.privateKeyToAccount(myArgs[0]).address;
 
 const CACHE_FILENAME = ".myLocation.json";
-
 // cf. https://www.ip2location.com/web-service/ip2location :
 const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION_KEY}&package=WS5`;
 
-var myLocation;
 
+async function fetchValidatorDetails(key,nickname){
+    const myAddress = web3_reader.eth.accounts.privateKeyToAccount(key).address;
+    var details = {nickname:nickname, address:myAddress};
+    if (process.env.LOCATION_KEY){
+        var myLocation;
+        if (fs.existsSync(CACHE_FILENAME)){
+            console.log("Loading geo location from cache...");
+            myLocation = JSON.parse(fs.readFileSync(CACHE_FILENAME));
+        } else {
+            console.log(`Querying IP locator service at ${ipLocatorURL}...`);
+            myLocation = (await axios.get(ipLocatorURL)).data;
+            fs.writeFileSync(CACHE_FILENAME,JSON.stringify(myLocation));
+        }   
+        details['country'] = myLocation.country_name;
+        details['city'] = myLocation.city_name;
+        details['latitude'] = myLocation.latitude;
+        details['longitude'] = myLocation.longitude;
+        
+    }
+    return details;
+
+}
 
 async function main(){
-    // IP lookup:
-    if (!process.env.LOCATION_KEY){
-        console.log("No LOCATION_KEY avaialble for georeferencing");
-        process.exit(1);
-    }
-    if (fs.existsSync(CACHE_FILENAME)){
-        console.log("Loading geo location from cache...");
-        myLocation = JSON.parse(fs.readFileSync(CACHE_FILENAME));
-    } else {
-        console.log(`Querying IP locator service at ${ipLocatorURL}...`);
-        myLocation = (await axios.get(ipLocatorURL)).data;
-        fs.writeFileSync(CACHE_FILENAME,JSON.stringify(myLocation));
-    }   
     
-    var validatorDetails = {
-        nickname:nickname, address:myAddress, country:myLocation.country_name, city:myLocation.city_name, latitude:myLocation.latitude, longitude:myLocation.longitude
-        };
+    var validatorDetails = await fetchValidatorDetails(myArgs[0],myArgs[1]);
 
     console.log(validatorDetails);
 
     // blockchain discovery:
-    // validate(documentHash, initTime, subscriber, choice, **valUrl**, reportHash)
-    // event : ValidatorValidated(msg.sender, documentHash, validationTime, decision, valUrl)
-
 
     //TODO: bound the first block to something more recent
     nonCohort.getPastEvents('ValidatorValidated',{fromBlock:"earliest", toBlock:"latest"}).then( async function(events){
