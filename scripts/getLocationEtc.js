@@ -1,5 +1,5 @@
 // Minimal example illustrating georeferencing this (Pacioli node-like..) script
-// args: wallet_private_key, nickname_for_node
+// RUN with: scripts/getLocationEtc.js wallet_private_key nickname_for_node
 
 require('dotenv').config({ path: './.env' });
 const fs = require('fs');
@@ -62,6 +62,28 @@ async function fetchValidatorDetails(key,nickname){
     return details;
 }
 
+// gets all validators and their last validation, as a map of validator -> its last validation (url,blockNumber)
+// may be SLOW due to IPFS access
+async function fetchLastValidations(contract){
+    //var lastBlock = await web3_reader.eth.getBlockNumber();
+    //TODO: bound the first block to something more recent; probably start from a not so recent one, so IPFS propagates.....
+    var events = await contract.getPastEvents('ValidatorValidated',{fromBlock:"earliest", toBlock:"latest"});
+    
+    // reverse order by block number:
+    events.sort( (a,b) => (a.blockNumber > b.blockNumber) ? -1 : ((b.blockNumber > a.blockNumber) ? 1 : 0));
+
+    var lastValidations = {}; 
+    for (let e of events) 
+        if (!lastValidations[e.returnValues.validator]) {
+            var validatorDetails = JSON.parse(await ipfs.files.cat(e.returnValues.valUrl+''))["validatorDetails"];
+            lastValidations[e.returnValues.validator] = {
+                valUrl:e.returnValues.valUrl, blockNumber:e.blockNumber, validatorDetails: validatorDetails
+                };
+        }
+
+    return lastValidations;
+}
+
 async function main(){
     
     var validatorDetails = await fetchValidatorDetails(myArgs[0],myArgs[1]);
@@ -69,26 +91,8 @@ async function main(){
 
     // blockchain discovery:
 
-    var lastBlock = await web3_reader.eth.getBlockNumber();
-    console.log("Last block: "+lastBlock);
-
-    //TODO: bound the first block to something more recent; probably start from a not so recent one, so IPFS propagates.....
-    nonCohort.getPastEvents('ValidatorValidated',{fromBlock:"earliest", toBlock:"latest"}).then( async function(events){
-        // reverse order by block number:
-        events.sort( (a,b) => (a.blockNumber > b.blockNumber) ? -1 : ((b.blockNumber > a.blockNumber) ? 1 : 0));
-
-        var lastValidations = {}; // map of validator -> its last validation (url,blockNumber)
-        for (let e of events) 
-            if (!lastValidations[e.returnValues.validator]) {
-                var validatorDetails = JSON.parse(await ipfs.files.cat(e.returnValues.valUrl+''))["validatorDetails"];
-                lastValidations[e.returnValues.validator] = {
-                    valUrl:e.returnValues.valUrl, blockNumber:e.blockNumber, validatorDetails: validatorDetails
-                    };
-            }
-
-        console.log(lastValidations);
-
-    });
+    console.log(await fetchLastValidations(nonCohort));
+    process.exit(0);
 }
 
 main();
