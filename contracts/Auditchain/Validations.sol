@@ -59,7 +59,7 @@ abstract contract Validations is  ReentrancyGuard{
     //     uint256 operatorsTotalStake;
     // }
 
-    mapping(uint256 => mapping(bytes32 => uint256)) activeOperatorsStake;
+    mapping(uint256 => mapping(bytes32 => uint256)) public activeOperatorsStake;
 
     uint256 public recentTimestamp;
     bytes32 public recentValidationHash;
@@ -69,7 +69,7 @@ abstract contract Validations is  ReentrancyGuard{
     mapping(bytes32 => Validation) public validations; // track each validation
 
     event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
-    event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision, string valUrl);
+    event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 indexed validationTime, ValidationStatus decision, string valUrl);
     event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url, address[] winners);
     event PaymentProcessed(bytes32 validationHash, address winner, uint256 pointsPlus, uint256 pointsMinus);
     event WinnerVoted(address validator, address winner, bool isValid);
