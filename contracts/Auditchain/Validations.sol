@@ -48,14 +48,28 @@ abstract contract Validations is  ReentrancyGuard{
         mapping(address => uint256) winnerVotesMinus;
         mapping(address => bytes32) validationHash;
         uint64 winnerConfirmations;
-        bool paymentSent;
         address winner;
+        uint256 stakeValue;
     }
+
+    
+    // struct activeOpertor{
+
+    //     bytes32 validationHash;
+    //     uint256 operatorsTotalStake;
+    // }
+
+    mapping(uint256 => mapping(bytes32 => uint256)) public activeOperatorsStake;
+
+    uint256 public recentTimestamp;
+    bytes32 public recentValidationHash;
+    uint256 public quorum = 100;                                  //first validator will be 100% quorum
+
 
     mapping(bytes32 => Validation) public validations; // track each validation
 
     event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
-    event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 validationTime, ValidationStatus decision, string valUrl);
+    event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 indexed validationTime, ValidationStatus decision, string valUrl);
     event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url, address[] winners);
     event PaymentProcessed(bytes32 validationHash, address winner, uint256 pointsPlus, uint256 pointsMinus);
     event WinnerVoted(address validator, address winner, bool isValid);
@@ -71,6 +85,11 @@ abstract contract Validations is  ReentrancyGuard{
         validationHelpers = IValidatinosHelpers(_validationHelpers);
         // _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
+    }
+
+    function updateQuorum(bytes32 _recentValidationHash, uint256 _operatorStake, uint256 _recentTimestamp) internal {
+            activeOperatorsStake[_recentTimestamp][_recentValidationHash] = 
+            activeOperatorsStake[_recentTimestamp][_recentValidationHash].add( _operatorStake);
     }
 
    /**
@@ -125,10 +144,9 @@ abstract contract Validations is  ReentrancyGuard{
         uint256 operatorCount = returnValidatorCount();
         uint256 currentQuorum = validation.winnerConfirmations * 100 / operatorCount;
         
-        if (currentQuorum >= members.requiredQuorum() && !validation.paymentSent){
+        if (currentQuorum >= members.requiredQuorum() && validation.winner == address(0)){
             address winner = validationHelpers.selectWinner(validationHash, winners);
             validation.winner = winner;
-            validation.paymentSent = true;
             processPayments(validationHash, winner);
         }
     }
@@ -204,15 +222,18 @@ abstract contract Validations is  ReentrancyGuard{
      * @param validationHash - consist of hash of hashed document and timestamp
      * @param documentHash hash of the document
      */
-    function executeValidation(bytes32 validationHash, bytes32 documentHash, uint256 quorum) internal nonReentrant {
+    function executeValidation(bytes32 validationHash, bytes32 documentHash, uint256 _quorum) internal nonReentrant {
        
         Validation storage validation = validations[validationHash];
         validation.executionTime = block.timestamp;
 
         (address[] memory winners, uint256 consensus) = validationHelpers.determineWinners(validationHash);
         validation.consensus = consensus;
+        // (,uint256[] memory totalStake,,,,) =  collectValidationResults(validationHash);
+        recentTimestamp = validation.validationTime;
+        recentValidationHash = validationHash;
         
-        emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, quorum, block.timestamp, validation.url, winners);
+        emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, _quorum, block.timestamp, validation.url, winners);
         
     }
 
@@ -223,7 +244,7 @@ abstract contract Validations is  ReentrancyGuard{
      * @param validationTime - this is the time when validation has been initialized
      * @param decision - one of the ValidationStatus choices cast by validator
      */
-        function validate(bytes32 documentHash, uint256 validationTime, address subscriber, ValidationStatus decision, string memory valUrl, bytes32 reportHash) public virtual {
+    function validate(bytes32 documentHash, uint256 validationTime, address subscriber, ValidationStatus decision, string memory valUrl, bytes32 reportHash) public virtual {
 
         bytes32 validationHash = keccak256(abi.encodePacked(documentHash, validationTime, subscriber));
         Validation storage validation = validations[validationHash];
@@ -242,13 +263,17 @@ abstract contract Validations is  ReentrancyGuard{
         nodeOperations.increaseStakeRewards(msg.sender);
         nodeOperations.increaseDelegatedStakeRewards(msg.sender);
 
+        uint256 stakeAmt = memberHelpers.returnDepositAmount(msg.sender);
+        updateQuorum(validationHash, stakeAmt, validation.validationTime);
         emit ValidatorValidated(msg.sender, documentHash, validationTime, decision, valUrl);
 
-        uint256 quorum = validationHelpers.calculateVoteQuorum(validationHash, address(this));
-
-        if (quorum >= members.requiredQuorum() && validation.executionTime == 0) {
+        if (recentTimestamp > 0 && validation.executionTime == 0) // this is not first transactoin and there3 was no execution
+            quorum = (activeOperatorsStake[validationTime][validationHash] * 100).div(activeOperatorsStake[recentTimestamp][recentValidationHash]);
+        
+        if ((quorum >= members.requiredQuorum() || quorum == 100) && validation.executionTime == 0 )      // first transaction quorum is 100% for first validator
             executeValidation(validationHash, documentHash, quorum);
-        }
+        
+
     }
 
 
@@ -277,7 +302,7 @@ abstract contract Validations is  ReentrancyGuard{
         consensus = validation.consensus;
         validationsCompleted = validation.validationsCompleted;
         winnerConfirmations = validation.winnerConfirmations;
-        paymentSent = validation.paymentSent;
+        paymentSent = winner != address(0);
         winner = validation.winner;
 
     }

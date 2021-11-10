@@ -77,7 +77,7 @@ let members, token, web3, validation, owner;
 
 
 async function uploadReportToIPFS(url) {
-    console.log("Uploading report to IPFS...");
+    console.log("Uploading report to IPFS...", url);
     const reportContent = (await axios.get(url)).data;
     const bufRule = Buffer.from(reportContent);
     const reportFile = [
@@ -206,15 +206,16 @@ async function deploy() {
     validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber1, gas: 800000 });
     console.log("Submission for dataSubscriber1");
 
-    // reportURL = "https://www.sec.gov/Archives/edgar/data/1318605/000095017021000046/tsla-20210331.htm";
+    reportURL =  "http://accounting.auditchain.finance/reporting-scheme/proof/reference-implementation/instance_f.xml";
 
-    // await setUpContracts("0x254198af956f996631d6231743b8578f07c9745330081e28af0e29642e896786");
-    // const dataSubscriber2 = providerForUpdate.addresses[0];
-    // result = await saveToIpfs(reportURL);
-    // validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber2, gas: 800000 });
-    // console.log("Submission for dataSubscriber2");
 
-    reportURL = "https://www.sec.gov/Archives/edgar/data/1108524/000110852417000040/crm-20171031.xml";
+    await setUpContracts("0x254198af956f996631d6231743b8578f07c9745330081e28af0e29642e896786");
+    const dataSubscriber2 = providerForUpdate.addresses[0];
+    result = await saveToIpfs(reportURL);
+    validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber2, gas: 800000 });
+    console.log("Submission for dataSubscriber2");
+
+    reportURL = "http://accounting.auditchain.finance/reporting-scheme/proof/reference-implementation/instance_mf.xml";
 
 
     await setUpContracts("0x75e947d1c03407dc87331769842f0c89c915e8a93b480ec055dcafeeca99cac5");

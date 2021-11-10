@@ -76,7 +76,17 @@ module.exports = {
       skipDryRun: true,
       websocket: true,
       timeoutBlocks: 50000,
-      networkCheckTimeout: 1000000
+      networkCheckTimeout: 1000000,
+      skipDryRun: true
+
+    },
+    matic: {
+      provider: () => new HDWalletProvider(MNEMONIC, 'https://matic-mumbai.chainstacklabs.com'),
+      network_id: 80001,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+      chainId: 80001,
     },
     coverage: {
       host: 'localhost',

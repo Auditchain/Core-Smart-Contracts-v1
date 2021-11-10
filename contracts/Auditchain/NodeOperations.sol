@@ -26,7 +26,7 @@ contract NodeOperations is AccessControl {
     uint256 public stakeRatio = 1000;
     uint256 public stakeRatioDelegating = 1100;
     uint256 public stakingRatioReferral = 9100;
-    uint256 public POWFee = 100e18;
+    uint256 public POWFee = 1e18;
 
 
     struct nodeOperator {
@@ -42,6 +42,7 @@ contract NodeOperations is AccessControl {
         bool noDelegations;
         bool isCPA;
     }
+
 
     mapping(address => nodeOperator) public nodeOpStruct;
 
@@ -138,6 +139,8 @@ contract NodeOperations is AccessControl {
         return nodeOpStruct[operator].isNodeOperator;
 
     }
+
+
 
     /*** 
     * @dev return members of the staking pool

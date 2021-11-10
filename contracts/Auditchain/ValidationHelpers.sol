@@ -38,13 +38,13 @@ contract ValidationHelpers {
     }
 
 
-    function returnWinnerStruct(bytes32 validationHash, address contractAddress)public view returns (string memory valUrl, address winner){
+    function returnWinnerStruct(bytes32 validationHash, address contractAddress)public view returns (string memory valUrl, address winner, uint256 validationTime){
 
         
-        (,,,,,,,,,winner) = IValidations(contractAddress).returnValidationRecord(validationHash);
+        (,,validationTime,,,,,,,winner) = IValidations(contractAddress).returnValidationRecord(validationHash);
         valUrl = IValidations(contractAddress).returnValidationUrl(validationHash, winner);
 
-        return (valUrl, winner);
+        return (valUrl, winner, validationTime);
 
     }
 

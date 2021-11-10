@@ -8,7 +8,7 @@
     "compile": "truffle compile --optimize-runs 200",
     "migrate-local": "truffle migrate --network=development --reset",
     "migrate-ropsten": "truffle migrate --network=ropsten --reset",
-    "flatten": "sol-merger './contracts/Auditchain/*.sol' ./flat",
+    "flatten": "sol-merger './contracts/*.sol' ./flat",
     "flatten-STOs": "sol-merger './contracts/OfferingFactories/*.sol' ./flat/OfferingFactories",
     "coverage": "./node_modules/.bin/solidity-coverage"
   },
@@ -21,7 +21,7 @@
   "homepage": "",
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.2",
-    "@truffle/hdwallet-provider": "^1.5.1",
+    "@truffle/hdwallet-provider": "^1.4.0",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
@@ -43,7 +43,7 @@
     "should": "^13.2.3",
     "sol-merger": "^0.1.4",
     "solc": "^0.8.9",
-    "truffle": "^5.4.14",
+    "truffle": "^5.4.10",
     "truffle-hdwallet-provider": "^1.0.0-web3one.4",
     "web3": "^1.6.0"
   },

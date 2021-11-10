@@ -376,6 +376,21 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   // await noCohort.validate(documentHash, validationInitTime, user, 1, { from: delegating, gas: 800000 });
 
 
+  documentURL = "http://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance1.xml"
+  documentHash = web3.utils.soliditySha3(documentURL);
+
+  result = await noCohort.initializeValidationNoCohort(documentHash, documentURL, 1, { from: dataSubscriber });
+  event = result.logs[0];
+  validationInitTime = event.args.initTime;
+  user = event.args.user
+
+  await noCohort.validate(documentHash, validationInitTime, user, 1, "", documentHash, { from: validator1, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, user, 2, "", documentHash, { from: validator2, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, user, 1, "", documentHash, { from: validator3, gas: 800000 });
+  await noCohort.validate(documentHash, validationInitTime, user, 1, "", documentHash, { from: validator4, gas: 800000 });
+  // await noCohort.validate(documentHash, validationInitTime, user, 1, { from: delegating, gas: 800000 });
+
+
   // console.log("result:", resultVal);
 
   const eventsMember = await nodeOperations.getPastEvents(
@@ -569,18 +584,18 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log("\n\n" + "React format:" + "\n\n");
 
 
-  console.log("\n\n" + 'audtTokenAddress:"' + token.address + '",');
-  console.log('membersAddress:"' + members.address + '",');
-  console.log('memberHelpersAddress:"' + memberHelpers.address + '",');
-  console.log('depositModifiersAddress:"' + depositModifiers.address + '",');
-  console.log('cohortFactoryAddress:"' + cohortFactory.address + '",');
-  console.log('validationsHelpersAddress:"' + validationHelpers.address + '",');
-  console.log('validationsCohortAddress:"' + cohort.address + '",');
-  console.log('validationsNoCohortAddress:"' + noCohort.address + '",')
-  console.log('nodeOperationsAddress:"' + nodeOperations.address + '",');
-  console.log('governorAlphaAddress:"' + gov.address + '",');
-  console.log('timelockAddress:"' + timelock.address + '",');
-  console.log('rulesNFTAddress:"' + nft.address + '",' + "\n\n");
+  console.log("\n\n" + '"AUDT_TOKEN_ADDRESS":"' + token.address + '",');
+  console.log('"MEMBER_ADDRESS":"' + members.address + '",');
+  console.log('"MEMBER_HELPERS_ADDRESS":"' + memberHelpers.address + '",');
+  console.log('"DEPOSIT_MODIFIERS_ADDRESS":"' + depositModifiers.address + '",');
+  console.log('"COHORT_FACTORY_ADDRESS":"' + cohortFactory.address + '",');
+  console.log('"VALIDATIONS_HELPERS_ADDRESS":"' + validationHelpers.address + '",');
+  console.log('"VALIDATIONS_COHORT_ADDRESS":"' + cohort.address + '",');
+  console.log('"VALIDATIONS_NO_COHORT_ADDRESS":"' + noCohort.address + '",')
+  console.log('"NODE_OPERATIONS_ADDRESS":"' + nodeOperations.address + '",');
+  console.log('"GOVERNOR_ALPHA_ADDRESS":"' + gov.address + '",');
+  console.log('"TIMELOCK_ADDRESS":"' + timelock.address + '",');
+  console.log('"RULES_NFT_ADDRESS":"' + nft.address + '",' + "\n\n");
 
 
 
