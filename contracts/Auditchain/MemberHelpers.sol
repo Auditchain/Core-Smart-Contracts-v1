@@ -23,6 +23,7 @@ contract MemberHelpers is AccessControl {
     mapping(address => uint256) public deposits; //track deposits per user
     uint256 public minContribution = 5e21;
     uint256 public maxContribution = 25e21;
+    uint256 public totalStaked;
     
 
     event LogDepositReceived(address indexed from, uint256 amount);
@@ -98,6 +99,7 @@ contract MemberHelpers is AccessControl {
         );
         IERC20(auditToken).safeTransferFrom(msg.sender, address(this), amount);
         deposits[msg.sender] = deposits[msg.sender].add(amount);
+        totalStaked = totalStaked.add(amount);
         emit LogDepositReceived(msg.sender, amount);
     }
 
@@ -124,6 +126,7 @@ contract MemberHelpers is AccessControl {
         }
 
         deposits[msg.sender] = deposits[msg.sender].sub(amount);
+        totalStaked = totalStaked.sub(amount);
         IERC20(auditToken).safeTransfer(msg.sender, amount);
         emit LogDepositRedeemed(msg.sender, amount);
     }
