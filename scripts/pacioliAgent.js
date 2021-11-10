@@ -25,7 +25,8 @@ let HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config({ path: './.env' }); // update process.env
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
-const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
+const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json');
+const MEMBERS = require('../build/contracts/Members.json');
 
 //TODO: this module is still copied from https://github.com/Auditchain/Reporting-Validation-Engine/tree/main/clientExamples/pacioliClient:
 const pacioli = require('./pacioliClient');
@@ -44,6 +45,7 @@ const mnemonic = process.env.MNEMONIC;
 // Address for smart contracts
 const nonCohortAddress = process.env.VALIDATIONS_NO_COHORT_ADDRESS;
 const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
+const members = process.env.MEMBER_ADDRESS;
 
 const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
@@ -66,6 +68,7 @@ let nonCohortValidate;
 let nodeOperations;
 let providerForUpdate;
 let nodeOperationsPreEvent;
+let membersContract;
 let owner;
 let validationCount = 0;
 
@@ -76,8 +79,12 @@ const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION
 
 async function fetchValidatorDetails(key,nickname){
     const web3_reader = web3;
+    const owner = providerForUpdate.addresses[0];
+
     const myAddress = web3_reader.eth.accounts.privateKeyToAccount(key).address;
-    var details = {nickname:nickname, address:myAddress};
+    const entityName = await membersContract.methods.user(owner, 1).call();
+
+    var details = {nickname:entityName, address:myAddress};
     try{
         if (process.env.LOCATION_KEY){
             var myLocation;
@@ -123,6 +130,8 @@ async function setUpNodeOperator(account) {
     // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
+    membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
+
 }
 
 
@@ -358,13 +367,14 @@ async function startProcess() {
 
 
     let myArgs = process.argv.slice(2);
+    setUpContracts(myArgs[0]);
+    setUpNodeOperator(myArgs[0]);
 
     validatorDetails = await fetchValidatorDetails(myArgs[0],myArgs[1]);
     console.log("Details known about this node:");
     console.log(validatorDetails);
 
-    setUpContracts(myArgs[0]);
-    setUpNodeOperator(myArgs[0]);
+    
 
     owner = providerForUpdate.addresses[0];
     nonce = await web3.eth.getTransactionCount(owner);
