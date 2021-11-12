@@ -4,7 +4,6 @@ let Web3 = require('web3');
 let ethers = require('ethers');
 let axios = require("axios");
 let ipfsAPI = require("ipfs-api");
-const fs = require('fs');
 
 const { create } = require("ipfs-http-client");
 
@@ -25,8 +24,7 @@ let HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config({ path: './.env' }); // update process.env
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
-const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json');
-const MEMBERS = require('../build/contracts/Members.json');
+const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
 
 //TODO: this module is still copied from https://github.com/Auditchain/Reporting-Validation-Engine/tree/main/clientExamples/pacioliClient:
 const pacioli = require('./pacioliClient');
@@ -45,7 +43,6 @@ const mnemonic = process.env.MNEMONIC;
 // Address for smart contracts
 const nonCohortAddress = process.env.VALIDATIONS_NO_COHORT_ADDRESS;
 const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
-const members = process.env.MEMBER_ADDRESS;
 
 const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
@@ -58,7 +55,7 @@ setInterval( //hack to keep alive our brittle websocket, which tends to close af
     60000);
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
-let ipfsBase = 'https://ipfs.io/ipfs/';
+let ipfsBase = 'https://ipfs.infura.io/ipfs/';
 
 let ipfs1 = ipfsAPI('ipfs.infura.io', 5001, {
     protocol: 'https'
@@ -68,44 +65,9 @@ let nonCohortValidate;
 let nodeOperations;
 let providerForUpdate;
 let nodeOperationsPreEvent;
-let membersContract;
 let owner;
 let validationCount = 0;
 
-
-const GEO_CACHE_FILENAME = ".myLocation.json";
-// cf. https://www.ip2location.com/web-service/ip2location :
-const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION_KEY}&package=WS5`;
-
-async function fetchValidatorDetails(key){
-    const web3_reader = web3;
-    const owner = providerForUpdate.addresses[0];
-
-    const myAddress = web3_reader.eth.accounts.privateKeyToAccount(key).address;
-    const entityName = await membersContract.methods.user(owner, 1).call();
-
-    var details = {nickname:entityName, address:myAddress};
-    try{
-        if (process.env.LOCATION_KEY){
-            var myLocation;
-            if (fs.existsSync(GEO_CACHE_FILENAME)){
-                console.log("Loading geo location from cache...");
-                myLocation = JSON.parse(fs.readFileSync(GEO_CACHE_FILENAME));
-            } else {
-                console.log(`Querying IP locator service at ${ipLocatorURL}...`);
-                myLocation = (await axios.get(ipLocatorURL)).data;
-                fs.writeFileSync(GEO_CACHE_FILENAME,JSON.stringify(myLocation));
-            }   
-            details['country'] = myLocation.country_name;
-            details['city'] = myLocation.city_name;
-            details['latitude'] = myLocation.latitude;
-            details['longitude'] = myLocation.longitude;
-        }
-    } catch(e){
-        console.log("Could not georeference: "+e);
-    }
-    return details;
-}
 
 /**
  * @dev {initialize smart contracts with the web socket provider}
@@ -130,8 +92,6 @@ async function setUpNodeOperator(account) {
     // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
-    membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
-
 }
 
 
@@ -153,8 +113,8 @@ async function verifyPacioli(metadatatUrl, trxHash) {
         .catch(error => console.log("ERROR: " + error));
 
 
-    if (!reportContent) 
-            return [null, false];
+    if (!reportContent)
+        return [null, false];
 
     const jsonStringFromObject = JSON.stringify(reportContent);
     const bufRule = Buffer.from(jsonStringFromObject);
@@ -174,8 +134,8 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     return [pacioliIPFS, reportContent.isValid];
 }
 
-//TODO:  Use only for testing to bypass calling Pacioli
-// async function verifyPacioli1(metadatatUrl, trxHash) {
+// TODO:  Use only for testing to bypass calling Pacioli
+// async function verifyPacioli(metadatatUrl, trxHash) {
 
 //     return ["https://ipfs.io/ipfs/QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
 // }
@@ -200,8 +160,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
         reportUrl: ipfsBase + url,
         reportHash: reportHash,
         reportPacioli: ipfsBase + reportPacioliIPFSUrl,
-        result: isValid,
-        validatorDetails: validatorDetails
+        result: isValid
     };
 
     const jsonStringFromObject = JSON.stringify(metaDataObject);
@@ -255,6 +214,10 @@ async function validate(documentHash, initTime, choice, trxHash, valUrl, reportH
 
     console.log("[6 " + trxHash + "] Waiting for validation transaction to complete... ");
     const owner = providerForUpdate.addresses[0];
+    const checkNonce = await web3.eth.getTransactionCount(owner);
+
+    if (checkNonce > nonce)
+        nonce = checkNonce;
 
     nonCohortValidate.methods
         .validate(documentHash, initTime, subscriber, choice, valUrl, reportHash)
@@ -328,9 +291,12 @@ async function checkHash(event) {
         }
 
         if (myReportHash == 0 && i == validation[0].length - 1) {
-            if (times == 20) {
+            if (times > 20) {
                 i = validation[0].length;
                 console.log("[8. " + times + "  " + event.transactionHash + "] Gave up on waiting for results of validation. Limit of retries reached.");
+                return [null, null];
+
+
             }
             else {
 
@@ -357,8 +323,6 @@ async function checkHash(event) {
     return [vote, winnerAddress];
 }
 
-var validatorDetails = null;
-
 /**
  * @dev Start listening to events
  */
@@ -367,14 +331,9 @@ async function startProcess() {
 
 
     let myArgs = process.argv.slice(2);
+
     setUpContracts(myArgs[0]);
     setUpNodeOperator(myArgs[0]);
-
-    validatorDetails = await fetchValidatorDetails(myArgs[0]);
-    console.log("Details known about this node:");
-    console.log(validatorDetails);
-
-    
 
     owner = providerForUpdate.addresses[0];
     nonce = await web3.eth.getTransactionCount(owner);
@@ -387,7 +346,7 @@ async function startProcess() {
         console.log("Process started.");
 
         // Wait for validation and start the process
-        nonCohort.events.ValidationInitialized({fromBlock:'latest'})
+        nonCohort.events.ValidationInitialized({ fromBlock: 'latest' })
             .on('data', async function (event) {
 
                 const trxHash = event.transactionHash;
@@ -405,7 +364,7 @@ async function startProcess() {
             })
 
         // Wait for completion of validation and determine earnings 
-        nonCohort.events.RequestExecuted({fromBlock:'latest'})
+        nonCohort.events.RequestExecuted({ fromBlock: 'latest' })
             .on('data', async function (event) {
                 const trxHash = event.transactionHash;
                 const count = event.returnValues.winners.length;
@@ -425,8 +384,13 @@ async function startProcess() {
 
                 if (winners.length > 0) {
                     console.log("[10 " + event.transactionHash + "] Awaiting verification of winners...  ");
+
+                    const checkNonce = await web3.eth.getTransactionCount(owner);
+                    if (checkNonce > nonce)
+                        nonce = checkNonce;
+
                     nonCohortValidate.methods.voteWinner(winners, votes, validationHash)
-                        .send({ from: owner, gas: 500000, nonce: nonce })
+                        .send({ from: owner, gas: 800000, nonce: nonce })
                         .on("receipt", function (receipt) {
                             console.log("[11 " + event.transactionHash + "] Verification of winners completed...  ");
 
@@ -444,7 +408,7 @@ async function startProcess() {
             .on('data', async function (event) {
                 console.log("[12 " + event.transactionHash + "] Winning validator paid...  ");
                 console.log("address", event.returnValues.winner);
-                console.log("points puls:", event.returnValues.pointsPlus);
+                console.log("points plus:", event.returnValues.pointsPlus);
                 console.log("points minus:", event.returnValues.pointsMinus);
             })
             .on('error', console.error);
