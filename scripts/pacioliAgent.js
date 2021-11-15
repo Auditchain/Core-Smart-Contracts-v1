@@ -4,6 +4,7 @@ let Web3 = require('web3');
 let ethers = require('ethers');
 let axios = require("axios");
 let ipfsAPI = require("ipfs-api");
+const fs = require('fs');
 
 const { create } = require("ipfs-http-client");
 
@@ -25,6 +26,7 @@ require('dotenv').config({ path: './.env' }); // update process.env
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
 const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
+const MEMBERS = require('../build/contracts/Members.json');
 
 //TODO: this module is still copied from https://github.com/Auditchain/Reporting-Validation-Engine/tree/main/clientExamples/pacioliClient:
 const pacioli = require('./pacioliClient');
@@ -43,6 +45,7 @@ const mnemonic = process.env.MNEMONIC;
 // Address for smart contracts
 const nonCohortAddress = process.env.VALIDATIONS_NO_COHORT_ADDRESS;
 const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
+const members = process.env.MEMBER_ADDRESS;
 
 const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
@@ -65,9 +68,48 @@ let nonCohortValidate;
 let nodeOperations;
 let providerForUpdate;
 let nodeOperationsPreEvent;
+let membersContract;
 let owner;
 let validationCount = 0;
 
+const GEO_CACHE_FILENAME = ".myLocation.json";
+// cf. https://www.ip2location.com/web-service/ip2location :
+const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION_KEY}&package=WS5`;
+
+async function fetchValidatorDetails(key){
+    const web3_reader = web3;
+    const owner = providerForUpdate.addresses[0];
+
+    //const entityName = await membersContract.methods.user(owner, 1).call();
+    var entityName;
+    try{ entityName = await membersContract.methods.user(owner,1).call()} 
+    catch(ex){console.log("EXCEPTION in fetchValidatorDetails:"+ex)};
+    //BUG in this version: EXCEPTION in fetchValidatorDetails:Error: data out-of-bounds (length=3, offset=32, code=BUFFER_OVERRUN, version=abi/5.0.7)
+    // To reproduce:
+    // node scripts/pacioliAgent.js 0xd66f2ee9bc1eda34087ccd5e5ac699194b7a34f12fbda8e115fb2506e3740429
+    
+    var details = {nickname:entityName, address:owner};
+    try{
+        if (process.env.LOCATION_KEY){
+            var myLocation;
+            if (fs.existsSync(GEO_CACHE_FILENAME)){
+                console.log("Loading geo location from cache...");
+                myLocation = JSON.parse(fs.readFileSync(GEO_CACHE_FILENAME));
+            } else {
+                console.log(`Querying IP locator service at ${ipLocatorURL}...`);
+                myLocation = (await axios.get(ipLocatorURL)).data;
+                fs.writeFileSync(GEO_CACHE_FILENAME,JSON.stringify(myLocation));
+            }   
+            details['country'] = myLocation.country_name;
+            details['city'] = myLocation.city_name;
+            details['latitude'] = myLocation.latitude;
+            details['longitude'] = myLocation.longitude;
+        }
+    } catch(e){
+        console.log("Could not georeference: "+e);
+    }
+    return details;
+}
 
 /**
  * @dev {initialize smart contracts with the web socket provider}
@@ -80,6 +122,7 @@ async function setUpContracts(account) {
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
+    membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
 }
 
 /**
@@ -160,6 +203,7 @@ async function uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid)
         reportUrl: ipfsBase + url,
         reportHash: reportHash,
         reportPacioli: ipfsBase + reportPacioliIPFSUrl,
+        validatorDetails: validatorDetails,
         result: isValid
     };
 
@@ -323,6 +367,8 @@ async function checkHash(event) {
     return [vote, winnerAddress];
 }
 
+var validatorDetails = null;
+
 /**
  * @dev Start listening to events
  */
@@ -334,6 +380,10 @@ async function startProcess() {
 
     setUpContracts(myArgs[0]);
     setUpNodeOperator(myArgs[0]);
+
+    validatorDetails = await fetchValidatorDetails(myArgs[0]);
+    console.log("Details known about this node:");
+    console.log(validatorDetails);
 
     owner = providerForUpdate.addresses[0];
     nonce = await web3.eth.getTransactionCount(owner);
