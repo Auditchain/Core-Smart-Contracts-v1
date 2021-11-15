@@ -77,7 +77,11 @@ const GEO_CACHE_FILENAME = ".myLocation.json";
 // cf. https://www.ip2location.com/web-service/ip2location :
 const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION_KEY}&package=WS5`;
 
+<<<<<<< HEAD
 async function fetchValidatorDetails(key,nickname){
+=======
+async function fetchValidatorDetails(key){
+>>>>>>> 11ca5e0eaffe4c762374587101d0464f0a77f4b3
     const web3_reader = web3;
     const owner = providerForUpdate.addresses[0];
 
@@ -375,7 +379,11 @@ async function startProcess() {
     setUpContracts(myArgs[0]);
     setUpNodeOperator(myArgs[0]);
 
+<<<<<<< HEAD
     validatorDetails = await fetchValidatorDetails(myArgs[0],myArgs[1]);
+=======
+    validatorDetails = await fetchValidatorDetails(myArgs[0]);
+>>>>>>> 11ca5e0eaffe4c762374587101d0464f0a77f4b3
     console.log("Details known about this node:");
     console.log(validatorDetails);
 

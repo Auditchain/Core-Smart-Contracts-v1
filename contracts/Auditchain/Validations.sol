@@ -33,7 +33,7 @@ abstract contract Validations is  ReentrancyGuard{
     enum ValidationStatus {Undefined, Yes, No}        
 
     struct Validation {
-   bool cohort;
+        bool cohort;
         address requestor;
         uint256 validationTime;
         uint256 executionTime;
@@ -46,18 +46,13 @@ abstract contract Validations is  ReentrancyGuard{
         mapping(address => string) validationUrl;
         mapping(address => uint256) winnerVotesPlus;
         mapping(address => uint256) winnerVotesMinus;
-        mapping(address => bytes32) validationHash;
+        mapping(address => bytes32) reportHash;
         uint64 winnerConfirmations;
         address winner;
         uint256 stakeValue;
     }
 
-    
-    // struct activeOpertor{
 
-    //     bytes32 validationHash;
-    //     uint256 operatorsTotalStake;
-    // }
 
     mapping(uint256 => mapping(bytes32 => uint256)) public activeOperatorsStake;
 
@@ -197,7 +192,7 @@ abstract contract Validations is  ReentrancyGuard{
                 validationTime[j] = validation.validatorTime[validatorsList[i]];
                 validationUrl[j] = validation.validationUrl[validatorsList[i]];
                 validatorListActive[j] = validatorsList[i];
-                reportHash[j] = validation.validationHash[validatorsList[i]];
+                reportHash[j] = validation.reportHash[validatorsList[i]];
                 j++;
             }
         }
@@ -256,7 +251,7 @@ abstract contract Validations is  ReentrancyGuard{
         validation.validatorChoice[msg.sender] = decision;
         validation.validatorTime[msg.sender] = block.timestamp;
         validation.validationUrl[msg.sender] = valUrl;
-        validation.validationHash[msg.sender] = reportHash;
+        validation.reportHash[msg.sender] = reportHash;
 
         validation.validationsCompleted ++;
 
