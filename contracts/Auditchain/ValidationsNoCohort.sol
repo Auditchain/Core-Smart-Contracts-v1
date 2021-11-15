@@ -53,7 +53,11 @@ contract ValidationsNoCohort is Validations {
     }
 
     function returnValidatorCount() public view override returns (uint256){
-        return nodeOperations.returnNodeOperatorsCount();
+        // return nodeOperations.returnNodeOperatorsCount();
+
+        (address[] memory nodeOperators,,,,,) = collectValidationResults(recentValidationHash);
+        return nodeOperators.length;
+        
     }
 
     function returnValidatorList(bytes32 validationHash) public view override  returns (address[] memory){
