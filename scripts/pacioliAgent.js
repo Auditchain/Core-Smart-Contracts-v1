@@ -109,7 +109,7 @@ async function fetchValidatorDetails(key,nickname){
 
 /**
  * @dev {initialize smart contracts with the web socket provider}
- * @param {account of this operator} account 
+ * @param {account of this operator} account.
 */
 async function setUpContracts(account) {
 
@@ -126,8 +126,8 @@ async function setUpContracts(account) {
  */
 async function setUpNodeOperator(account) {
 
-    const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
-    // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
+    // const providerForCall = new HDWalletProvider(account, goerli_infura_server); // change to main_infura_server or another testnet. 
+    const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
     membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
@@ -141,7 +141,7 @@ async function setUpNodeOperator(account) {
  * @param  {blockchain transaction hash} trxHash
  * @returns {location of Pacioli report on IPFS and result of validation valid or not}
  */
-async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli1(metadatatUrl, trxHash) {
 
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
@@ -175,10 +175,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 }
 
 //TODO:  Use only for testing to bypass calling Pacioli
-// async function verifyPacioli1(metadatatUrl, trxHash) {
+async function verifyPacioli(metadatatUrl, trxHash) {
 
-//     return ["https://ipfs.io/ipfs/QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-// }
+    return ["https://ipfs.io/ipfs/QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
+}
 
 
 /**
