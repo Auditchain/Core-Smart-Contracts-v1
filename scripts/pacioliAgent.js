@@ -122,7 +122,6 @@ async function setUpContracts(account) {
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
-    membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
 }
 
 /**
@@ -135,6 +134,8 @@ async function setUpNodeOperator(account) {
     // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForCall);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
+    membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
+
 }
 
 
