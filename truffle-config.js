@@ -4,7 +4,7 @@ var dotenv = require("dotenv");
 dotenv.config();
 
 
-const HDWalletProvider = require("truffle-hdwallet-provider");
+const HDWalletProvider = require("@truffle/hdwallet-provider");
 const MNEMONIC = process.env.MNEMONIC
 const INFURA_KEY = process.env.INFURA_KEY
 
@@ -81,10 +81,10 @@ module.exports = {
 
     },
     matic: {
-      provider: () => new HDWalletProvider(MNEMONIC, 'https://matic-mumbai.chainstacklabs.com'),
+      provider: () => new HDWalletProvider(MNEMONIC, 'https://polygon-mumbai.infura.io/v3/' + INFURA_KEY),
       network_id: 80001,
-      confirmations: 2,
-      timeoutBlocks: 200,
+      confirmations: 1,
+      timeoutBlocks: 1800,
       skipDryRun: true,
       chainId: 80001,
     },
