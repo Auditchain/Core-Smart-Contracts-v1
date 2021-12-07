@@ -21,7 +21,7 @@
   "homepage": "",
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.3",
-    "@truffle/hdwallet-provider": "^1.6.0",
+    "@truffle/hdwallet-provider": "^1.7.0",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
