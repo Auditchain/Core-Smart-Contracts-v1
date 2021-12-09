@@ -34,7 +34,7 @@ contract Members is  AccessControl {
     uint256 public platformShareValidation = 15;    // fee from validation
     uint256 public enterpriseMatch = 200;           // percentage to match against amountTokensPerValidation
     uint256 public minDepositDays = 60;             // number of days to considered for calculation of average spendings
-    uint256 public requiredQuorum = 30;             // quorum required to consider validation valid
+    uint256 public requiredQuorum = 80;             // quorum required to consider validation valid
     
 
     
