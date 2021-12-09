@@ -141,7 +141,7 @@ abstract contract Validations is  ReentrancyGuard{
         }
 
         validation.winnerConfirmations++;
-        uint256 operatorCount = returnValidatorCount();
+        uint256 operatorCount = returnValidatorCount(validationHash);
         uint256 currentQuorum = validation.winnerConfirmations * 100 / operatorCount;
         
         if (currentQuorum >= members.requiredQuorum() && validation.winner == address(0)){
@@ -154,7 +154,7 @@ abstract contract Validations is  ReentrancyGuard{
 
     function returnValidatorList(bytes32 validationHash) public view virtual returns (address[] memory);
 
-    function returnValidatorCount() public view virtual returns(uint256);
+    function returnValidatorCount(bytes32 validatoinHash) public virtual returns(uint256);
     
     
 
@@ -265,7 +265,7 @@ abstract contract Validations is  ReentrancyGuard{
 
         uint256 stakeAmt = memberHelpers.returnDepositAmount(msg.sender);
         updateQuorum(validationHash, stakeAmt, validation.validationTime);
-        emit ValidatorValidated(msg.sender, documentHash, validationTime, decision, valUrl);
+        emit ValidatorValidated(msg.sender, documentHash, validation.validatorTime[msg.sender], decision, valUrl);
 
         if (recentTimestamp > 0 && validation.executionTime == 0) // this is not first transactoin and there3 was no execution
             quorum = (activeOperatorsStake[validationTime][validationHash] * 100).div(activeOperatorsStake[recentTimestamp][recentValidationHash]);
