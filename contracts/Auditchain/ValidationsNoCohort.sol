@@ -52,7 +52,7 @@ contract ValidationsNoCohort is Validations {
         super.validate(documentHash, validationTime, subscriber, decision, valUrl, reportHash);
     }
 
-    function returnValidatorCount() public view override returns (uint256){
+    function returnValidatorCount(bytes32 valHash) public view override returns (uint256){
         // return nodeOperations.returnNodeOperatorsCount();
 
         (address[] memory nodeOperators,,,,,) = collectValidationResults(recentValidationHash);
