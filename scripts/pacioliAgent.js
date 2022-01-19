@@ -37,7 +37,6 @@ const rinkeby_infura_server = process.env.RINKEBY_INFURA_SERVER;
 const main_infura_server = process.env.MAINNET_INFURA_SERVER;
 const goerli_infura_server = process.env.GOERLI_INFURA_SERVER
 const mumbai_server = process.env.MUMBAI_SERVER;
-
 const local_host = process.env.LOCAL;
 const mnemonic = process.env.MNEMONIC;
 
