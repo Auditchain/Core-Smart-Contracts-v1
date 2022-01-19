@@ -36,7 +36,7 @@ const ropsten_infura_server = process.env.ROPSTEN_INFURA_SERVER;
 const rinkeby_infura_server = process.env.RINKEBY_INFURA_SERVER;
 const main_infura_server = process.env.MAINNET_INFURA_SERVER;
 const goerli_infura_server = process.env.GOERLI_INFURA_SERVER
-const mumbai_server = process.env.MUMBAI_CHAINSTACK_SERVER
+const mumbai_server = process.env.MUMBAI_SERVER;
 
 const local_host = process.env.LOCAL;
 const mnemonic = process.env.MNEMONIC;
@@ -154,10 +154,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     const reportUrl = JSON.parse(result)["reportUrl"];
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-    //     .catch(error => console.log("ERROR: " + error));
-    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
         .catch(error => console.log("ERROR: " + error));
+    // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    //     .catch(error => console.log("ERROR: " + error));
 
 
     if (!reportContent)
