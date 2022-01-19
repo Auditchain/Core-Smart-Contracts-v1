@@ -52,7 +52,7 @@ contract ValidationsNoCohort is Validations {
         super.validate(documentHash, validationTime, subscriber, decision, valUrl, reportHash);
     }
 
-    function returnValidatorCount(bytes32 valHash) public view override returns (uint256){
+    function returnValidatorCount(bytes32 recentValidationHash) public view override returns (uint256){
         // return nodeOperations.returnNodeOperatorsCount();
 
         (address[] memory nodeOperators,,,,,) = collectValidationResults(recentValidationHash);
@@ -65,6 +65,26 @@ contract ValidationsNoCohort is Validations {
         address[] memory validatorsList = nodeOperations.returnNodeOperators();
         return validatorsList;
     }
+
+
+       function returnValidatorListActual(bytes32 validationHash) public view returns (address[] memory){
+
+        //  (address[] memory nodeOperators,,,,,)  = collectValidationResults(validationHash);
+        Validation storage validation = validations[validationHash];
+        uint256 j=0;
+
+        address[] memory validatorListActive = new address[](validation.validationsCompleted);
+        address[] memory validatorsList = nodeOperations.returnNodeOperators();
+
+         for (uint256 i = 0; i < validatorsList.length; i++) {
+            if(validation.validatorChoice[validatorsList[i]] != ValidationStatus.Undefined) {
+                validatorListActive[j] = validatorsList[i];
+                j++;
+            }
+        }
+        return validatorListActive;
+    }
+
 
 
 }
