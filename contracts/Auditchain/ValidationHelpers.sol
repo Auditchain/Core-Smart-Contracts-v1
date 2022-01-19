@@ -170,6 +170,7 @@ contract ValidationHelpers {
         // address  contractToCall = determineCaller(chort);
 
         address[] memory validatorsList = IValidations(validationContract).returnValidatorList(validationHash);
+        require(validatorsList.length > 0, "ValidationHelpers:calculateVoteQuorum - There is no validators or hash was incorrect");
         // (,,uint validationTime,,,,,,,) = IValidations(validationContract).returnValidationRecord(validationHash);
         (address[] memory validatorListActive, ,uint256[] memory choice,,,) =  IValidations(validationContract).collectValidationResults(validationHash);
 
