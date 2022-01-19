@@ -85,7 +85,7 @@ contract DepositModifiers is  AccessControl {
 
         require(memberHelpers.returnDepositAmount(msg.sender) >= accessFee, "DepositModifier:dataSubscriberPayment - You don't have enough AUDT to complet this tranasction.");
         IERC20(auditToken).safeTransferFrom(msg.sender, address(this), accessFee);
-        uint platformShare = 100 - members.enterpriseShareSubscriber() -members.validatorShareSubscriber();
+        uint platformShare = (uint256(100)).sub(members.enterpriseShareSubscriber()).sub(members.validatorShareSubscriber());
         IERC20(auditToken).safeTransfer(members.platformAddress(), accessFee.mul(platformShare).div(100));
 
         if (members.userMap(msg.sender, Members.UserType(2)) || members.userMap(msg.sender, Members.UserType(0))){
