@@ -12,6 +12,8 @@ const NODE_OPERATIONS = artifacts.require('../NodeOperations');
 const DEPOSIT_MODIFIERS = artifacts.require('../DepositModifiers');
 
 const VALIDATION = artifacts.require('../ValidationsNoCohort');
+const VALIDATION_HELPERS = artifacts.require('../ValidationHelpers');
+
 
 
 import expectRevert from './helpers/expectRevert';
@@ -43,6 +45,8 @@ contract("Node Operations contract", (accounts) => {
     let nodeOperations
     let depositModifiers;
     let validation;
+    let validationHelpers;
+
     let documentHash;
     let validationHash;
 
@@ -74,7 +78,9 @@ contract("Node Operations contract", (accounts) => {
         cohortFactory = await COHORTFACTORY.new(members.address, memberHelpers.address);
         nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address, members.address);
         depositModifiers = await DEPOSIT_MODIFIERS.new(members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address)
-        validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address)
+        validationHelpers = await VALIDATION_HELPERS.new(memberHelpers.address);
+
+        validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address)
 
 
 
@@ -459,12 +465,14 @@ contract("Node Operations contract", (accounts) => {
 
         it("It should succeed. Validator received stake rewards from their direct validation.", async () => {
 
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, dataSubscriber, 1, documentURL, documentHash, { from: validator1, gas: 900000 });
+
 
             // ensure that user is not the winner for the proof of stake reward
             timeMachine.advanceTimeAndBlock(1);
 
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, dataSubscriber, 1, documentURL, documentHash, { from: validator2, gas: 900000 });
+
 
             let stakeRatio = await nodeOperations.stakeRatio();
             let deposit = await memberHelpers.returnDepositAmount(validator2);
@@ -491,7 +499,8 @@ contract("Node Operations contract", (accounts) => {
 
             await nodeOperations.toggleNodeOperator({ from: validator2 });
             await nodeOperations.delegate(validator1, { from: validator2 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, dataSubscriber, 1, documentURL, documentHash, { from: validator1, gas: 900000 });
+
 
             let nodeOperatorStruct = await nodeOperations.nodeOpStruct(validator2);
             let amount = nodeOperatorStruct.delegateAmount;
@@ -505,11 +514,21 @@ contract("Node Operations contract", (accounts) => {
 
             let POWFee = await nodeOperations.POWFee();
 
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+            // await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+            let result = await validation.validate(documentHash, validationInitTime, dataSubscriber, 1, documentURL, documentHash, { from: validator1, gas: 900000 });
+
 
             timeMachine.advanceTimeAndBlock(1);
 
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, dataSubscriber, 1, documentURL, documentHash, { from: validator2, gas: 900000 });
+
+
+            let event = result.logs[1];
+            assert.equal(event.event, 'RequestExecuted');
+
+            validation.voteWinner(event.args.winners, [true, true, true], event.args.validationHash, { from: validator1 });
+            validation.voteWinner(event.args.winners, [true, true, true], event.args.validationHash, { from: validator2 });
+
             let nodeOperatorStruct = await nodeOperations.nodeOpStruct(validator1);
             let amount = nodeOperatorStruct.POWAmount;
             assert.strictEqual(amount.toString(), POWFee.toString());
@@ -524,7 +543,7 @@ contract("Node Operations contract", (accounts) => {
 
             await nodeOperations.toggleNodeOperator({ from: validator2 });
             await nodeOperations.delegate(validator1, { from: validator2 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, dataSubscriber, 1, documentURL, documentHash, { from: validator1, gas: 900000 });
 
             let nodeOperatorStruct = await nodeOperations.nodeOpStruct(validator1);
             let amount = nodeOperatorStruct.referralAmount;
@@ -566,43 +585,18 @@ contract("Node Operations contract", (accounts) => {
 
             await nodeOperations.toggleNodeOperator({ from: validator2 });
             await nodeOperations.delegate(validator1, { from: validator2 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+            let result = await validation.validate(documentHash, validationInitTime, dataSubscriber, 1, documentURL, documentHash, { from: validator1, gas: 900000 });
 
-            let result = await nodeOperations.claimStakeRewards(false, { from: validator1 });
+            let event = result.logs[1];
+            assert.equal(event.event, 'RequestExecuted');
 
-            let event = result.logs[0];
-            assert.equal(event.event, 'LogStakingRewardsClaimed');
-            let amount = event.args.amount;
+            validation.voteWinner(event.args.winners, [true, true, true], event.args.validationHash, { from: validator1 });
 
-            let depositAfter = await memberHelpers.returnDepositAmount(validator1);
-            let depositAfterDifference = BN(depositAfter.toString()).minus(BN(deposit.toString()));
-            assert.strictEqual(depositAfterDifference.toString(), totalEarnedCalc.toString());
-            assert.strictEqual(depositAfterDifference.toString(), amount.toString());
+            let result2 = await nodeOperations.claimStakeRewards(false, { from: validator1 });
 
-        })
-
-
-        it("It should succeed. Node Operator claimed correct stake rewards from their node operation, POW and referral", async () => {
-
-            let POWFee = await nodeOperations.POWFee();
-            let deposit = await memberHelpers.returnDepositAmount(validator1);
-            let referralRatio = await nodeOperations.stakingRatioReferral();
-            let stakeRatio = await nodeOperations.stakeRatio();
-
-            let oneValidationReferral = BN(deposit.toString()).divide(BN(referralRatio.toString()));
-            let oneValidationDirect = BN(deposit.toString()).divide(BN(stakeRatio.toString()));
-
-            let totalEarnedCalc = BN(oneValidationReferral).add(oneValidationDirect).add(POWFee.toString());
-
-            await nodeOperations.toggleNodeOperator({ from: validator2 });
-            await nodeOperations.delegate(validator1, { from: validator2 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-
-            let result = await nodeOperations.claimStakeRewards(false, { from: validator1 });
-
-            let event = result.logs[0];
-            assert.equal(event.event, 'LogStakingRewardsClaimed');
-            let amount = event.args.amount;
+            let event2 = result2.logs[0];
+            assert.equal(event2.event, 'LogStakingRewardsClaimed');
+            let amount = event2.args.amount;
 
             let depositAfter = await memberHelpers.returnDepositAmount(validator1);
             let depositAfterDifference = BN(depositAfter.toString()).minus(BN(deposit.toString()));
@@ -610,6 +604,9 @@ contract("Node Operations contract", (accounts) => {
             assert.strictEqual(depositAfterDifference.toString(), amount.toString());
 
         })
+
+
+
 
         it("It should succeed. Delegating validator claimed correct stake rewards from their delegation", async () => {
 
@@ -618,10 +615,9 @@ contract("Node Operations contract", (accounts) => {
 
             let oneValidationDelegating = BN(deposit.toString()).divide(BN(delegatingRatio.toString()));
 
-
             await nodeOperations.toggleNodeOperator({ from: validator2 });
             await nodeOperations.delegate(validator1, { from: validator2 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, dataSubscriber, 1, documentURL, documentHash, { from: validator1, gas: 900000 });
 
             let result = await nodeOperations.claimStakeRewards(false, { from: validator2 });
 
@@ -648,7 +644,8 @@ contract("Node Operations contract", (accounts) => {
 
             await nodeOperations.toggleNodeOperator({ from: validator2 });
             await nodeOperations.delegate(validator1, { from: validator2 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, dataSubscriber, 1, documentURL, documentHash, { from: validator1, gas: 900000 });
+
 
             let result = await nodeOperations.claimStakeRewards(true, { from: validator2 });
 

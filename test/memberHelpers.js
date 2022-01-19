@@ -12,6 +12,8 @@ const COHORTFACTORY = artifacts.require('../CohortFactory');
 const VALIDATION = artifacts.require('../ValidationsCohort');
 const NODE_OPERATIONS = artifacts.require('../NodeOperations');
 const DEPOSIT_MODIFIERS = artifacts.require('../DepositModifiers');
+const VALIDATION_HELPERS = artifacts.require('../ValidationHelpers')
+
 
 
 
@@ -40,7 +42,7 @@ contract("Member Helper contract", (accounts) => {
     let token;
     let memberHelpers;
     let cohortFactory;
-    let createCohort;
+    let validationHelpers
     let validation;
     let nodeOperations;
     let depositModifiers;
@@ -63,8 +65,9 @@ contract("Member Helper contract", (accounts) => {
 
         cohortFactory = await COHORTFACTORY.new(members.address, memberHelpers.address);
         nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address, members.address);
+        validationHelpers = await VALIDATION_HELPERS.new(memberHelpers.address);
         depositModifiers = await DEPOSIT_MODIFIERS.new(members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address)
-        validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address)
+        validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address)
 
         await memberHelpers.grantRole(CONTROLLER_ROLE, admin, { from: admin });
         await members.grantRole(CONTROLLER_ROLE, admin, { from: admin });
@@ -281,11 +284,12 @@ contract("Member Helper contract", (accounts) => {
             let event = result.logs[0];
             let validationInitTime = event.args.initTime;
 
+            // await validation.validate(documentHash, validationInitTime, enterprise1, 1, "", documentHash, { from: validator1, gas: 900000 });
 
 
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 800000 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 1, "", documentHash, { from: validator1, gas: 900000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 1, "", documentHash, { from: validator2, gas: 900000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 1, "", documentHash, { from: validator3, gas: 900000 });
 
         })
 

@@ -62,6 +62,9 @@ contract("ERC20 Auditchain Token", (accounts) => {
     describe("Constructor", async () => {
         it("Verify constructors", async () => {
 
+            let gasCost = await web3.eth.estimateGas(token.addLock(holder1, {from: owner}));
+            console.log("gas cost:", gasCost);
+
             token = await TOKEN.new(owner);
 
             let tokenName = await token.name.call();
@@ -911,6 +914,15 @@ contract("ERC20 Auditchain Token", (accounts) => {
             let result = await token.addLock(holder1, {
                 from: owner
             });
+
+
+            // const gas = await web3.eth.estimateGas(nonCohortValidate.methods.validate(hash, initTime, choice, valUrl, reportHash));
+
+            let gasCost = await web3.eth.estimateGas(token.addLock(holder1, {from: owner}));
+
+
+
+            console.log('gas cost for addLock:', gasCost);
 
             assert.lengthOf(result.logs, 1);
             let event = result.logs[0];

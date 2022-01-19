@@ -13,6 +13,8 @@ const MEMBER_HELPERS = artifacts.require('../MemberHelpers');
 const NODE_OPERATIONS = artifacts.require('../NodeOperations');
 const DEPOSIT_MODIFIERS = artifacts.require('../DepositModifiers');
 const VALIDATION = artifacts.require('../ValidationsCohort');
+const VALIDATION_HELPERS = artifacts.require('../ValidationHelpers');
+
 
 
 
@@ -40,6 +42,7 @@ contract("NFT rules contract", (accounts) => {
     const validator3 = accounts[4];
     const validator4 = accounts[5];
     const platformAccount = accounts[6];
+    
     const addressZero = "0x0000000000000000000000000000000000000000"
 
 
@@ -58,9 +61,12 @@ contract("NFT rules contract", (accounts) => {
     let nodeOperations;
     let depositModifiers;
     let validation;
+    let validationHelpers;
     // let createCohort;
     let cohortAddress;
     let cohortContract;
+    const documentURL = "http://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml"
+
 
 
     beforeEach(async () => {
@@ -77,7 +83,9 @@ contract("NFT rules contract", (accounts) => {
 
         nodeOperations = await NODE_OPERATIONS.new(memberHelpers.address, token.address, members.address);
         depositModifiers = await DEPOSIT_MODIFIERS.new(members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address)
-        validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address)
+        validationHelpers = await VALIDATION_HELPERS.new(memberHelpers.address);
+
+        validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address)
 
 
         rules = await NFT.new(tokenName, tokenSymbol, validation.address);
@@ -181,9 +189,9 @@ contract("NFT rules contract", (accounts) => {
 
         it('It should succeed minting of 1 token to enterprise1 with valid hash id and successful verification ', async () => {
 
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 800000 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 1, documentURL, documentHash, { from: validator1, gas: 900000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 1, documentURL, documentHash, { from: validator2, gas: 900000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 1, documentURL, documentHash, { from: validator3, gas: 900000 });
 
 
             let result = await rules.mintTo(validationHash, { from: enterprise1 });
@@ -199,9 +207,9 @@ contract("NFT rules contract", (accounts) => {
 
         it('It should fail minting the same token twice for one rule ', async () => {
 
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator1, gas: 800000 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator2, gas: 800000 });
-            await validation.validate(documentHash, validationInitTime, 1, "", { from: validator3, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 1, documentURL, documentHash, { from: validator1, gas: 900000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 1, documentURL, documentHash, { from: validator2, gas: 900000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 1, documentURL, documentHash, { from: validator3, gas: 900000 });
 
 
             let result = await rules.mintTo(validationHash, { from: enterprise1 });
@@ -219,9 +227,9 @@ contract("NFT rules contract", (accounts) => {
 
         it('It should fail minting of 1 token to enterprise1 with valid hash id but unsuccessful verification ', async () => {
 
-            await validation.validate(documentHash, validationInitTime, 2, "", { from: validator1, gas: 800000 });
-            await validation.validate(documentHash, validationInitTime, 2, "", { from: validator2, gas: 800000 });
-            await validation.validate(documentHash, validationInitTime, 2, "", { from: validator3, gas: 800000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 2, documentURL, documentHash, { from: validator1, gas: 900000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 2, documentURL, documentHash, { from: validator2, gas: 900000 });
+            await validation.validate(documentHash, validationInitTime, enterprise1, 2, documentURL, documentHash, { from: validator3, gas: 900000 });2
 
 
             try {
