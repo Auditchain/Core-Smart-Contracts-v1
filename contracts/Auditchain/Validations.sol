@@ -33,7 +33,7 @@ abstract contract Validations is  ReentrancyGuard{
     enum ValidationStatus {Undefined, Yes, No}        
 
     struct Validation {
-   bool cohort;
+        bool cohort;
         address requestor;
         uint256 validationTime;
         uint256 executionTime;
