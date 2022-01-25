@@ -44,6 +44,9 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
     uint8 public constant DECIMALS = 18;
     uint256 public constant INITIAL_SUPPLY = 250000000 * (10**uint256(DECIMALS));
     uint256 public totalMigrated;
+
+    
+
     
     event Migrate(address indexed from, address indexed to, uint256 value);
 
@@ -51,6 +54,14 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
     constructor(address account) ERC20("Auditchain", "AUDT") {
         require(account != address(0), "AuditToken:constructor - Address can't be 0");
         _mint(account, INITIAL_SUPPLY);      
+        _setupRole(DEFAULT_ADMIN_ROLE, account);
+    }
+
+
+        /// @dev Initialize.
+    function initialize(address account) public {
+        // __ERC20_init("Auditchain", "AUDT");
+        require(account != address(0), "AuditToken:initialize - Address can't be 0");
         _setupRole(DEFAULT_ADMIN_ROLE, account);
     }
 

@@ -22,7 +22,7 @@ contract RulesERC721Token is ERC721, ERC721URIStorage, ERC721Enumerable
     mapping(bytes32 => bool) public NFTCompleted;
     event Mint(uint256 tokenId, address recipient);
 
-     function tokenURI(uint256 tokenId) public view virtual override(ERC721URIStorage, ERC721) returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721URIStorage, ERC721) returns (string memory) {
        
         return super.tokenURI(tokenId);
     }

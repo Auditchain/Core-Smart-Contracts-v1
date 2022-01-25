@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.0;
-pragma experimental ABIEncoderV2;
+// pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./Members.sol";
 import "./MemberHelpers.sol";
@@ -20,6 +20,8 @@ contract CohortFactory is  AccessControl {
     }
 
     uint256[] public minValidatorPerCohort = [0,3,3,3,3,3,3];
+    bytes32 public constant SETTER_ROLE =  keccak256("SETTER_ROLE");
+
 
     // Invitation structure to hold info about its status
     struct Invitation {
@@ -54,6 +56,12 @@ contract CohortFactory is  AccessControl {
     event ValidatorCleared(address validator, AuditTypes audit, address enterprise);
 
 
+     /// @dev check if caller is a setter     
+    modifier isSetter {
+        require(hasRole(SETTER_ROLE, msg.sender), "Members:isSetter - Caller is not a setter");
+
+        _;
+    }
 
     constructor(Members _members, MemberHelpers _memberHelpers) {
         members = _members;
@@ -66,7 +74,7 @@ contract CohortFactory is  AccessControl {
     * @param _minValidatorPerCohort new value 
     * @param audits type of validations
     */
-    function updateMinValidatorsPerCohort(uint256 _minValidatorPerCohort, uint256 audits) public  {
+    function updateMinValidatorsPerCohort(uint256 _minValidatorPerCohort, uint256 audits) public  isSetter()  {
 
         require(_minValidatorPerCohort != 0, "CohortFactory:updateMinValidatorsPerCohort - New value for the  min validator per cohort can't be 0");
         require(audits <= 6 && audits >=0 , "Cohort Factory:updateMinValidatorsPerCohort - Audit type has to be <= 5 and >=0");
