@@ -1,6 +1,7 @@
 "use strict";
 let contract = require('truffle-contract');
 let Web3 = require('web3');
+let Web3WsProvider = require('web3-providers-ws');
 let ethers = require('ethers');
 let axios = require("axios");
 let ipfsAPI = require("ipfs-api");
@@ -48,7 +49,22 @@ const nonCohortAddress = process.env.VALIDATIONS_NO_COHORT_ADDRESS;
 const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
 const members = process.env.MEMBER_ADDRESS;
 
-const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
+const  provider =  new Web3WsProvider(process.env.WEBSOCKET_PROVIDER, {
+    clientConfig: {
+        keepalive: true,
+        keepaliveInterval: 60000, // ms
+     },
+     // Enable auto reconnection
+     reconnect: {
+        auto: true,
+        delay: 5000, // ms
+        maxAttempts: 5,
+        onTimeout: false
+     }
+  })
+
+//TODO: Remove this line once verified that replacement above is fixed.
+// const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
 let nonce;
 
@@ -153,10 +169,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     const reportUrl = JSON.parse(result)["reportUrl"];
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-        .catch(error => console.log("ERROR: " + error));
-    // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
     //     .catch(error => console.log("ERROR: " + error));
+    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+        .catch(error => console.log("ERROR: " + error));
 
 
     if (!reportContent)
