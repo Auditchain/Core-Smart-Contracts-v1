@@ -135,7 +135,7 @@ async function fetchValidatorDetails(key){
 async function setUpContracts(account) {
 
 
-    providerForUpdate = new HDWalletProvider(account, process.env.WEBSOCKET_PROVIDER); // change to main_infura_server or another testnet. 
+    providerForUpdate = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
@@ -163,7 +163,7 @@ async function setUpNodeOperator(account) {
  * @param  {blockchain transaction hash} trxHash
  * @returns {location of Pacioli report on IPFS and result of validation valid or not}
  */
-async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli1(metadatatUrl, trxHash) {
 
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
@@ -197,10 +197,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 }
 
 // TODO:  Use only for testing to bypass calling Pacioli
-// async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli(metadatatUrl, trxHash) {
 
-//     return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-// }
+    return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
+}
 
 
 /**
