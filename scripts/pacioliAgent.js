@@ -163,7 +163,7 @@ async function setUpNodeOperator(account) {
  * @param  {blockchain transaction hash} trxHash
  * @returns {location of Pacioli report on IPFS and result of validation valid or not}
  */
-async function verifyPacioli1(metadatatUrl, trxHash) {
+async function verifyPacioli(metadatatUrl, trxHash) {
 
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
@@ -197,10 +197,10 @@ async function verifyPacioli1(metadatatUrl, trxHash) {
 }
 
 // TODO:  Use only for testing to bypass calling Pacioli
-async function verifyPacioli(metadatatUrl, trxHash) {
+// async function verifyPacioli(metadatatUrl, trxHash) {
 
-    return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-}
+//     return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
+// }
 
 
 /**
