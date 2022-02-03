@@ -143,21 +143,6 @@ async function setUpContracts(account) {
     membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
 }
 
-/**
- * @dev {initialize node operator contract with https: to solve the interference of this pre check with listening to events on socket provider}
- * @param {account of this operator} account 
- */
-// async function setUpNodeOperator(account) {
-
-
-//     const providerForCall = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
-//     // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
-//     const web3Update = new Web3(providerForCall);
-//     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
-//     membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
-
-// }
-
 
 /**
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
