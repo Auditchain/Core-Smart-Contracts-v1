@@ -69,10 +69,11 @@ const web3 = new Web3(provider);
 let nonce;
 
 
-const agentBornAT = Date.now();
-setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
-    () => (web3.eth.getBlockNumber().then(what => console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds; current block ${what}`))),
-    60000);
+// this may help with some web 3 providers with brittle web sockets connections:
+// const agentBornAT = Date.now();
+// setInterval( //hack to keep alive our brittle websocket, which tends to close after some inactivity
+//     () => (web3.eth.getBlockNumber().then(what => console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds; current block ${what}`))),
+//     60000);
 
 let nonCohort = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
 let ipfsBase = 'https://ipfs.infura.io/ipfs/';
