@@ -139,22 +139,24 @@ async function setUpContracts(account) {
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
+    nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
+    membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
 }
 
 /**
  * @dev {initialize node operator contract with https: to solve the interference of this pre check with listening to events on socket provider}
  * @param {account of this operator} account 
  */
-async function setUpNodeOperator(account) {
+// async function setUpNodeOperator(account) {
 
 
-    const providerForCall = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
-    // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
-    const web3Update = new Web3(providerForCall);
-    nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
-    membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
+//     const providerForCall = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
+//     // const providerForCall = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. 
+//     const web3Update = new Web3(providerForCall);
+//     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
+//     membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
 
-}
+// }
 
 
 /**
@@ -398,7 +400,7 @@ async function startProcess() {
     let myArgs = process.argv.slice(2);
 
     setUpContracts(myArgs[0]);
-    setUpNodeOperator(myArgs[0]);
+    // setUpNodeOperator(myArgs[0]);
 
     validatorDetails = await fetchValidatorDetails(myArgs[0]);
     console.log("Details known about this node:");
