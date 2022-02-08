@@ -53,13 +53,14 @@ const  provider =  new Web3WsProvider(process.env.WEBSOCKET_PROVIDER, {
     clientConfig: {
         keepalive: true,
         keepaliveInterval: 60000, // ms
+        timeout: 20000, // ms
      },
      // Enable auto reconnection
      reconnect: {
         auto: true,
         delay: 5000, // ms
         maxAttempts: 5,
-        onTimeout: false
+        onTimeout: true
      }
   })
 
@@ -144,7 +145,7 @@ async function setUpContracts(account) {
 }
 
 
-/**
+/** 
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
  * @param  {contains information about the location of the submitted report on IPFS by the data subscriber } metadatatUrl
  * @param  {blockchain transaction hash} trxHash
