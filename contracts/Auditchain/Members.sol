@@ -65,8 +65,6 @@ contract Members is  AccessControl {
     address[] public dataSubscribers;
     
     event UserAdded(address indexed user, string name, UserType indexed userType);
-    event LogDepositReceived(address indexed from, uint amount);
-    event LogSubscriptionCompleted(address subscriber, uint256 numberOfSubscriptions);
     event LogGovernanceUpdate(uint256 params, string indexed action);
 
     
