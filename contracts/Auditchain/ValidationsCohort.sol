@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract ValidationsCohort is Validations {
     using SafeMath for uint256;
 
-    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations, address _validationHelpers) 
-        Validations(_members, _memberHelpers, _cohortFactory, _depositModifiers, _nodeOperations, _validationHelpers){
+    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations, address _validationHelpers, address _queue) 
+        Validations(_members, _memberHelpers, _cohortFactory, _depositModifiers, _nodeOperations, _validationHelpers, _queue){
 
     }
 
@@ -20,11 +20,11 @@ contract ValidationsCohort is Validations {
     * @param url - locatoin of the file on IPFS or other decentralized file storage
     * @param auditType - type of auditing 
     */
-    function initializeValidationCohort(bytes32 documentHash, string memory url, AuditTypes auditType) public {
+    function initializeValidationCohort(bytes32 documentHash, string memory url, AuditTypes auditType, uint256 price) public {
 
         require(checkIfRequestorHasFunds(msg.sender), "NoCohort:initializeValidation - Not sufficient funds. Deposit additional funds.");
         require(cohortFactory.cohortMap(msg.sender, uint256(auditType)), "Cohort:intializeValidation - Only enterprise owing this cohort can call this function");
-        super.initializeValidation(documentHash, url, auditType, true);
+        super.initializeValidation(documentHash, url, auditType, true, price);
         
     }
 
