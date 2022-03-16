@@ -102,7 +102,7 @@ contract AuditToken is Locked, ERC20, Pausable, ERC20Burnable{
     /// @param to address to which new minted tokens are sent
     /// @param amount of tokens to send 
     /// @return A boolean that indicates if the operation was successful.
-    function mint(address to, uint256 amount) public isController() returns (bool) {       
+    function mint(address to, uint256 amount) public isMinter() returns (bool) {       
         require(to != address(0), "Token:mint - Recipient address can't be 0");        
         _mint(to, amount);
         return true;
