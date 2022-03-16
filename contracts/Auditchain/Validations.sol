@@ -6,6 +6,7 @@ import "./Members.sol";
 import "./DepositModifiers.sol";
 import "./ICohortFactory.sol";
 import "./IValidationHelpers.sol";
+import "./Queue.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
@@ -17,6 +18,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 abstract contract Validations is  ReentrancyGuard{
     using SafeMath for uint256;
     Members public members;
+    Queue public queue;
     MemberHelpers public memberHelpers;
     DepositModifiers public depositModifiers;
     ICohortFactory public cohortFactory;
@@ -31,6 +33,7 @@ abstract contract Validations is  ReentrancyGuard{
 
     // Validation can be approved or disapproved. Initial status is undefined.
     enum ValidationStatus {Undefined, Yes, No}        
+    
 
     struct Validation {
         bool cohort;
@@ -52,6 +55,7 @@ abstract contract Validations is  ReentrancyGuard{
         uint256 stakeValue;
     }
 
+    mapping(address => mapping (bytes32=> bool)) public votes;
     
     // struct activeOpertor{
 
@@ -68,14 +72,14 @@ abstract contract Validations is  ReentrancyGuard{
 
     mapping(bytes32 => Validation) public validations; // track each validation
 
-    event ValidationInitialized(address indexed user, bytes32 validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
+    event ValidationInitialized(address indexed user, bytes32 indexed validationHash, uint256 initTime, bytes32 documentHash, string url, AuditTypes indexed auditType);
     event ValidatorValidated(address indexed validator, bytes32 indexed documentHash, uint256 indexed validationTime, ValidationStatus decision, string valUrl);
-    event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url, address[] winners);
+    event RequestExecuted(uint256 indexed audits, address indexed requestor, bytes32 indexed validationHash, bytes32 documentHash, uint256 consensus, uint256 quorum,  uint256 timeExecuted, string url, address[] winners);
     event PaymentProcessed(bytes32 validationHash, address winner, uint256 pointsPlus, uint256 pointsMinus);
     event WinnerVoted(address validator, address winner, bool isValid);
 
 
-    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations, address _validationHelpers) {
+    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations, address _validationHelpers, address __queue) {
 
         members = Members(_members);
         memberHelpers = MemberHelpers(_memberHelpers);
@@ -83,6 +87,7 @@ abstract contract Validations is  ReentrancyGuard{
         depositModifiers = DepositModifiers(_depositModifiers);
         nodeOperations = INodeOperations(_nodeOperations);
         validationHelpers = IValidatinosHelpers(_validationHelpers);
+        queue = Queue(__queue);
         // _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
     }
@@ -108,7 +113,7 @@ abstract contract Validations is  ReentrancyGuard{
      * @param url - locatoin of the file on IPFS or other decentralized file storage
      * @param auditType - type of auditing 
      */
-    function initializeValidation(bytes32 documentHash, string memory url, AuditTypes auditType, bool isCohort) internal virtual {
+    function initializeValidation(bytes32 documentHash, string memory url, AuditTypes auditType, bool isCohort, uint256 price) internal virtual {
         require(documentHash.length > 0, "Validation:initializeValidation - Document hash value can't be 0");
 
         uint256 validationTime = block.timestamp;
@@ -122,6 +127,8 @@ abstract contract Validations is  ReentrancyGuard{
         newValidation.requestor = msg.sender;
         newValidation.auditType = auditType;
         newValidation.cohort = isCohort;
+
+        queue.addToQueue(price, validationHash );
 
         emit ValidationInitialized(msg.sender, validationHash, validationTime, documentHash, url, auditType);
     }
@@ -137,6 +144,7 @@ abstract contract Validations is  ReentrancyGuard{
             else
                 validation.winnerVotesMinus[winners[i]] =  validation.winnerVotesMinus[winners[i]].add(1);
 
+            votes[msg.sender][validationHash ]  = true;
             emit WinnerVoted(msg.sender, winners[i], vote[i]);
         }
 
@@ -145,6 +153,7 @@ abstract contract Validations is  ReentrancyGuard{
         uint256 currentQuorum = validation.winnerConfirmations * 100 / operatorCount;
         
         if (currentQuorum >= members.requiredQuorum() && validation.winner == address(0)){
+            queue.removeFromQueue(validationHash);
             address winner = validationHelpers.selectWinner(validationHash, winners);
             validation.winner = winner;
             processPayments(validationHash, winner);
@@ -212,6 +221,11 @@ abstract contract Validations is  ReentrancyGuard{
     function isValidated(bytes32 validationHash) public view returns (ValidationStatus){
         return validations[validationHash].validatorChoice[msg.sender];
     }
+
+    function hasVoted(bytes32 validationHash) public view returns (bool) {
+
+        return votes[msg.sender][validationHash];
+    }
    
     function processPayments(bytes32 validationHash, address winner) internal virtual {
     }
@@ -232,6 +246,7 @@ abstract contract Validations is  ReentrancyGuard{
         // (,uint256[] memory totalStake,,,,) =  collectValidationResults(validationHash);
         recentTimestamp = validation.validationTime;
         recentValidationHash = validationHash;
+        queue.setValidatedFlag(validationHash);
         
         emit RequestExecuted( uint256(validation.auditType), validation.requestor, validationHash, documentHash, consensus, _quorum, block.timestamp, validation.url, winners);
         
