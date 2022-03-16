@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract ValidationsNoCohort is Validations {
     using SafeMath for uint256;
 
-    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations, address _validationHelpers) 
-        Validations(_members, _memberHelpers, _cohortFactory, _depositModifiers, _nodeOperations, _validationHelpers){
+    constructor(address _members, address _memberHelpers, address _cohortFactory, address _depositModifiers, address _nodeOperations, address _validationHelpers, address queue ) 
+        Validations(_members, _memberHelpers, _cohortFactory, _depositModifiers, _nodeOperations, _validationHelpers, queue){
 
     }
 
@@ -19,11 +19,11 @@ contract ValidationsNoCohort is Validations {
     * @param url - locatoin of the file on IPFS or   function returnValidatorList(bytes32 validationHash) public view override  returns (address[] memory){
     * @param auditType - type of auditing 
     */
-    function initializeValidationNoCohort(bytes32 documentHash, string memory url, AuditTypes auditType) public {
+    function initializeValidationNoCohort(bytes32 documentHash, string memory url, AuditTypes auditType, uint256 price) public {
 
         require(checkIfRequestorHasFunds(msg.sender), "ValidationsNoCohort:initializeValidationNoCohort - Not sufficient funds. Deposit additional funds.");
         require(members.userMap(msg.sender, Members.UserType(2)), "ValidationsNoCohort:initializeValidationNoCohort - You have to register as data subscriber");
-        super.initializeValidation(documentHash, url, auditType, false);
+        super.initializeValidation(documentHash, url, auditType, false, price);
         
     }
 
