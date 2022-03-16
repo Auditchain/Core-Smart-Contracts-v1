@@ -14,12 +14,20 @@ contract Locked is AccessControl {
 
     // Create a new role identifier for the controller role
     bytes32 public constant CONTROLLER_ROLE = keccak256("CONTROLLER_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
 
        modifier isController {
             require(hasRole(CONTROLLER_ROLE, msg.sender), "Locked::isController - Caller is not a controller");
 
         _;
     }
+
+    modifier isMinter {
+            require(hasRole(MINTER_ROLE, msg.sender), "Locked::isMinter - Caller is not a minter");
+        _;
+    }
+
 
 
     /// @dev terminate transaction if any of the participants is locked
