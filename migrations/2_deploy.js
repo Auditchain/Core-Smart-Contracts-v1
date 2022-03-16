@@ -11,6 +11,7 @@ const MemberHelpers = artifacts.require('../build/contracts/MemberHelpers.sol');
 const DepositModifiers = artifacts.require('../build/contracts/DepositModifiers.sol');
 const NFT = artifacts.require('./RulesERC721Token.sol');
 const NodeOperations = artifacts.require('./NodeOperations.sol');
+const Queue = artifacts.require("./Queue.sol");
 
 const Timelock = artifacts.require('./Governance/Timelock.sol');
 
@@ -89,6 +90,9 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
   console.log("token address:", token.address);
 
+  await deployer.deploy(Queue);
+  let queue = await Queue.deployed();
+
   // await deployer.deploy(Members, token.address, platformAddress);
   await deployer.deploy(Members, platformAddress);
   let members = await Members.deployed();
@@ -114,10 +118,10 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
 
-  await deployer.deploy(Cohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address);
+  await deployer.deploy(Cohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address, queue.address);
   let cohort = await Cohort.deployed();
 
-  await deployer.deploy(NoCohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address);
+  await deployer.deploy(NoCohort, members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address, queue.address);
   let noCohort = await NoCohort.deployed();
 
 
@@ -133,24 +137,6 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
 
 
 
-
-
-  // front format
-
-  console.log("\n\n Front (Bogdan's testing suit) format" + "\n\n");
-
-  console.log("\n\n" + '"AUDT_TOKEN_ADDRESS":"' + token.address + '",');
-  console.log('"MEMBERS_ADDRESS":"' + members.address + '",');
-  console.log('"MEMBER_HELPERS_ADDRESS":"' + memberHelpers.address + '",');
-  console.log('"DEPOSIT_MODIFIERS_ADDRESS":"' + depositModifiers.address + '",');
-  console.log('"COHORT_FACTORY_ADDRESS":"' + cohortFactory.address + '",');
-  console.log('"VALIDATIONS_COHORT_ADDRESS":"' + cohort.address + '",');
-  console.log('"VALIDATIONS_NO_COHORT_ADDRESS":"' + noCohort.address + '",');
-  console.log('"NODE_OPERATIONS_ADDRESS":"' + nodeOperations.address + '",');
-  console.log('"GOVERNOR_ALPHA_ADDRESS":"' + gov.address + '",');
-  console.log('"TIMELOCK_ADDRESS":"' + timelock.address + '",');
-  console.log('"NFT":"' + nft.address + '"' + "\n\n");
-
   // env format
   console.log("\n\n" + ".env format" + "\n\n");
 
@@ -164,6 +150,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('VALIDATIONS_COHORT_ADDRESS=' + cohort.address);
   console.log('VALIDATIONS_NO_COHORT_ADDRESS=' + noCohort.address);
   console.log('NODE_OPERATIONS_ADDRESS=' + nodeOperations.address);
+  console.log('QUEUE_ADDRESS=' + queue.address);
   console.log('GOVERNOR_ALPHA_ADDRESS=' + gov.address);
   console.log('TIMELOCK_ADDRESS=' + timelock.address);
   console.log('RULES_NFT_ADDRESS=' + nft.address);
@@ -181,6 +168,7 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   console.log('"VALIDATIONS_COHORT_ADDRESS":"' + cohort.address + '",');
   console.log('"VALIDATIONS_NO_COHORT_ADDRESS":"' + noCohort.address + '",')
   console.log('"NODE_OPERATIONS_ADDRESS":"' + nodeOperations.address + '",');
+  console.log('"QUEUE_ADDRESS":"' + queue.address + '",');
   console.log('"GOVERNOR_ALPHA_ADDRESS":"' + gov.address + '",');
   console.log('"TIMELOCK_ADDRESS":"' + timelock.address + '",');
   console.log('"RULES_NFT_ADDRESS":"' + nft.address + '",' + "\n\n");
@@ -392,6 +380,28 @@ module.exports = async function (deployer, network, accounts) { // eslint-disabl
   await token.transfer(validator14, validatorTokenAmount, { from: admin });
   await token.transfer(validator15, validatorTokenAmount, { from: admin });
   await token.transfer(validator16, validatorTokenAmount, { from: admin });
+
+  await token.approve(MemberHelpers.address, "25000000000000000000000", {from:  validator1});
+  await memberHelpers.stake("25000000000000000000000", {from:validator1});
+
+
+  await token.approve(MemberHelpers.address, "25000000000000000000000", {from:  validator2});
+  await memberHelpers.stake("25000000000000000000000", {from:validator2});
+
+  await token.approve(MemberHelpers.address, "25000000000000000000000", {from:  validator3});
+  await memberHelpers.stake("25000000000000000000000", {from:validator3});
+
+  await token.approve(MemberHelpers.address, "25000000000000000000000", {from:  dataSubscriber1});
+  await memberHelpers.stake("25000000000000000000000", {from:dataSubscriber1});
+
+
+  await nodeOperations.toggleNodeOperator({from:  validator1});
+  await nodeOperations.toggleNodeOperator({from:  validator2});
+  await nodeOperations.toggleNodeOperator({from:  validator3});
+
+
+  // await token.approve(memberHelpers.address, validatorTokenAmount, {from:validator1} );
+  // await memberHelpers.stake(validatorTokenAmount, {from:validator1});
 
   console.log("FINISHED");
 
