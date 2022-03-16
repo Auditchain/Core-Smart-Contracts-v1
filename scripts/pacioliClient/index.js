@@ -65,6 +65,12 @@ const pacioli = function(){
                     if (error) 
                         reject(error.code+"\nSTDERR:"+stderr);
                     else {
+                        if (ENV.SHOW_PACIOLI_OUTPUT){
+                            console.log("Pacioli stdout:");
+                            console.log(""+stdout);
+                            console.log("Pacioli stderr:");
+                            console.log(""+stderr);
+                        }
                         var result = JSON.parse(fs.readFileSync(tmpFile));
                         fs.unlink(tmpFile,function(){});
                         resolve(result); 
