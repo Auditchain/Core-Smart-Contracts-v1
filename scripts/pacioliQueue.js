@@ -54,6 +54,8 @@ const queue = process.env.QUEUE_ADDRESS;
 let lastTransaction;
 let validatorDetails = null;
 let agentBornAT;
+let intervalSize = 7000;
+let sleepTime = 1000;
 
 
 const provider = new Web3WsProvider(process.env.WEBSOCKET_PROVIDER, {
@@ -79,6 +81,7 @@ let mutex = true;
 let waitingNum = 0;
 let setIntervalId;
 let setVoteIntervalId;
+let queueContractUpdate;
 
 // this may help with some web 3 providers with brittle web sockets connections:
 // const agentBornAT = Date.now();
@@ -151,14 +154,16 @@ async function fetchValidatorDetails(key) {
 async function setUpContracts(account) {
 
 
-    // providerForUpdate = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
-    providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. xx`
+    providerForUpdate = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
+    //providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. xx`
 
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
     membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
+    queueContractUpdate = new web3Update.eth.Contract(QUEUE["abi"], queue);
+
     // queueContract = new web3Update.eth.Contract(QUEUE["abi"], queue);
 
     owner = providerForUpdate.addresses[0];
@@ -323,8 +328,8 @@ async function validate(documentHash, initTime, choice, trxHash, valUrl, reportH
             });
     } else {
 
-        console.log("--------------------------------Waiting for 4 seconds validate");
-        await sleep(4000);
+        console.log("--------------------------------Waiting for " +  sleepTime /1000 + " seconds validate");
+        await sleep(sleepTime);
         await validate(documentHash, initTime, choice, trxHash, valUrl, reportHash, subscriber);
     }
 
@@ -393,7 +398,7 @@ async function checkHash(event) {
             else {
 
                 console.log("[8. " + times + "  " + event.transactionHash + "] It will wait for 5 sec");
-                await sleep(5000);
+                await sleep(sleepTime);
                 validation = await nonCohortValidate.methods.collectValidationResults(validationHash).call();
                 console.log("[8. " + times + "]" + event.transactionHash + "] Attempting Validation again");
                 i = -1;
@@ -418,21 +423,17 @@ async function checkHash(event) {
 
 async function voteWinner(winners, votes, validationHash) {
 
+    mutex = false;
     const nonce = await web3.eth.getTransactionCount(owner);
     console.log("Nonce value from VoteWinner:", nonce);
-    mutex = false;
     nonCohortValidate.methods.voteWinner(winners, votes, validationHash)
         .send({ from: owner, gas: 800000, nonce: nonce })
         .on("receipt", function (receipt) {
             console.log("[11 " + receipt.transactionHash + "] Verification of winners completed...  ");
-            // nonce++;nonce
             mutex = true;
-
         })
         .on("error", function (error) {
             mutex = true;
-            // nonce++;
-
             console.log("An error occurred in voteWinner for transaction ", error)
         });
 }
@@ -444,27 +445,22 @@ async function returnNextValidation(vHash) {
     let nextValidationHash;
 
     if (vHash)
-        nextValidationHash = await queueContract.methods.getValidationToProcess(lastValidationHash).call();
+        nextValidationHash = await queueContract.methods.getValidationToProcess(vHash).call();
     else
         nextValidationHash = await queueContract.methods.getNextValidation().call();
 
 
     while (!Done) {
-
-
         let isValidated = await nonCohortValidate.methods.isValidated(nextValidationHash).call({ from: owner });
-        // console.log("is validated", isValidated);
 
         if (isValidated == 0) {
             Done = true;
-
         }
         else if (nextValidationHash == "0x0000000000000000000000000000000000000000000000000000000000000000")
             Done = true;
         else {
             nextValidationHash = await queueContract.methods.getValidationToProcess(nextValidationHash).call();
             console.log("Looking for unprocessed validation", nextValidationHash);
-
         }
     }
 
@@ -479,33 +475,23 @@ async function returnNextValidationForVote(vHash) {
 
 
     if (vHash)
-        nextValidationHash = await queueContract.methods.getValidationToVote(lastValidationHash).call();
+        nextValidationHash = await queueContract.methods.getValidationToVote(vHash).call();
     else
         nextValidationHash = await queueContract.methods.getNextValidationToVote().call();
 
 
     while (!Done) {
-
-
         let hasVoted = await nonCohortValidate.methods.hasVoted(nextValidationHash).call({ from: owner });
-        // console.log("has voted", hasVoted);
-
         if (!hasVoted) {
-            // console.log("In the loop record to vote  found", nextValidationHash);
             Done = true;
-
         }
         else if (nextValidationHash == "0x0000000000000000000000000000000000000000000000000000000000000000")
             Done = true;
         else {
             nextValidationHash = await queueContract.methods.getValidationToVote(nextValidationHash).call();
-            // console.log("Looking for unprocessed vote", nextValidationHash);
-
         }
     }
-
     return nextValidationHash;
-
 }
 
 async function checkValQueue(lastValidationHash) {
@@ -522,7 +508,7 @@ async function checkValQueue(lastValidationHash) {
             validationHash = await returnNextValidation();
 
             let head = await queueContract.methods.head().call();
-          
+
             if ((lastValidationHash != validationHash)
                 && (validationHash != "0x0000000000000000000000000000000000000000000000000000000000000000")) {
 
@@ -533,23 +519,23 @@ async function checkValQueue(lastValidationHash) {
                 });
 
                 const values = validationInitialized[0].returnValues;
-                const trxHash = values.transactionHash;
-              
+                const trxHash = validationInitialized[0].transactionHash;
+
                 console.log("Queue called:", queueSize);
                 await executeVerification(values.url, trxHash, values.documentHash, values.initTime, values.user);
                 await checkValQueue(validationHash);
 
             } else {
-                console.log("Queue called and ignored");
+                console.log("Queue called from validation and ignored");
                 setIntervalId = setInterval(
-                    () => (checkValQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
-                    5000);
+                    () => (checkValQueue(validationHash).then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
+                    intervalSize);
             }
         } else {
-            console.log("Queue called and is empty");
+            console.log("Queue called from validation and is empty");
             setIntervalId = setInterval(
                 () => (checkValQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
-                5000);
+                intervalSize);
         }
     } catch (error) {
 
@@ -564,12 +550,12 @@ async function checkVoteQueue(lastValidationHash) {
 
         clearInterval(setVoteIntervalId);
         const queueSize = await queueContract.methods.returnQueueSize().call();
-        console.log("queue size from vote:", queueSize.toString());
+        // console.log("queue size from vote:", queueSize.toString());
         let validationHash;
 
         if (Number(queueSize) > 0) {
             validationHash = await returnNextValidationForVote();
-           
+
             console.log("Previous validation hash in vote", lastValidationHash);
             console.log("validation hash in vote", validationHash);
             if ((lastValidationHash != validationHash)
@@ -592,13 +578,13 @@ async function checkVoteQueue(lastValidationHash) {
                 console.log("Queue called and ignored in vote");
                 setVoteIntervalId = setInterval(
                     () => (checkVoteQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
-                    5000);
+                    intervalSize);
             }
         } else {
-            console.log("Queue called and is empty in vote");
+            console.log("Queue called from vote and is empty");
             setVoteIntervalId = setInterval(
                 () => (checkVoteQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
-                5000);
+                intervalSize);
         }
     } catch (error) {
 
@@ -625,11 +611,11 @@ async function executeVote(values) {
 
     if (mutex) {
         await voteWinner(winners, votes, values.returnValues.validationHash);
-      
+
     } else {
 
-        console.log("--------------------------------Waiting for 4 seconds RequestExecuted")
-        await sleep(4000);
+        console.log("--------------------------------Waiting for " +  sleepTime /1000 + " seconds RequestExecuted")
+        await sleep(sleepTime);
         await voteWinner(winners, votes, values.returnValues.validationHash);
     }
 }
@@ -644,23 +630,23 @@ async function startProcess() {
     let myArgs = process.argv.slice(2);
 
     setUpContracts(myArgs[0]);
-    // setUpNodeOperator(myArgs[0]);
 
     validatorDetails = await fetchValidatorDetails(myArgs[0]);
     console.log("Details known about this node:");
     console.log(validatorDetails);
 
-    // owner = providerForUpdate.addresses[0];
     nonce = await web3.eth.getTransactionCount(owner);
 
     const validationStruct = await nodeOperationsPreEvent.methods.nodeOpStruct(owner).call();
     const isNodeOperator = validationStruct.isNodeOperator;
     const isDelegating = validationStruct.isDelegating;
 
-
+    // nonce = await web3.eth.getTransactionCount(owner);
+    // await queueContractUpdate.methods.removeFromQueue("0x8da8e1c87697b694f7b847e866c83cb380d7f61e73985571d7cd7107dc4e7a45").send({ from: owner, gas: 900000, nonce: nonce });
     if (isNodeOperator && !isDelegating) {
         console.log("Process started.");
         agentBornAT = Date.now();
+
         await checkValQueue();
         await checkVoteQueue();
         nonCohort.events.PaymentProcessed({})
@@ -681,3 +667,4 @@ async function startProcess() {
 }
 
 startProcess();
+
