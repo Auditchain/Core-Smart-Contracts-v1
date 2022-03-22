@@ -55,7 +55,8 @@ let lastTransaction;
 let validatorDetails = null;
 let agentBornAT;
 let intervalSize = 7000;
-let sleepTime = 1000;
+let sleepTime = 7000;
+let zeroTransaction = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 
 const provider = new Web3WsProvider(process.env.WEBSOCKET_PROVIDER, {
@@ -155,7 +156,7 @@ async function setUpContracts(account) {
 
 
     providerForUpdate = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
-    //providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. xx`
+    // providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. xx`
 
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
@@ -172,20 +173,20 @@ async function setUpContracts(account) {
 
 /** 
  * @dev Call Pacioli endpoint and receive report, then store it on IPFS
- * @param  {contains information about the location of the submitted report on IPFS by the data subscriber } metadatatUrl
+ * @param  {contains information about the location of the submitted report on IPFS by the data subscriber }
  * @param  {blockchain transaction hash} trxHash
  * @returns {location of Pacioli report on IPFS and result of validation valid or not}
  */
-async function verifyPacioli1(metadatatUrl, trxHash) {
+async function verifyPacioli(metadatatUrl, trxHash) {
 
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-    //     .catch(error => console.log("ERROR: " + error));
-    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
         .catch(error => console.log("ERROR: " + error));
+    // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    //     .catch(error => console.log("ERROR: " + error));
 
 
     if (!reportContent)
@@ -210,10 +211,10 @@ async function verifyPacioli1(metadatatUrl, trxHash) {
 }
 
 // TODO:  Use only for testing to bypass calling Pacioli
-async function verifyPacioli(metadatatUrl, trxHash) {
+// async function verifyPacioli(metadatatUrl, trxHash) {
 
-    return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-}
+//     return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
+// }
 
 
 /**
@@ -297,11 +298,7 @@ async function validate(documentHash, initTime, choice, trxHash, valUrl, reportH
     if (mutex) {
         mutex = false;
         const nonce = await web3.eth.getTransactionCount(owner);
-
-        // if (checkNonce > nonce)
-        //     nonce = checkNonce;
-
-        console.log("Nonce value from validate:", nonce);
+        // console.log("Nonce value from validate:", nonce);
 
         nonCohortValidate.methods
             .validate(documentHash, initTime, subscriber, choice, valUrl, reportHash)
@@ -328,7 +325,7 @@ async function validate(documentHash, initTime, choice, trxHash, valUrl, reportH
             });
     } else {
 
-        console.log("--------------------------------Waiting for " +  sleepTime /1000 + " seconds validate");
+        console.log("Waiting for " + sleepTime / 1000 + " seconds in  validate()");
         await sleep(sleepTime);
         await validate(documentHash, initTime, choice, trxHash, valUrl, reportHash, subscriber);
     }
@@ -425,7 +422,7 @@ async function voteWinner(winners, votes, validationHash) {
 
     mutex = false;
     const nonce = await web3.eth.getTransactionCount(owner);
-    console.log("Nonce value from VoteWinner:", nonce);
+    // console.log("Nonce value from VoteWinner:", nonce);
     nonCohortValidate.methods.voteWinner(winners, votes, validationHash)
         .send({ from: owner, gas: 800000, nonce: nonce })
         .on("receipt", function (receipt) {
@@ -434,35 +431,37 @@ async function voteWinner(winners, votes, validationHash) {
         })
         .on("error", function (error) {
             mutex = true;
-            console.log("An error occurred in voteWinner for transaction ", error)
+            console.log("An error occurred in voteWinner  ", error)
         });
 }
 
 async function returnNextValidation(vHash) {
 
+    console.log("Looking for unprocessed validation starting @", vHash);
+
     let Done = false;
-    let validationHash;
     let nextValidationHash;
 
-    if (vHash)
+    if (vHash && vHash != zeroTransaction)
         nextValidationHash = await queueContract.methods.getValidationToProcess(vHash).call();
     else
         nextValidationHash = await queueContract.methods.getNextValidation().call();
 
-
     while (!Done) {
         let isValidated = await nonCohortValidate.methods.isValidated(nextValidationHash).call({ from: owner });
-
         if (isValidated == 0) {
             Done = true;
         }
-        else if (nextValidationHash == "0x0000000000000000000000000000000000000000000000000000000000000000")
+        else if (nextValidationHash == zeroTransaction)
             Done = true;
         else {
             nextValidationHash = await queueContract.methods.getValidationToProcess(nextValidationHash).call();
-            console.log("Looking for unprocessed validation", nextValidationHash);
         }
     }
+
+    if (nextValidationHash != zeroTransaction)
+        console.log("Validation to process found", nextValidationHash);
+
 
     return nextValidationHash;
 
@@ -473,24 +472,30 @@ async function returnNextValidationForVote(vHash) {
     let Done = false;
     let nextValidationHash;
 
+    console.log("Looking for validation to vote on starting @", vHash);
 
-    if (vHash)
+    if (vHash && vHash != zeroTransaction) {
         nextValidationHash = await queueContract.methods.getValidationToVote(vHash).call();
+    }
     else
         nextValidationHash = await queueContract.methods.getNextValidationToVote().call();
 
-
+    if (nextValidationHash != zeroTransaction)
+        console.log("next validation from returnNextValidationForVote:  ", nextValidationHash);
     while (!Done) {
         let hasVoted = await nonCohortValidate.methods.hasVoted(nextValidationHash).call({ from: owner });
         if (!hasVoted) {
             Done = true;
         }
-        else if (nextValidationHash == "0x0000000000000000000000000000000000000000000000000000000000000000")
+        else if (nextValidationHash == zeroTransaction)
             Done = true;
         else {
             nextValidationHash = await queueContract.methods.getValidationToVote(nextValidationHash).call();
         }
     }
+    if (nextValidationHash != zeroTransaction)
+        console.log("Validation to vote on found", nextValidationHash);
+
     return nextValidationHash;
 }
 
@@ -500,17 +505,16 @@ async function checkValQueue(lastValidationHash) {
 
         clearInterval(setIntervalId);
         const queueSize = await queueContract.methods.returnQueueSize().call();
-        console.log("queue size:", queueSize.toString());
+        console.log("Queue size:", queueSize.toString());
         let validationHash;
-        let validationValues;
 
         if (Number(queueSize) > 0) {
-            validationHash = await returnNextValidation();
+            validationHash = await returnNextValidation(lastValidationHash);
 
             let head = await queueContract.methods.head().call();
 
             if ((lastValidationHash != validationHash)
-                && (validationHash != "0x0000000000000000000000000000000000000000000000000000000000000000")) {
+                && (validationHash != zeroTransaction)) {
 
                 const validationInitialized = await nonCohortValidate.getPastEvents("ValidationInitialized", {
                     filter: { validationHash: validationHash },
@@ -521,18 +525,17 @@ async function checkValQueue(lastValidationHash) {
                 const values = validationInitialized[0].returnValues;
                 const trxHash = validationInitialized[0].transactionHash;
 
-                console.log("Queue called:", queueSize);
                 await executeVerification(values.url, trxHash, values.documentHash, values.initTime, values.user);
                 await checkValQueue(validationHash);
 
             } else {
-                console.log("Queue called from validation and ignored");
+                console.log("Queue called from checkValQueue and ignored");
                 setIntervalId = setInterval(
                     () => (checkValQueue(validationHash).then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
                     intervalSize);
             }
         } else {
-            console.log("Queue called from validation and is empty");
+            console.log("Queue called from checkValQueue and is empty");
             setIntervalId = setInterval(
                 () => (checkValQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
                 intervalSize);
@@ -550,16 +553,16 @@ async function checkVoteQueue(lastValidationHash) {
 
         clearInterval(setVoteIntervalId);
         const queueSize = await queueContract.methods.returnQueueSize().call();
-        // console.log("queue size from vote:", queueSize.toString());
+        console.log("Queue size from checkVoteQueue:", queueSize.toString());
         let validationHash;
 
         if (Number(queueSize) > 0) {
-            validationHash = await returnNextValidationForVote();
+            validationHash = await returnNextValidationForVote(lastValidationHash);
 
-            console.log("Previous validation hash in vote", lastValidationHash);
-            console.log("validation hash in vote", validationHash);
             if ((lastValidationHash != validationHash)
-                && (validationHash != "0x0000000000000000000000000000000000000000000000000000000000000000")) {
+                && (validationHash != zeroTransaction)) {
+
+                console.log("check vote queue", validationHash);
 
                 const requestExecuted = await nonCohortValidate.getPastEvents("RequestExecuted", {
                     filter: { validationHash: validationHash },
@@ -567,21 +570,22 @@ async function checkVoteQueue(lastValidationHash) {
                     toBlock: "latest",
                 });
 
+                // console.log("request executed, ", requestExecuted)
+
                 const values = requestExecuted[0];
                 const trxHash = values.transactionHash;
 
-                console.log("Queue called from vote:", queueSize);
                 await executeVote(values);
                 await checkVoteQueue(validationHash);
 
             } else {
-                console.log("Queue called and ignored in vote");
+                console.log("Queue called from checkVoteQueue and ignored");
                 setVoteIntervalId = setInterval(
                     () => (checkVoteQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
                     intervalSize);
             }
         } else {
-            console.log("Queue called from vote and is empty");
+            console.log("Queue called from checkVoteQueue and is empty");
             setVoteIntervalId = setInterval(
                 () => (checkVoteQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
                 intervalSize);
@@ -614,7 +618,7 @@ async function executeVote(values) {
 
     } else {
 
-        console.log("--------------------------------Waiting for " +  sleepTime /1000 + " seconds RequestExecuted")
+        console.log("Waiting for " + sleepTime / 1000 + " seconds in executeVote")
         await sleep(sleepTime);
         await voteWinner(winners, votes, values.returnValues.validationHash);
     }
@@ -642,7 +646,7 @@ async function startProcess() {
     const isDelegating = validationStruct.isDelegating;
 
     // nonce = await web3.eth.getTransactionCount(owner);
-    // await queueContractUpdate.methods.removeFromQueue("0x8da8e1c87697b694f7b847e866c83cb380d7f61e73985571d7cd7107dc4e7a45").send({ from: owner, gas: 900000, nonce: nonce });
+    // await queueContractUpdate.methods.removeFromQueue("0xe92485a0aaa38b9ba188ee1afc240b088ead4e90b916c2b0d3759e5adad7fae1").send({ from: owner, gas: 900000, nonce: nonce });
     if (isNodeOperator && !isDelegating) {
         console.log("Process started.");
         agentBornAT = Date.now();
