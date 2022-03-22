@@ -48,26 +48,29 @@ const mnemonic = process.env.MNEMONIC;
 const nonCohortAddress = process.env.VALIDATIONS_NO_COHORT_ADDRESS;
 const nodeOperationsAddress = process.env.NODE_OPERATIONS_ADDRESS;
 const members = process.env.MEMBER_ADDRESS;
+let lastTransaction;
 
-const  provider =  new Web3WsProvider(process.env.WEBSOCKET_PROVIDER, {
+const provider = new Web3WsProvider(process.env.WEBSOCKET_PROVIDER, {
     clientConfig: {
         keepalive: true,
         keepaliveInterval: 60000, // ms
         timeout: 20000, // ms
-     },
-     // Enable auto reconnection
-     reconnect: {
+    },
+    // Enable auto reconnection
+    reconnect: {
         auto: true,
         delay: 5000, // ms
         maxAttempts: 5,
         onTimeout: true
-     }
-  })
+    }
+})
 
 //TODO: Remove this line once verified that replacement above is fixed.
 // const provider = new Web3.providers.WebsocketProvider(process.env.WEBSOCKET_PROVIDER); // e.g. 'ws://localhost:8545'
 const web3 = new Web3(provider);
 let nonce;
+let mutex = true;
+let waitingNum = 0;
 
 
 // this may help with some web 3 providers with brittle web sockets connections:
@@ -95,37 +98,37 @@ const GEO_CACHE_FILENAME = ".myLocation.json";
 // cf. https://www.ip2location.com/web-service/ip2location :
 const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION_KEY}&package=WS5`;
 
-async function fetchValidatorDetails(key){
+async function fetchValidatorDetails(key) {
     const web3_reader = web3;
     const owner = providerForUpdate.addresses[0];
 
     //const entityName = await membersContract.methods.user(owner, 1).call();
     var entityName;
-    try{ entityName = await membersContract.methods.user(owner,1).call()} 
-    catch(ex){console.log("EXCEPTION in fetchValidatorDetails:"+ex)};
+    try { entityName = await membersContract.methods.user(owner, 1).call() }
+    catch (ex) { console.log("EXCEPTION in fetchValidatorDetails:" + ex) };
     //BUG in this version: EXCEPTION in fetchValidatorDetails:Error: data out-of-bounds (length=3, offset=32, code=BUFFER_OVERRUN, version=abi/5.0.7)
     // To reproduce:
     // node scripts/pacioliAgent.js 0xd66f2ee9bc1eda34087ccd5e5ac699194b7a34f12fbda8e115fb2506e3740429
-    
-    var details = {nickname:entityName, address:owner};
-    try{
-        if (process.env.LOCATION_KEY){
+
+    var details = { nickname: entityName, address: owner };
+    try {
+        if (process.env.LOCATION_KEY) {
             var myLocation;
-            if (fs.existsSync(GEO_CACHE_FILENAME)){
+            if (fs.existsSync(GEO_CACHE_FILENAME)) {
                 console.log("Loading geo location from cache...");
                 myLocation = JSON.parse(fs.readFileSync(GEO_CACHE_FILENAME));
             } else {
                 console.log(`Querying IP locator service at ${ipLocatorURL}...`);
                 myLocation = (await axios.get(ipLocatorURL)).data;
-                fs.writeFileSync(GEO_CACHE_FILENAME,JSON.stringify(myLocation));
-            }   
+                fs.writeFileSync(GEO_CACHE_FILENAME, JSON.stringify(myLocation));
+            }
             details['country'] = myLocation.country_name;
             details['city'] = myLocation.city_name;
             details['latitude'] = myLocation.latitude;
             details['longitude'] = myLocation.longitude;
         }
-    } catch(e){
-        console.log("Could not georeference: "+e);
+    } catch (e) {
+        console.log("Could not georeference: " + e);
     }
     return details;
 }
@@ -137,12 +140,15 @@ async function fetchValidatorDetails(key){
 async function setUpContracts(account) {
 
 
-    providerForUpdate = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
+    // providerForUpdate = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
+    providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. xx`
+
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperations = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
     nodeOperationsPreEvent = new web3Update.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
     membersContract = new web3Update.eth.Contract(MEMBERS["abi"], members);
+    owner = providerForUpdate.addresses[0];
 }
 
 
@@ -152,7 +158,7 @@ async function setUpContracts(account) {
  * @param  {blockchain transaction hash} trxHash
  * @returns {location of Pacioli report on IPFS and result of validation valid or not}
  */
-async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli1(metadatatUrl, trxHash) {
 
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
@@ -186,10 +192,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 }
 
 // TODO:  Use only for testing to bypass calling Pacioli
-// async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli(metadatatUrl, trxHash) {
 
-//     return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-// }
+    return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
+}
 
 
 /**
@@ -251,6 +257,8 @@ async function executeVerification(url, trxHash, documentHash, initTime, subscri
     }
 
     const [metaDataLink, reportHash] = await uploadMetadataToIpfs(url, reportPacioliIPFSUrl, trxHash, isValid);
+
+    console.log("Created metadata file for tx:", trxHash)
     await validate(documentHash, initTime, isValid ? 1 : 2, trxHash, metaDataLink, reportHash, subscriber);
 }
 
@@ -265,30 +273,50 @@ async function executeVerification(url, trxHash, documentHash, initTime, subscri
 async function validate(documentHash, initTime, choice, trxHash, valUrl, reportHash, subscriber) {
 
     console.log("[6 " + trxHash + "] Waiting for validation transaction to complete... ");
-    const owner = providerForUpdate.addresses[0];
-    const checkNonce = await web3.eth.getTransactionCount(owner);
 
-    if (checkNonce > nonce)
-        nonce = checkNonce;
 
-    nonCohortValidate.methods
-        .validate(documentHash, initTime, subscriber, choice, valUrl, reportHash)
-        .send({ from: owner, gas: 800000, nonce: nonce })
-        .on("receipt", function (receipt) {
-            const event = receipt.events.ValidatorValidated.returnValues;
-            let msg;
-            if (choice == 1)
-                console.log("[7 " + trxHash + "] Request has been validated as acceptable.")
-            else
-                console.log("[7 " + trxHash + "] Request has been validated as adverse");
-        })
-        .on("error", function (error) {
-            console.log("An error occurred:", error)
-        });
 
-    nonce++;
-    validationCount++
-    console.log("Total validation count:" + validationCount);
+    if (mutex) {
+        mutex = false;
+        const nonce = await web3.eth.getTransactionCount(owner);
+
+        // if (checkNonce > nonce)
+        //     nonce = checkNonce;
+
+        console.log("Nonce value from validate:", nonce);
+
+        nonCohortValidate.methods
+            .validate(documentHash, initTime, subscriber, choice, valUrl, reportHash)
+            .send({ from: owner, gas: 900000, nonce: nonce })
+            .on("receipt", function (receipt) {
+                const event = receipt.events.ValidatorValidated.returnValues;
+                let msg;
+
+                console.log("validation mumbai hash:", receipt.transactionHash)
+                if (choice == 1)
+                    console.log("[7 " + trxHash + "] Request has been validated as acceptable.")
+                else
+                    console.log("[7 " + trxHash + "] Request has been validated as adverse");
+
+                validationCount++
+                console.log("Total validation count:" + validationCount);
+                mutex = true;
+                // nonce++;
+
+            })
+            .on("error", function (error) {
+                mutex = true;
+                // nonce++;
+                console.log("An error occurred in [validate] for transaction " + trxHash + "  ", error)
+            });
+    } else {
+
+        console.log("--------------------------------Waiting for 3 seconds validate");
+        await sleep(4000);
+        await validate(documentHash, initTime, choice, trxHash, valUrl, reportHash, subscriber);
+    }
+
+
 }
 
 
@@ -316,7 +344,7 @@ async function checkHash(event) {
     const winnerSelected = Math.floor((Math.random() * count));
     const winnerAddress = event.returnValues.winners[winnerSelected];
     const validationHash = event.returnValues.validationHash;
-    const owner = providerForUpdate.addresses[0];
+    // const owner = providerForUpdate.addresses[0];
 
     console.log("[8 " + event.transactionHash + "] Verifying winner validation for account:" + winnerAddress)
 
@@ -375,6 +403,27 @@ async function checkHash(event) {
     return [vote, winnerAddress];
 }
 
+async function voteWinner(winners, votes, validationHash) {
+
+    const nonce = await web3.eth.getTransactionCount(owner);
+    console.log("Nonce value from VoteWinner:", nonce);
+    mutex = false;
+    nonCohortValidate.methods.voteWinner(winners, votes, validationHash)
+        .send({ from: owner, gas: 800000, nonce: nonce })
+        .on("receipt", function (receipt) {
+            console.log("[11 " + receipt.transactionHash + "] Verification of winners completed...  ");
+            // nonce++;
+            mutex = true;
+
+        })
+        .on("error", function (error) {
+            mutex = true;
+            // nonce++;
+
+            console.log("An error occurred in voteWinner for transaction ", error)
+        });
+}
+
 var validatorDetails = null;
 
 /**
@@ -393,12 +442,13 @@ async function startProcess() {
     console.log("Details known about this node:");
     console.log(validatorDetails);
 
-    owner = providerForUpdate.addresses[0];
+    // owner = providerForUpdate.addresses[0];
     nonce = await web3.eth.getTransactionCount(owner);
 
     const validationStruct = await nodeOperationsPreEvent.methods.nodeOpStruct(owner).call();
     const isNodeOperator = validationStruct.isNodeOperator;
     const isDelegating = validationStruct.isDelegating;
+
 
     if (isNodeOperator && !isDelegating) {
         console.log("Process started.");
@@ -412,7 +462,31 @@ async function startProcess() {
                 const documentHash = event.returnValues.documentHash;
                 const initTime = event.returnValues.initTime;
                 const subscriber = event.returnValues.user;
-                await executeVerification(url, trxHash, documentHash, initTime, subscriber);
+                const validationHash = event.returnValues.validationHash;
+                const isValidated = await nonCohort.methods.isValidated(validationHash).call({from: owner});
+                console.log("is validated:", isValidated);
+                // console.log("document hash:", documentHash);
+
+
+                console.log("actual tx hash:", trxHash);
+                console.log("documentHash:", documentHash);
+                console.log("initTime:", initTime);
+                console.log("validationHash:", validationHash);
+
+
+
+                // if (isValidated == 0 ){
+                if (trxHash != lastTransaction) {
+                    // console.log("last tx hash:", lastTransaction);
+                    await executeVerification(url, trxHash, documentHash, initTime, subscriber);
+                }
+
+
+                lastTransaction = trxHash;
+
+                // else
+                //     console.log("already validated");
+
                 // console.log(`We have ${nonCohort.events.ValidationInitialized().listenerCount('data')} listener(s) for the ValidationInitialized event`);
             })
             .on('error', async function (error, event) {
@@ -443,33 +517,42 @@ async function startProcess() {
                 if (winners.length > 0) {
                     console.log("[10 " + event.transactionHash + "] Awaiting verification of winners...  ");
 
-                    const checkNonce = await web3.eth.getTransactionCount(owner);
-                    if (checkNonce > nonce)
-                        nonce = checkNonce;
 
-                    nonCohortValidate.methods.voteWinner(winners, votes, validationHash)
-                        .send({ from: owner, gas: 800000, nonce: nonce })
-                        .on("receipt", function (receipt) {
-                            console.log("[11 " + event.transactionHash + "] Verification of winners completed...  ");
 
-                        })
-                        .on("error", function (error) {
-                            console.log("An error occurred:", error)
-                        });
-                    nonce++;
+                    if (mutex) {
+
+                        // const nonce = await web3.eth.getTransactionCount(owner);
+                        // // if (checkNonce > nonce)
+                        // //     nonce = checkNonce;
+
+
+
+                        // console.log("Nonce value from RequestExecuted:", nonce)
+
+                        // mutex = false;
+                        await voteWinner(winners, votes, validationHash);
+                        // mutex = true;
+
+
+                    } else {
+
+                        console.log("--------------------------------Waiting for 3 seconds RequestExecuted")
+                        await sleep(4000);
+                        await voteWinner(winners, votes, validationHash);
+                    }
                 }
             })
             .on('error', console.error);
 
-        // find out result of payment
-        nonCohort.events.PaymentProcessed({})
-            .on('data', async function (event) {
-                console.log("[12 " + event.transactionHash + "] Winning validator paid...  ");
-                console.log("address", event.returnValues.winner);
-                console.log("points plus:", event.returnValues.pointsPlus);
-                console.log("points minus:", event.returnValues.pointsMinus);
-            })
-            .on('error', console.error);
+        //     // find out result of payment
+            nonCohort.events.PaymentProcessed({})
+                .on('data', async function (event) {
+                    console.log("[12 " + event.transactionHash + "] Winning validator paid...  ");
+                    console.log("address", event.returnValues.winner);
+                    console.log("points plus:", event.returnValues.pointsPlus);
+                    console.log("points minus:", event.returnValues.pointsMinus);
+                })
+                .on('error', console.error);
     }
     else if (isDelegating)
         console.log("You can't validate because you are delegating your stake to another member. To become validator, register as Node Operator first.");
