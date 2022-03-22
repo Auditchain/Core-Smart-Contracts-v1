@@ -183,10 +183,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     const reportUrl = JSON.parse(result)["reportUrl"];
 
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-        .catch(error => console.log("ERROR: " + error));
-    // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
     //     .catch(error => console.log("ERROR: " + error));
+    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+        .catch(error => console.log("ERROR: " + error));
 
 
     if (!reportContent)
@@ -293,8 +293,6 @@ async function validate(documentHash, initTime, choice, trxHash, valUrl, reportH
 
     console.log("[6 " + trxHash + "] Waiting for validation transaction to complete... ");
 
-
-
     if (mutex) {
         mutex = false;
         const nonce = await web3.eth.getTransactionCount(owner);
@@ -329,8 +327,6 @@ async function validate(documentHash, initTime, choice, trxHash, valUrl, reportH
         await sleep(sleepTime);
         await validate(documentHash, initTime, choice, trxHash, valUrl, reportHash, subscriber);
     }
-
-
 }
 
 
@@ -418,6 +414,13 @@ async function checkHash(event) {
     return [vote, winnerAddress];
 }
 
+
+/**
+ * @dev {Validator votes who is the winner of validation}
+ * @param  {list of validators who have successfully completed validation} winner
+ * @param  {votes of respective validators} votes
+ * @param  {validation hash of transaction in question} validationHash
+ */
 async function voteWinner(winners, votes, validationHash) {
 
     mutex = false;
@@ -434,6 +437,12 @@ async function voteWinner(winners, votes, validationHash) {
             console.log("An error occurred in voteWinner  ", error)
         });
 }
+
+/**
+ * 
+ * @param {hash of last validation} vHash 
+ * @returns {found hash}
+ */
 
 async function returnNextValidation(vHash) {
 
@@ -467,6 +476,11 @@ async function returnNextValidation(vHash) {
 
 }
 
+/**
+ * @dev returns next validation for a vote
+ * @param {last hash of voted validation} vHash 
+ * @returns {validation hash to vote}
+ */
 async function returnNextValidationForVote(vHash) {
 
     let Done = false;
@@ -499,6 +513,11 @@ async function returnNextValidationForVote(vHash) {
     return nextValidationHash;
 }
 
+
+/**
+ * @dev checks if there is any request in queue for validation
+ * @param {last processed validation hash } lastValidationHash 
+ */
 async function checkValQueue(lastValidationHash) {
 
     try {
@@ -547,6 +566,10 @@ async function checkValQueue(lastValidationHash) {
 
 }
 
+/**
+ * @dev checks if there is any request in queue for a vote of winning validator
+ * @param {last processed validation hash } lastValidationHash 
+ */
 async function checkVoteQueue(lastValidationHash) {
 
     try {
@@ -597,7 +620,10 @@ async function checkVoteQueue(lastValidationHash) {
 
 }
 
-
+/**
+ * @dev It will execute vote on the winners
+ * @param { an object with validators and their choices} values 
+ */
 async function executeVote(values) {
 
     let winners = [];
@@ -625,7 +651,7 @@ async function executeVote(values) {
 }
 
 /**
- * @dev Start listening to events
+ * @dev Setup the environment and schedule processes 
  */
 
 async function startProcess() {
