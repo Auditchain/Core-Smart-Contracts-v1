@@ -27,7 +27,9 @@ module.exports = {
       network_id: "*", // Match any network id
       accounts: 10,
       defaultEtherBalance: 1000,
-      blockTime: 3
+      blockTime: 3,
+      maxFeePerGas: 885000000,
+      baseFeePerGas:875000000
     },
     rinkeby: {
       provider: function () {
@@ -81,12 +83,18 @@ module.exports = {
 
     },
     matic: {
-      provider: () => new HDWalletProvider(MNEMONIC, 'https://polygon-mumbai.infura.io/v3/' + INFURA_KEY),
+      // provider: () => new HDWalletProvider(MNEMONIC, 'https://matic-mumbai.chainstacklabs.com'),
+      provider: () => new HDWalletProvider(MNEMONIC, 'https://polygon-mumbai.g.alchemy.com/v2/H2g1siLIwqCBQMIY052r_vJAejQ_A_V3'),
+
       network_id: 80001,
       confirmations: 1,
       timeoutBlocks: 1800,
       skipDryRun: true,
       chainId: 80001,
+      timeoutBlocks: 50000,
+      networkCheckTimeout: 1000000,
+      skipDryRun: true,
+      blockTime: 3,
     },
     coverage: {
       host: 'localhost',
