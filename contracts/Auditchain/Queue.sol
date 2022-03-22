@@ -176,6 +176,7 @@ contract Queue {
             _link(prevObjectId, removeObject.next);
         }
         delete objects[removeObject.id];
+        queueCount--;
         emit ObjectRemoved(_id);
     }
 
@@ -317,7 +318,7 @@ contract Queue {
     function removeFromQueue(bytes32 _valHash) public {
         uint256 id = findIdForValidationHash(_valHash);
         remove(id);
-        queueCount--;
+       
     }
 
     function setValidatedFlag(bytes32 _valHash)public {
@@ -328,6 +329,17 @@ contract Queue {
 
     function returnQueueSize() public view returns(uint256) {
         return queueCount;
+    }
+
+    function replaceTransaction(bytes32 _valHash, uint256 newPrice) public {
+        removeFromQueue(_valHash);
+        addToQueue(newPrice, _valHash); 
+    }
+
+    function cancelTransaction(bytes32 _valHash) public {
+
+        removeFromQueue(_valHash);
+
     }
 
 
