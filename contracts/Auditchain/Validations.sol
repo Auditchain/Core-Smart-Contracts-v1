@@ -153,10 +153,10 @@ abstract contract Validations is  ReentrancyGuard{
         uint256 currentQuorum = validation.winnerConfirmations * 100 / operatorCount;
         
         if (currentQuorum >= members.requiredQuorum() && validation.winner == address(0)){
-            queue.removeFromQueue(validationHash);
             address winner = validationHelpers.selectWinner(validationHash, winners);
             validation.winner = winner;
             processPayments(validationHash, winner);
+            queue.removeFromQueue(validationHash);
         }
     }
 
@@ -317,8 +317,8 @@ abstract contract Validations is  ReentrancyGuard{
         consensus = validation.consensus;
         validationsCompleted = validation.validationsCompleted;
         winnerConfirmations = validation.winnerConfirmations;
-        paymentSent = winner != address(0);
         winner = validation.winner;
+        paymentSent = winner != address(0);
 
     }
 
