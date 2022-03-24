@@ -48314,10 +48314,285 @@
       "links": {},
       "address": "0x089446041366336eb15A76Dd4D4577e2565C6423",
       "transactionHash": "0x94c79a98c1f26cde16f128f71d019637c3b7b7cb1dc6f2ed732c7ba78f09b325"
+    },
+    "1648124946284": {
+      "events": {
+        "0x789d6ca7c6ba494ee9a2cbda76e410066f2ab37d7bf222e02830f76f977a7d29": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "accessFee",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "audits",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "enterprise",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "enterpriseShare",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogDataSubscriberPaid",
+          "type": "event"
+        },
+        "0x3e4fd36a8c6a5f774423977e7d7e6badc0d7f8972efdaa142830e6048bdcdd52": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "validator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogDataSubscriberValidatorPaid",
+          "type": "event"
+        },
+        "0x037abc98223efd7cb15f107ace271379a203ca8074c377ac5f59197a71d9c060": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "validator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tokens",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "validationHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "LogFeesReceived",
+          "type": "event"
+        },
+        "0x0e22e6ef1196fe27e82986093beb035e9f2f94cb97aa512feb89bba5584d0010": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "validator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tokens",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "validationHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "LogNonCohortPaymentReceived",
+          "type": "event"
+        },
+        "0x71f25b27a282beb06a7ef6b4d9442e51dfe9a1679cd4a24bdc461258a5b63ee5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "requestor",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "winner",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "validationHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogNonCohortValidationPaid",
+          "type": "event"
+        },
+        "0x1a685b956fe761ae8240849ef27481e954f16db54e815dae112f1f9860caeb3a": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tokens",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "enterpriseAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "enterprise",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "validationHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "LogRewardsDeposited",
+          "type": "event"
+        },
+        "0xe0b9e94ab5fbe92a5c1fcdc7f3dba88b173c784bda0772e4998afde008575268": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "subscriber",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "numberOfSubscriptions",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogSubscriptionCompleted",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x9B76be14642f3b2f69588054d5D974153064e1B9",
+      "transactionHash": "0xc9bb38bb1ac35f0018b68aa3e8a829b3ecf2683e565301dca5a773a39fb55e25"
     }
   },
   "schemaVersion": "3.4.1",
-  "updatedAt": "2022-03-22T15:42:42.233Z",
+  "updatedAt": "2022-03-24T12:29:20.552Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

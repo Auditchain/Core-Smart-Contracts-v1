@@ -60530,10 +60530,301 @@
       "links": {},
       "address": "0x7729Fce90B195374A6929d2e8a162F4CFE64A82A",
       "transactionHash": "0x218694ca938425f8eb71c7088a3326f16affe63400d319a6ad1eef3961eb9879"
+    },
+    "1648124946284": {
+      "events": {
+        "0x4b8d562d356022e8b61f63ef35522204f80493a3470e8054809edb86e2c7cc29": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "action",
+              "type": "string"
+            }
+          ],
+          "name": "LogCPAToggled",
+          "type": "event"
+        },
+        "0x91e762b6a3379646d3eb7b17dc3d73070be2f226797f2120f8df1fd23ceea331": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "delegating",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogDelegatedStakeRewardsIncreased",
+          "type": "event"
+        },
+        "0x4c3b375b28d33f6da54f5db9f9e21f32e8dccce22c6b386a5ccd14acab659ad5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "delegating",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newDelegatee",
+              "type": "address"
+            }
+          ],
+          "name": "LogDelegation",
+          "type": "event"
+        },
+        "0xf99dba3a76085484eae2e89cc2e2ee5edffe3f1d25cdd1e6c5757447b9b5b473": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "params",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "action",
+              "type": "string"
+            }
+          ],
+          "name": "LogGovernanceUpdate",
+          "type": "event"
+        },
+        "0xf513c01ff458e6e9c2d933630bffb2ed21fe264c8a1df87e350103c1d5249a92": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "action",
+              "type": "string"
+            }
+          ],
+          "name": "LogNoDelegateToggled",
+          "type": "event"
+        },
+        "0x865cebc4621af692efc5ecb87041bae7eced8c916f529795ddfc7368978d75f7": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "action",
+              "type": "string"
+            }
+          ],
+          "name": "LogNodeOperatorToggled",
+          "type": "event"
+        },
+        "0xaf09fd05a4dac80c46aefb0d434552d1ff107640d2b30ed5fbd9fedb3f99942f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "delegating",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogReferralStakeRewardsIncreased",
+          "type": "event"
+        },
+        "0x1eceec0a0536d861c2e32af951fed5ce132e28eabd91abe6a89c9fdb3d13233c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "delegating",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "delegatee",
+              "type": "address"
+            }
+          ],
+          "name": "LogRemoveDelegation",
+          "type": "event"
+        },
+        "0x7f4591d6aa3e694b1ffc02f7762738dd3ca8e1d7357293b29833ef3136b213bd": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "validator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogStakeRewardsIncreased",
+          "type": "event"
+        },
+        "0x935cd710a2bc7a3db341f3f67ba6abdb9ea572d203b87642e2d3595591527905": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogStakingRewardsClaimed",
+          "type": "event"
+        },
+        "0x4fcc1f6709c7de29c80bcd44f92e9b5548613a2d8ebefacf9fa570d687cce28c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogStakingRewardsTransferredOut",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x0a890b230a960Ba15b4FbD1a269157F649Bf5A99",
+      "transactionHash": "0x28414a203f9e705043ce273be04d3dddb10b7d7069b2243c8f8ce758499b87e5"
     }
   },
   "schemaVersion": "3.4.1",
-  "updatedAt": "2022-03-22T15:42:42.284Z",
+  "updatedAt": "2022-03-24T12:29:20.580Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

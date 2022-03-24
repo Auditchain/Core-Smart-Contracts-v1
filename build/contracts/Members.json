@@ -30412,10 +30412,136 @@
       "links": {},
       "address": "0x7590E68AB5d24A1D2D8958f1C4b08B0b776724F7",
       "transactionHash": "0x30817427266ac9094b1e594d320c510c49547c9595d0fbc19ce9e1f8a6920ef5"
+    },
+    "1648124946284": {
+      "events": {
+        "0xf99dba3a76085484eae2e89cc2e2ee5edffe3f1d25cdd1e6c5757447b9b5b473": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "params",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "action",
+              "type": "string"
+            }
+          ],
+          "name": "LogGovernanceUpdate",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        },
+        "0x8897d4c16f6b907647cc92f3b2f80418ac81581b8e74f9dda595d3910b44c862": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "enum Members.UserType",
+              "name": "userType",
+              "type": "uint8"
+            }
+          ],
+          "name": "UserAdded",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xB251eD18802E0bA9424f70Eb43ecE6664B9A9d9a",
+      "transactionHash": "0xdbf897431f640010b0d5453dea33d21880055bd2a8821d80a7caccef3012a6f5"
     }
   },
   "schemaVersion": "3.4.1",
-  "updatedAt": "2022-03-22T15:42:42.011Z",
+  "updatedAt": "2022-03-24T12:29:20.419Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

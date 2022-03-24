@@ -5,6 +5,11 @@ import "./Validations.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 
+/**
+ * @title ValidationsNoCohort
+ * Allows on validation with cohort requested by data subscribers. 
+ */
+
 contract ValidationsNoCohort is Validations {
     using SafeMath for uint256;
 

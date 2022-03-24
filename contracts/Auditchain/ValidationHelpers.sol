@@ -5,7 +5,10 @@ import "./IValidations.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./MemberHelpers.sol";
 
-
+/**
+ * @title ValidationHelpers
+ * @dev additinal function for validations
+ */
 
 contract ValidationHelpers {
 

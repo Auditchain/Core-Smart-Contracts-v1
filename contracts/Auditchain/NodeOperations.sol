@@ -9,7 +9,7 @@ import "./MemberHelpers.sol";
 
 /**
  * @title NodeOperations
- * Additional function for Members
+ * Functions for Node Operators
  */
 contract NodeOperations is AccessControl {
 

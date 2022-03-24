@@ -31430,10 +31430,168 @@
       "links": {},
       "address": "0xe975c890f4f4664BefC679f66615a99Fd1189BFb",
       "transactionHash": "0xea547245e7874cb0a50530606e2bd68a4ae0281068401ea2773026b39c7b5cd4"
+    },
+    "1648124946284": {
+      "events": {
+        "0xc712b41e0b9b7891d0d4ffebc1102bbe2f6ffa1ad4d8047cda3a6dd03ca6ed42": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogDecreaseDeposit",
+          "type": "event"
+        },
+        "0x3916187166447a01764df803fb1147a37c55a4ca1c7271a7a75c0ab1079b2d95": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogDepositReceived",
+          "type": "event"
+        },
+        "0x20753e209c8b7c10296bc27da0f765febee7e5b7ef4056d315655b1687468b7d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogDepositRedeemed",
+          "type": "event"
+        },
+        "0x6c5e7e4e203673af133e4db76883b962ff3faf782281e7bea6f78f2c7874dba0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogIncreaseDeposit",
+          "type": "event"
+        },
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x702d786ABdf68eCE25D47fDdA32fCD847A9eD602",
+      "transactionHash": "0x8f5af32bd909f955f5617dfb743197c3c3caa2e0c8b57a12637b6188cfb62655"
     }
   },
   "schemaVersion": "3.4.1",
-  "updatedAt": "2022-03-22T15:42:42.213Z",
+  "updatedAt": "2022-03-24T12:29:20.539Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
