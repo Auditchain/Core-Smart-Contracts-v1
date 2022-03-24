@@ -677,7 +677,7 @@ async function startProcess() {
         console.log("Process started.");
         agentBornAT = Date.now();
 
-        await checkValQueue();
+        checkValQueue();
         await checkVoteQueue();
         nonCohort.events.PaymentProcessed({})
             .on('data', async function (event) {
