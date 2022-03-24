@@ -129,14 +129,24 @@ async function setUpContracts(account) {
 
 let dataSubscriber1 = "0xd431134b507d3B6F2742687e14cD9CbA5b6BE0F4"; // 2
 
+const reports = [
+    "https://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml",
+    "https://www.sec.gov/Archives/edgar/data/1318605/000095017021000046/tsla-20210331.htm",
+    "https://www.sec.gov/Archives/edgar/data/789019/000156459020034944/msft-10k_20200630_htm.xml",
+    "https://www.sec.gov/Archives/edgar/data/1108524/000110852417000040/crm-20171031.xml",
+];
+
 async function deploy() {
+
+    let myArgs = process.argv.slice(2);
 
     try {
 
         let randomNum = Math.floor(Math.random() * 1000000);
 
-        let reportURL = "https://xbrlsite.azurewebsites.net/2021/reporting-scheme/proof/reference-implementation/instance.xml";
-        let result
+        // if no report given as command argument, round-robbin of the above
+        let reportURL = myArgs[0] ? myArgs[0] : reports[run%reports.length];
+        let result 
 
         await setUpContracts("0x9ca184fa913e7ca5f49b0c89a2665beac582c12cce4308473ef65f4166d58dfa");
         const dataSubscriber1 = providerForUpdate.addresses[0];
@@ -148,12 +158,15 @@ async function deploy() {
         await validation.methods.initializeValidationNoCohort(testHash, result[1], 1, "2000000000000000000").send({ from: dataSubscriber1, gas: 900000 });
         run++;
         console.log("[" + run + "] Run completed");
+        if (run>=MAX_RUNS)
+            process.exit(0);
+
 
     } catch (e) {
         console.log(e)
     }
 }
 
-
-// setInterval(deploy, 5000);
+const MAX_RUNS = 8;
+setInterval(deploy, 5000);
 deploy();
