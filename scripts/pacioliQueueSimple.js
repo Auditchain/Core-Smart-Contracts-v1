@@ -155,8 +155,8 @@ async function fetchValidatorDetails(key) {
 async function setUpContracts(account) {
 
 
-    // providerForUpdate = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
-    providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. xx`
+    providerForUpdate = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
+    // providerForUpdate = new HDWalletProvider(account, local_host); // change to main_infura_server or another testnet. xx`
 
     const web3Update = new Web3(providerForUpdate);
     nonCohortValidate = new web3Update.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
