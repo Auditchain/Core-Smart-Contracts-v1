@@ -182,10 +182,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-        .catch(error => console.log("ERROR: " + error));
-    // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
     //     .catch(error => console.log("ERROR: " + error));
+    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+        .catch(error => console.log("ERROR: " + error));
 
 
     if (!reportContent)
