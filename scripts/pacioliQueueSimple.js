@@ -181,12 +181,11 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
-
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-    //     .catch(error => console.log("ERROR: " + error));
-    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
         .catch(error => console.log("ERROR: " + error));
+    // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    //     .catch(error => console.log("ERROR: " + error));
 
 
     if (!reportContent)
@@ -518,7 +517,7 @@ async function returnNextValidationForVote(vHash) {
  * @dev checks if there is any request in queue for validation
  * @param {last processed validation hash } lastValidationHash 
  */
-async function checkValQueue() {
+async function checkValQueue(vHash) {
 
     try {
 
@@ -529,7 +528,8 @@ async function checkValQueue() {
 
         if (Number(queueSize) > 0) {
             validationHash = await queueContract.methods.getNextValidation().call();
-            if (validationHash != zeroTransaction) {
+            if (vHash != validationHash && validationHash != zeroTransaction) {
+                console.log("from checkValQueueu", validationHash);
                 let isValidated = await nonCohortValidate.methods.isValidated(validationHash).call({ from: owner });
 
                 if (isValidated == 0) {
@@ -544,20 +544,20 @@ async function checkValQueue() {
                     const trxHash = validationInitialized[0].transactionHash;
 
                     await executeVerification(values.url, trxHash, values.documentHash, values.initTime, values.user);
-                    await checkValQueue();
+                    await checkValQueue(validationHash);
                 }
 
                 else {
                     console.log("Queue called from checkValQueue and ignored");
                     setIntervalId = setInterval(
-                        () => (checkValQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
+                        () => (checkValQueue(validationHash).then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
                         intervalSize);
                 }
 
             } else {
                 console.log("Queue called from checkValQueue and ignored");
                 setIntervalId = setInterval(
-                    () => (checkValQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
+                    () => (checkValQueue(validationHash).then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
                     intervalSize);
             }
         } else {
@@ -577,7 +577,7 @@ async function checkValQueue() {
  * @dev checks if there is any request in queue for a vote of winning validator
  * @param {last processed validation hash } lastValidationHash 
  */
-async function checkVoteQueue() {
+async function checkVoteQueue(vHash) {
 
     try {
 
@@ -591,7 +591,7 @@ async function checkVoteQueue() {
 
             // validationHash = await returnNextValidationForVote(lastValidationHash);
 
-            if ((validationHash != zeroTransaction)) {
+            if (vHash != validationHash && validationHash != zeroTransaction) {
 
                 let hasVoted = await nonCohortValidate.methods.hasVoted(validationHash).call({ from: owner });
                 if (!hasVoted) {
@@ -613,14 +613,14 @@ async function checkVoteQueue() {
                 else {
                     console.log("Queue called from checkVoteQueue and ignored");
                     setVoteIntervalId = setInterval(
-                        () => (checkVoteQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
+                        () => (checkVoteQueue(validationHash).then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
                         intervalSize);
                 }
 
             } else {
                 console.log("Queue called from checkVoteQueue and ignored");
                 setVoteIntervalId = setInterval(
-                    () => (checkVoteQueue().then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
+                    () => (checkVoteQueue(validationHash).then(console.log(`ran ${(Date.now() - agentBornAT) / 1000} seconds`))),
                     intervalSize);
             }
         } else {
@@ -694,7 +694,7 @@ async function startProcess() {
         agentBornAT = Date.now();
 
         checkValQueue();
-        await checkVoteQueue();
+        checkVoteQueue();
         nonCohort.events.PaymentProcessed({})
             .on('data', async function (event) {
                 console.log("[12 " + event.transactionHash + "] Winning validator paid...  ");
