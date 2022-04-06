@@ -34,7 +34,8 @@ const ipfsBase = 'https://ipfs.infura.io/ipfs/';
 const ropsten_infura_server = process.env.ROPSTEN_INFURA_SERVER;
 const rinkeby_infura_server = process.env.RINKEBY_INFURA_SERVER;
 const main_infura_server = process.env.MAINNET_INFURA_SERVER;
-const goerli_infura_server = process.env.GOERLI_INFURA_SERVER
+const goerli_infura_server = process.env.GOERLI_INFURA_SERVER;
+const mumbai_server = process.env.MUMBAI_SERVER;
 const local_host = process.env.LOCAL;
 const mnemonic = process.env.MNEMONIC;
 
@@ -115,7 +116,7 @@ async function setUpContracts(account) {
 
     try {
 
-        providerForUpdate = new HDWalletProvider(account, process.env.WEBSOCKET_PROVIDER); // change to main_infura_server or another testnet. 
+        providerForUpdate = new HDWalletProvider(account, mumbai_server); // change to main_infura_server or another testnet. 
         web3 = new Web3(providerForUpdate);
         members = new web3.eth.Contract(Members["abi"], memberAddress);
         token = new web3.eth.Contract(Token["abi"], tokenAddress);
@@ -155,7 +156,7 @@ async function deploy() {
         
         let testHash = web3.utils.keccak256(reportURL + randomNum);
         console.log("Hash from deploy:", testHash);
-        await validation.methods.initializeValidationNoCohort(testHash, result[1], 1, "2000000000000000000").send({ from: dataSubscriber1, gas: 900000 });
+        await validation.methods.initializeValidationNoCohort(testHash, result[1], 1, "7000000000000000000").send({ from: dataSubscriber1, gas: 900000 });
         run++;
         console.log("[" + run + "] Run completed");
         if (run>=MAX_RUNS)
@@ -166,7 +167,6 @@ async function deploy() {
         console.log(e)
     }
 }
-
-const MAX_RUNS = 8;
-setInterval(deploy, 5000);
+const MAX_RUNS = 6;
+// setInterval(deploy, 5000);
 deploy();
