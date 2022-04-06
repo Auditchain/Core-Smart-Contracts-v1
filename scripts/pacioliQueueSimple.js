@@ -182,10 +182,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
     console.log("[1 " + trxHash + "]" + "  Querying Pacioli " + reportUrl);
-    // const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
-    //     .catch(error => console.log("ERROR: " + error));
-    const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    const reportContent = await pacioli.callRemote(reportUrl, trxHash, true)
         .catch(error => console.log("ERROR: " + error));
+    // const reportContent = await pacioli.callLocal(reportUrl, trxHash, true)
+    //     .catch(error => console.log("ERROR: " + error));
 
 
     if (!reportContent)
@@ -210,10 +210,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 }
 
 // TODO:  Use only for testing to bypass calling Pacioli
-// async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli1(metadatatUrl, trxHash) {
 
-//     return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-// }
+    return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
+}
 
 
 /**
@@ -534,17 +534,26 @@ async function checkValQueue(vHash) {
 
                 if (isValidated == 0) {
 
-                    const validationInitialized = await nonCohortValidate.getPastEvents("ValidationInitialized", {
-                        filter: { validationHash: validationHash },
-                        fromBlock: 0,
-                        toBlock: "latest",
-                    });
+                    try {
 
-                    const values = validationInitialized[0].returnValues;
-                    const trxHash = validationInitialized[0].transactionHash;
+                        const validationInitialized = await nonCohortValidate.getPastEvents("ValidationInitialized", {
+                            filter: { validationHash: validationHash },
+                            fromBlock: 0,
+                            toBlock: "latest",
+                        });
 
-                    await executeVerification(values.url, trxHash, values.documentHash, values.initTime, values.user);
-                    await checkValQueue(validationHash);
+
+                        const values = validationInitialized[0].returnValues;
+                        const trxHash = validationInitialized[0].transactionHash;
+
+                        await executeVerification(values.url, trxHash, values.documentHash, values.initTime, values.user);
+                        await checkValQueue(validationHash);
+                    }
+
+                    catch (error) {
+
+                        console.log("after reading events", error);
+                    }
                 }
 
                 else {
