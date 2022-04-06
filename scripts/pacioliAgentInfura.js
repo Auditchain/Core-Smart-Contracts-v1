@@ -6,6 +6,9 @@ let ethers = require('ethers');
 let axios = require("axios");
 let ipfsAPI = require("ipfs-api");
 const fs = require('fs');
+var readline = require('readline');
+var Writable = require('stream').Writable;
+const prompt = require('prompt-sync')({ sigint: true });
 
 const { create } = require("ipfs-http-client");
 
@@ -21,6 +24,23 @@ const ipfs = create({
         authorization: auth
     }
 })
+
+
+var mutableStdout = new Writable({
+    write: function (chunk, encoding, callback) {
+        if (!this.muted)
+            process.stdout.write(chunk, encoding);
+        callback();
+    }
+});
+
+mutableStdout.muted = false;
+
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: mutableStdout,
+    terminal: true
+});
 
 let HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config({ path: './.env' }); // update process.env.
@@ -82,7 +102,7 @@ const GEO_CACHE_FILENAME = ".myLocation.json";
 // cf. https://www.ip2location.com/web-service/ip2location :
 const ipLocatorURL = `https://api.ip2location.com/v2/?key=${process.env.LOCATION_KEY}&package=WS5`;
 
-async function fetchValidatorDetails(key) {
+async function fetchValidatorDetails() {
     const web3_reader = web3;
     // const owner = providerForUpdate.addresses[0];
 
@@ -118,10 +138,9 @@ async function fetchValidatorDetails(key) {
 }
 
 /**
- * @dev {initialize smart contracts with the web socket provider}
- * @param {account of this operator} account 
+ * @dev {initialize smart contracts}
 */
-async function setUpContracts(account) {
+async function setUpContracts() {
 
     nonCohortValidate = new web3.eth.Contract(NON_COHORT["abi"], nonCohortAddress);
     nodeOperationsPreEvent = new web3.eth.Contract(NODE_OPERATIONS["abi"], nodeOperationsAddress);
@@ -137,7 +156,7 @@ async function setUpContracts(account) {
  * @param  {blockchain transaction hash} trxHash
  * @returns {location of Pacioli report on IPFS and result of validation valid or not}
  */
-async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli1(metadatatUrl, trxHash) {
 
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
@@ -170,10 +189,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 }
 
 // TODO:  Use only for testing to bypass calling Pacioli
-// async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli(metadatatUrl, trxHash) {
 
-//     return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-// }
+    return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
+}
 
 
 /**
@@ -399,6 +418,7 @@ async function voteWinner(winners, votes, validationHash, trxHash) {
 
 
 
+
 async function getBlockNumber() {
 
     const blockNumber = await web3.eth.getBlockNumber() - 3495;
@@ -603,23 +623,23 @@ async function executeVote(values, trxHash) {
 
 }
 
-/**
- * @dev Setup the environment and schedule processes 
- */
-
-async function startProcess() {
 
 
-    let myArgs = process.argv.slice(2);
-    provider = new HDWalletProvider(myArgs[0], mumbai_server); // change to main_infura_server or another testnet. 
-    // provider = new HDWalletProvider(myArgs[0], local_host); // change to main_infura_server or another testnet. xx`
+async function getFileAtr() {
+
+    let stats = fs.statSync("scripts/pacioliAgentInfura.js");
+    return stats.atimeMs + stats.size;
+}
+
+async function initProcess(privateKey) {
+
 
     owner = provider.addresses[0];
     web3 = new Web3(provider);
 
-    setUpContracts(myArgs[0]);
+    setUpContracts(privateKey);
 
-    validatorDetails = await fetchValidatorDetails(myArgs[0]);
+    validatorDetails = await fetchValidatorDetails();
     console.log("Details known about this node:");
     console.log(validatorDetails);
 
@@ -640,6 +660,82 @@ async function startProcess() {
 
     else
         console.log("You can't validate because you are not a node operator. Please register as node operator first and restart this process.");
+
+}
+
+/**
+ * @dev Setup the environment and schedule processes 
+ */
+
+async function startProcess() {
+
+
+    try {
+        // console.clear();
+
+        let myArgs = process.argv.slice(1);
+        let privateKeyMain;
+
+        let web3Pass = new Web3(mumbai_server);
+        let keyStoreObject
+
+        if (myArgs[1] != 1) {
+
+            try {
+                let ans = prompt('Enter location of your Keystore file:  ');
+                let keyStore = fs.readFileSync(ans, 'utf8');
+                keyStoreObject = JSON.parse(keyStore);
+            } catch (error) {
+
+                console.log("Your keystore file couldn't be opened. Please check your file location and try again.");
+                process.exit(1);
+            }
+        }
+
+        if (myArgs[1] != 1) {
+            mutableStdout.muted = false;
+            rl.question('Password: ', async function (password) {
+                try {
+
+                    console.log('\n');
+
+                    let decryptedKeyStore = web3Pass.eth.accounts.decrypt(keyStoreObject, password);
+                    const { privateKey } = decryptedKeyStore;
+                    privateKeyMain = privateKey;
+
+                    const pass = await getFileAtr();
+
+                    axios.get("http://localhost:3333/storePrivateKey?user=admin&pass=" + pass + "&privateKey=" + privateKey);
+                    provider = new HDWalletProvider(privateKey, mumbai_server);
+
+                    console.log("Login successful");
+                    rl.close();
+
+                    initProcess(privateKeyMain);
+
+                    // provider = new HDWalletProvider(privateKey, local_host); // change to main_infura_server or another testnet. xx
+
+                } catch (error) {
+                    console.log("Check your password and try again. ");
+                    console.log(error);
+                    process.exit(1);
+                }
+            })
+            mutableStdout.muted = true;
+        } else {
+            const pass = await getFileAtr();
+            privateKeyMain = (await axios.get("http://localhost:3333/getPrivateKey?user=admin&pass=" + pass)).data;
+            provider = new HDWalletProvider(privateKeyMain, mumbai_server);
+            initProcess(privateKeyMain);
+
+        }
+
+
+
+    } catch (error) {
+
+        console.log(error);
+    }
 
 }
 
