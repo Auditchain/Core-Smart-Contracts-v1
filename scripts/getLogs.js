@@ -325,11 +325,11 @@ async function ValidationInitialized(filter) {
 }
 
 
-async function ValidationInitializedNoCohort(filter) {
+async function ValidationInitialized2filters(filter1, filter2) {
 
     try {
         const result = await noCohort.getPastEvents('ValidationInitialized', {
-            filter: { user: filter },
+            filter: { user: filter1, auditType: filter2 },
             fromBlock: 0,
             toBlock: 'latest'
         });
@@ -583,11 +583,12 @@ app.get('/DelegateVotesChanged', function (req, res) {
 })
 
 
-app.get('/ValidationInitializedNoCohort', function (req, res) {
+app.get('/ValidationInitialized2filters', function (req, res) {
 
-    let filter = req.query.filter;
+    let filter1 = req.query.filter1;
+    let filter2 = req.query.filter2;
 
-    ValidationInitializedNoCohort(filter).then(async function (returnedData) {
+    ValidationInitialized2filters(filter1, filter2).then(async function (returnedData) {
         res.end(JSON.stringify(returnedData));
     }).catch(function (err) {
         console.log(err);
