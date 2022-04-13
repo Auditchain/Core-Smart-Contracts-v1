@@ -156,7 +156,7 @@ async function setUpContracts() {
  * @param  {blockchain transaction hash} trxHash
  * @returns {location of Pacioli report on IPFS and result of validation valid or not}
  */
-async function verifyPacioli1(metadatatUrl, trxHash) {
+async function verifyPacioli(metadatatUrl, trxHash) {
 
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
@@ -189,10 +189,10 @@ async function verifyPacioli1(metadatatUrl, trxHash) {
 }
 
 // TODO:  Use only for testing to bypass calling Pacioli
-async function verifyPacioli(metadatatUrl, trxHash) {
+// async function verifyPacioli(metadatatUrl, trxHash) {
 
-    return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-}
+//     return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
+// }
 
 
 /**
@@ -679,8 +679,19 @@ async function startProcess() {
         let web3Pass = new Web3(mumbai_server);
         let keyStoreObject
 
-        if (myArgs[1] != 1) {
 
+        try {
+            const pass = await getFileAtr();
+            privateKeyMain = (await axios.get("http://localhost:3333/getPrivateKey?user=admin&pass=" + pass)).data;
+
+        } catch (error) {
+            privateKeyMain == "not authorized"
+        }
+
+        // password manager is not running or hasn't been initialized 
+        if (privateKeyMain == "not authorized" || privateKeyMain == undefined) {
+
+            // handel keystore file
             try {
                 let ans = prompt('Enter location of your Keystore file:  ');
                 let keyStore = fs.readFileSync(ans, 'utf8');
@@ -690,10 +701,10 @@ async function startProcess() {
                 console.log("Your keystore file couldn't be opened. Please check your file location and try again.");
                 process.exit(1);
             }
-        }
-
-        if (myArgs[1] != 1) {
+            
             mutableStdout.muted = false;
+
+            //handle password
             rl.question('Password: ', async function (password) {
                 try {
 
@@ -705,15 +716,21 @@ async function startProcess() {
 
                     const pass = await getFileAtr();
 
-                    axios.get("http://localhost:3333/storePrivateKey?user=admin&pass=" + pass + "&privateKey=" + privateKey);
+                    // store private key
+                    try {
+
+                        await axios.get("http://localhost:3333/storePrivateKey?user=admin&pass=" + pass + "&privateKey=" + privateKey);
+                    } catch (error) {
+
+                        console.log("WARNING  - Password manager is not running.")
+                    }
+
                     provider = new HDWalletProvider(privateKey, mumbai_server);
 
                     console.log("Login successful");
                     rl.close();
 
                     initProcess(privateKeyMain);
-
-                    // provider = new HDWalletProvider(privateKey, local_host); // change to main_infura_server or another testnet. xx
 
                 } catch (error) {
                     console.log("Check your password and try again. ");
@@ -723,14 +740,17 @@ async function startProcess() {
             })
             mutableStdout.muted = true;
         } else {
-            const pass = await getFileAtr();
-            privateKeyMain = (await axios.get("http://localhost:3333/getPrivateKey?user=admin&pass=" + pass)).data;
-            provider = new HDWalletProvider(privateKeyMain, mumbai_server);
-            initProcess(privateKeyMain);
 
+            // used during restart 
+            try {
+                const pass = await getFileAtr();
+                privateKeyMain = (await axios.get("http://localhost:3333/getPrivateKey?user=admin&pass=" + pass)).data;
+                provider = new HDWalletProvider(privateKeyMain, mumbai_server);
+                initProcess(privateKeyMain);
+            } catch (error) {
+                console.log("No password manager running.")
+            }
         }
-
-
 
     } catch (error) {
 
