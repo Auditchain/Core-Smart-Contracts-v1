@@ -12,6 +12,7 @@ const NODE_OPERATIONS = artifacts.require('../NodeOperations');
 const DEPOSIT_MODIFIERS = artifacts.require('../DepositModifiers');
 const VALIDATION = artifacts.require('../ValidationsNoCohort');
 const VALIDATION_HELPERS = artifacts.require('../ValidationHelpers');
+const QUEUE = artifacts.require("../Queue");
 
 
 
@@ -45,10 +46,12 @@ contract("NoCohort Validations contract", (accounts) => {
     let validation;
     let documentHash;
     let validationHash;
+    let queue;
 
     let auditTokenMin = "5000000000000000000000";
     let rewardTokensHalf = "341500000000000000000";
     let rewardTokens = "1000000000000000000";
+    let price = "1000000000000000000";
 
     let cohortAddress;
     let cohortContract;
@@ -75,7 +78,10 @@ contract("NoCohort Validations contract", (accounts) => {
         depositModifiers = await DEPOSIT_MODIFIERS.new(members.address, token.address, memberHelpers.address, cohortFactory.address, nodeOperations.address)
         validationHelpers = await VALIDATION_HELPERS.new(memberHelpers.address);
 
-        validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address)
+        queue = await QUEUE.new();
+
+
+        validation = await VALIDATION.new(members.address, memberHelpers.address, cohortFactory.address, depositModifiers.address, nodeOperations.address, validationHelpers.address, queue.address)
 
 
 
@@ -166,7 +172,7 @@ contract("NoCohort Validations contract", (accounts) => {
 
         it("Should succeed. Validation initialized by registered user who has sufficient funds", async () => {
 
-            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, { from: dataSubscriber });
+            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, price, { from: dataSubscriber });
 
             let event = result.logs[0];
             assert.equal(event.event, 'ValidationInitialized');
@@ -182,7 +188,7 @@ contract("NoCohort Validations contract", (accounts) => {
         it("Should fail. Validation initialized by not registered user.", async () => {
 
             try {
-                let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, { from: admin });
+                let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, price, { from: admin });
                 expectRevert();
             }
             catch (error) {
@@ -196,7 +202,7 @@ contract("NoCohort Validations contract", (accounts) => {
             await members.addUser(enterprise1, "Enterprise 1", 1, { from: admin });
 
             try {
-                let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 0, { from: enterprise1 });
+                let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 0, price, { from: enterprise1 });
                 expectRevert();
             }
             catch (error) {
@@ -211,7 +217,7 @@ contract("NoCohort Validations contract", (accounts) => {
 
         beforeEach(async () => {
 
-            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, { from: dataSubscriber });
+            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, price, { from: dataSubscriber });
             let event = result.logs[0]
             assert.equal(event.event, 'ValidationInitialized');
             validationInitTime = event.args.initTime;
@@ -331,7 +337,7 @@ contract("NoCohort Validations contract", (accounts) => {
 
         beforeEach(async () => {
 
-            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, { from: dataSubscriber });
+            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, price, { from: dataSubscriber });
 
 
             let event = result.logs[0];
@@ -366,7 +372,7 @@ contract("NoCohort Validations contract", (accounts) => {
 
         beforeEach(async () => {
 
-            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, { from: dataSubscriber });
+            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, price, { from: dataSubscriber });
 
             let event = result.logs[0];
             assert.equal(event.event, 'ValidationInitialized');
@@ -411,7 +417,7 @@ contract("NoCohort Validations contract", (accounts) => {
 
         beforeEach(async () => {
 
-            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, { from: dataSubscriber });
+            let result = await validation.initializeValidationNoCohort(documentHash, documentURL, 1, price, { from: dataSubscriber });
 
             let event = result.logs[0];
             assert.equal(event.event, 'ValidationInitialized');

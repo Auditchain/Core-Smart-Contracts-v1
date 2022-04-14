@@ -9,8 +9,10 @@ const fs = require('fs');
 
 const { create } = require("ipfs-http-client");
 
-const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
-const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
+require('dotenv').config({ path: './.env' }); // update process.env.
+
+const projectId = process.env.IPFS_USER;
+const projectSecret = process.env.IPFS_PASSWORD;
 const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
 
 const ipfs = create({
@@ -23,7 +25,6 @@ const ipfs = create({
 })
 
 let HDWalletProvider = require('@truffle/hdwallet-provider');
-require('dotenv').config({ path: './.env' }); // update process.env.
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
 const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')

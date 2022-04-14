@@ -14,8 +14,8 @@ let HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config({ path: './.env' }); // update process.env
 
 
-const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
-const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
+const projectId = process.env.IPFS_USER;
+const projectSecret = process.env.IPFS_PASSWORD;
 const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
 
 const ipfs = ipfsAPI({
@@ -167,6 +167,6 @@ async function deploy() {
         console.log(e)
     }
 }
-const MAX_RUNS = 6;
-// setInterval(deploy, 5000);
+const MAX_RUNS = 16;
+setInterval(deploy, 5000);
 deploy();

@@ -130,7 +130,7 @@ abstract contract Validations is  ReentrancyGuard{
 
         queue.addToQueue(price, validationHash );
 
-        emit ValidationInitialized(msg.sender, validationHash, validationTime, documentHash, url, auditType);
+        emit ValidationInitialized(msg.sender, validationHash, validationTime, documentHash, url, auditType);   
     }
 
 

@@ -34,7 +34,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -68,7 +69,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -92,7 +94,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -116,7 +119,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -135,7 +139,8 @@
         }
       ],
       "stateMutability": "pure",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -159,7 +164,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.0+commit.c7dfd78e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_memberHelpers\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"validationHash\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"validationContract\",\"type\":\"address\"}],\"name\":\"calculateVoteQuorum\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256[]\",\"name\":\"validation\",\"type\":\"uint256[]\"}],\"name\":\"determineConsensus\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"validationHash\",\"type\":\"bytes32\"}],\"name\":\"determineWinners\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"documentHash\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_validationTime\",\"type\":\"uint256\"}],\"name\":\"isHashAndTimeCorrect\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"validationHash\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"contractAddress\",\"type\":\"address\"}],\"name\":\"returnWinnerStruct\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"valUrl\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"winner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"validationTime\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"validationHash\",\"type\":\"bytes32\"},{\"internalType\":\"address[]\",\"name\":\"winners\",\"type\":\"address[]\"}],\"name\":\"selectWinner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"additinal function for validations\",\"kind\":\"dev\",\"methods\":{\"calculateVoteQuorum(bytes32,address)\":{\"details\":\"to calculate state of the quorum for the validation\",\"params\":{\"validationHash\":\"- consist of hash of hashed document and timestamp\"},\"returns\":{\"_0\":\"number representing current participation level in percentage\"}}},\"title\":\"ValidationHelpers\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Auditchain/ValidationHelpers.sol\":\"ValidationHelpers\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/AccessControl.sol\":{\"keccak256\":\"0xb9a137b317dc4806805f2259686186c0c053c32d80fe9c15ecdbf2eb1cf52849\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8910762bea89696c6dc68a63be98c6ddd597955f8a29418661cc99d0ce090663\",\"dweb:/ipfs/Qmed14MXXFdNYE22bCuVy5XVAMKUo1DncY8BF8VkyrvXmh\"]},\"@openzeppelin/contracts/access/IAccessControl.sol\":{\"keccak256\":\"0x59ce320a585d7e1f163cd70390a0ef2ff9cec832e2aa544293a00692465a7a57\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://bb2c137c343ef0c4c7ce7b18c1d108afdc9d315a04e48307288d2d05adcbde3a\",\"dweb:/ipfs/QmUxhrAQM3MM3FF5j7AtcXLXguWCJBHJ14BRdVtuoQc8Fh\"]},\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0x61437cb513a887a1bbad006e7b1c8b414478427d33de47c5600af3c748f108da\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2c3d0973630ed74f2b5ce3944677a885dc70ec32fc83b35f55045a10224da32b\",\"dweb:/ipfs/QmbefZ5RoEZKNHXCALfh683PnaNYzKPcKMFjyY1DVAgq8A\"]},\"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol\":{\"keccak256\":\"0xc3d946432c0ddbb1f846a0d3985be71299df331b91d06732152117f62f0be2b5\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4632c341a06ba5c079b51ca5a915efab4e6ab57735b37839b3e8365ff806a43e\",\"dweb:/ipfs/QmTHT3xHYed2wajEoA5qu7ii2BxLpPhQZHwAhtLK5Z7ANK\"]},\"@openzeppelin/contracts/utils/Address.sol\":{\"keccak256\":\"0x51b758a8815ecc9596c66c37d56b1d33883a444631a3f916b9fe65cb863ef7c4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://997ca03557985b3c6f9143a18b6c3a710b3bc1c7f189ee956d305a966ecfb922\",\"dweb:/ipfs/QmQaD3Wb62F88SHqmpLttvF6wKuPDQep2LLUcKPekeRzvz\"]},\"@openzeppelin/contracts/utils/Context.sol\":{\"keccak256\":\"0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6df0ddf21ce9f58271bdfaa85cde98b200ef242a05a3f85c2bc10a8294800a92\",\"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3\"]},\"@openzeppelin/contracts/utils/Strings.sol\":{\"keccak256\":\"0x32c202bd28995dd20c4347b7c6467a6d3241c74c8ad3edcbb610cd9205916c45\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8179c356adb19e70d6b31a1eedc8c5c7f0c00e669e2540f4099e3844c6074d30\",\"dweb:/ipfs/QmWFbivarEobbqhS1go64ootVuHfVohBseerYy9FTEd1W2\"]},\"@openzeppelin/contracts/utils/introspection/ERC165.sol\":{\"keccak256\":\"0xd10975de010d89fd1c78dc5e8a9a7e7f496198085c151648f20cba166b32582b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://fb0048dee081f6fffa5f74afc3fb328483c2a30504e94a0ddd2a5114d731ec4d\",\"dweb:/ipfs/QmZptt1nmYoA5SgjwnSgWqgUSDgm4q52Yos3xhnMv3MV43\"]},\"@openzeppelin/contracts/utils/introspection/IERC165.sol\":{\"keccak256\":\"0x447a5f3ddc18419d41ff92b3773fb86471b1db25773e07f877f548918a185bf1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://be161e54f24e5c6fae81a12db1a8ae87bc5ae1b0ddc805d82a1440a68455088f\",\"dweb:/ipfs/QmP7C3CHdY9urF4dEMb9wmsp1wMxHF6nhA2yQE5SKiPAdy\"]},\"@openzeppelin/contracts/utils/math/SafeMath.sol\":{\"keccak256\":\"0xa2f576be637946f767aa56601c26d717f48a0aff44f82e46f13807eea1009a21\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://973868f808e88e21a1a0a01d4839314515ee337ad096286c88e41b74dcc11fc2\",\"dweb:/ipfs/QmfYuZxRfx2J2xdk4EXN7jKg4bUYEMTaYk9BAw9Bqn4o2Y\"]},\"project:/contracts/Auditchain/ICohortFactory.sol\":{\"keccak256\":\"0x8267f943de6c82bbb1bac7cb1df7b387a87258900610a7da22f4241136bdc0fa\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b76c9b2637fb3f4342606c983e981694296fdff6a582aff9bdd8ec99011c8d43\",\"dweb:/ipfs/QmPh28Q168xXSgnXn57kiNWK5DTXnYhtDQLjmEm3K34Zgu\"]},\"project:/contracts/Auditchain/IValidations.sol\":{\"keccak256\":\"0x20b7ffb38f9b224626c060ca10f482129aeed2d430eae5697eb7d90766549937\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e7cb023f2babc426e8e1fec497323c7e04d0549d2c0a5b5995284ee963b89a1b\",\"dweb:/ipfs/QmUxTg3ZTy325DJe2VuxT5M7hepqHiPS4UDH6r8A9s5WMm\"]},\"project:/contracts/Auditchain/MemberHelpers.sol\":{\"keccak256\":\"0xa72a2a510de75c11a76e1bd2cd69ce2887e419697e32716d1d834e0762db94f9\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ab607d367b079d4433cf0d37305cee2880c454ffdca5593adbfb52c8ec951d43\",\"dweb:/ipfs/QmbV3xJ54ZK9JKbwA2HqMwyhP5prTfnbdHi7UzvqgJQdkH\"]},\"project:/contracts/Auditchain/Members.sol\":{\"keccak256\":\"0x862cb71c490ee9541dae7c76295d705d763c2210539488b792ffd7d432462d05\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e47a8c9014695249be60af6c3263b39620c738de80b5137442579b3e30ad2d7a\",\"dweb:/ipfs/Qmd5i5TkzEAXizzANn1i58YWNHkD2fzJ2LdZVUFpf7PHSd\"]},\"project:/contracts/Auditchain/ValidationHelpers.sol\":{\"keccak256\":\"0x286bc464f21cce6647c268b512b07ca9b66c7ddc6d7cc942018721120ff06fe4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://31c5020a92f5383cd1a7b46251ac89a641ed0e84f952b5fdfbbb650e6efca3d5\",\"dweb:/ipfs/Qme1DFP7duD4NnoTpxmSVCFUu5VuVhH8UB4EYRjSMaVUSb\"]},\"project:/contracts/IAuditToken.sol\":{\"keccak256\":\"0x43ef6930334bc6311cd68fa23b3cf0c066dbf0c9ed8be145e6239c9316e75258\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://09d8c81f4b150b52adce0ca636e6214b961053de28bfac9ef54c26fe04c02dce\",\"dweb:/ipfs/QmaYVp1emoVRqz8kSeQTRmVStDdpuzZUrNHMescNttgJtW\"]}},\"version\":1}",
@@ -34495,10 +34501,23 @@
       "links": {},
       "address": "0xFd79846d05F160dF08f1FadB6e5DA1b392686B8b",
       "transactionHash": "0x67986737dab144de26b7f73d0c1743c2ac671a7a9a85a1faa73197da181b8af5"
+    },
+    "1649342626725": {
+      "events": {},
+      "links": {},
+      "address": "0x47e83F4e45f70E6B6C7717AD44cdf2D75a2a0E92",
+      "transactionHash": "0x583bea27b6e29ac0ee218722e05e054d2398dd583140db8c9d167ec8ffcff249"
+    },
+    "1649434730606": {
+      "events": {},
+      "links": {},
+      "address": "0xFd79846d05F160dF08f1FadB6e5DA1b392686B8b",
+      "transactionHash": "0x913960698f996b4567ae69e087a730fe90e70dd1480cc19ff45e1b7d1e64fac5"
     }
   },
-  "schemaVersion": "3.4.6",
-  "updatedAt": "2022-04-04T20:05:45.476Z",
+  "schemaVersion": "3.4.1",
+  "updatedAt": "2022-04-08T16:19:02.353Z",
+  "networkType": "ethereum",
   "devdoc": {
     "details": "additinal function for validations",
     "kind": "dev",
