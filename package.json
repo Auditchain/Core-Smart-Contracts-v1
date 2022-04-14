@@ -39,6 +39,7 @@
     "ipfs-http-client": "^53.0.1",
     "openzeppelin-test-helpers": "^0.1.2",
     "pm2": "^5.1.2",
+    "prompt-sync": "^4.2.0",
     "save": "^2.3.3",
     "should": "^13.2.3",
     "sol-merger": "^0.1.4",

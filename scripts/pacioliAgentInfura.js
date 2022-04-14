@@ -12,8 +12,20 @@ const prompt = require('prompt-sync')({ sigint: true });
 
 const { create } = require("ipfs-http-client");
 
-const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
-const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
+
+let privateKeyMain;
+
+const SECRETS_PATH = process.env.SECRETS_PATH ? process.env.SECRETS_PATH : '/secrets';
+
+// update process.env with variables not yet defined outside
+if (fs.existsSync(SECRETS_PATH)) {
+    require('dotenv').config({ path: `${SECRETS_PATH}/PacioliNode.env` });
+    privateKeyMain = fs.readFileSync(`${SECRETS_PATH}/account.txt`, 'utf8').trim();
+} else 
+    require('dotenv').config({ path: './.env' }); 
+
+const projectId = process.env.IPFS_USER;
+const projectSecret = process.env.IPFS_PASSWORD;
 const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
 
 const ipfs = create({
@@ -43,7 +55,8 @@ var rl = readline.createInterface({
 });
 
 let HDWalletProvider = require('@truffle/hdwallet-provider');
-require('dotenv').config({ path: './.env' }); // update process.env.
+
+
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
 const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
@@ -673,85 +686,87 @@ async function startProcess() {
     try {
         // console.clear();
 
-        let myArgs = process.argv.slice(1);
-        let privateKeyMain;
-
-        let web3Pass = new Web3(mumbai_server);
-        let keyStoreObject
-
-
-        try {
-            const pass = await getFileAtr();
-            privateKeyMain = (await axios.get("http://localhost:3333/getPrivateKey?user=admin&pass=" + pass)).data;
-
-        } catch (error) {
-            privateKeyMain == "not authorized"
-        }
-
-        // password manager is not running or hasn't been initialized 
-        if (privateKeyMain == "not authorized" || privateKeyMain == undefined) {
-
-            // handel keystore file
-            try {
-                let ans = prompt('Enter location of your Keystore file:  ');
-                let keyStore = fs.readFileSync(ans, 'utf8');
-                keyStoreObject = JSON.parse(keyStore);
-            } catch (error) {
-
-                console.log("Your keystore file couldn't be opened. Please check your file location and try again.");
-                process.exit(1);
-            }
-            
-            mutableStdout.muted = false;
-
-            //handle password
-            rl.question('Password: ', async function (password) {
-                try {
-
-                    console.log('\n');
-
-                    let decryptedKeyStore = web3Pass.eth.accounts.decrypt(keyStoreObject, password);
-                    const { privateKey } = decryptedKeyStore;
-                    privateKeyMain = privateKey;
-
-                    const pass = await getFileAtr();
-
-                    // store private key
-                    try {
-
-                        await axios.get("http://localhost:3333/storePrivateKey?user=admin&pass=" + pass + "&privateKey=" + privateKey);
-                    } catch (error) {
-
-                        console.log("WARNING  - Password manager is not running.")
-                    }
-
-                    provider = new HDWalletProvider(privateKey, mumbai_server);
-
-                    console.log("Login successful");
-                    rl.close();
-
-                    initProcess(privateKeyMain);
-
-                } catch (error) {
-                    console.log("Check your password and try again. ");
-                    console.log(error);
-                    process.exit(1);
-                }
-            })
-            mutableStdout.muted = true;
+        if (privateKeyMain){ 
+            // simplified path, using unencrypted key obtained from (hopefully secure) /secrets directory
+            provider = new HDWalletProvider(privateKeyMain, mumbai_server);
+            initProcess(privateKeyMain);
         } else {
+            // more secure path, uses encrypted keystore object, and auxiliary server with password to decrypt it
+            let web3Pass = new Web3(mumbai_server);
+            let keyStoreObject
 
-            // used during restart 
             try {
                 const pass = await getFileAtr();
                 privateKeyMain = (await axios.get("http://localhost:3333/getPrivateKey?user=admin&pass=" + pass)).data;
-                provider = new HDWalletProvider(privateKeyMain, mumbai_server);
-                initProcess(privateKeyMain);
+
             } catch (error) {
-                console.log("No password manager running.")
+                privateKeyMain == "not authorized"
+            }
+
+            // password manager is not running or hasn't been initialized 
+            if (privateKeyMain == "not authorized" || privateKeyMain == undefined) {
+
+                // handel keystore file
+                try {
+                    let ans = prompt('Enter location of your Keystore file:  ');
+                    let keyStore = fs.readFileSync(ans, 'utf8');
+                    keyStoreObject = JSON.parse(keyStore);
+                } catch (error) {
+
+                    console.log("Your keystore file couldn't be opened. Please check your file location and try again.");
+                    process.exit(1);
+                }
+                
+                mutableStdout.muted = false;
+
+                //handle password
+                rl.question('Password: ', async function (password) {
+                    try {
+
+                        console.log('\n');
+
+                        let decryptedKeyStore = web3Pass.eth.accounts.decrypt(keyStoreObject, password);
+                        const { privateKey } = decryptedKeyStore;
+                        privateKeyMain = privateKey;
+
+                        const pass = await getFileAtr();
+
+                        // store private key
+                        try {
+
+                            await axios.get("http://localhost:3333/storePrivateKey?user=admin&pass=" + pass + "&privateKey=" + privateKey);
+                        } catch (error) {
+
+                            console.log("WARNING  - Password manager is not running.")
+                        }
+
+                        provider = new HDWalletProvider(privateKey, mumbai_server);
+
+                        console.log("Login successful");
+                        rl.close();
+
+                        initProcess(privateKeyMain);
+
+                    } catch (error) {
+                        console.log("Check your password and try again. ");
+                        console.log(error);
+                        process.exit(1);
+                    }
+                })
+                mutableStdout.muted = true;
+            } else {
+
+                // used during restart 
+                try {
+                    // const pass = await getFileAtr();
+                    // privateKeyMain = (await axios.get("http://localhost:3333/getPrivateKey?user=admin&pass=" + pass)).data;
+                    provider = new HDWalletProvider(privateKeyMain, mumbai_server);
+                    initProcess(privateKeyMain);
+                } catch (error) {
+                    console.log("No password manager running.")
+                }
             }
         }
-
     } catch (error) {
 
         console.log(error);
