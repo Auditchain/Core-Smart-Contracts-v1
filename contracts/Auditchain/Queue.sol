@@ -36,6 +36,8 @@ contract Queue {
         idCounter = 1;
     }
 
+    // event queueAdded(uint256 value, bytes32 hashValue);
+
     /**
      * @dev Retrieves the Object denoted by `_id`.
      */
@@ -43,10 +45,10 @@ contract Queue {
         public
         virtual
         view
-        returns (uint256, uint256, uint256, bytes32)
+        returns (uint256 id, uint256 next, uint256 price, bytes32 validationHash, bool executed)
     {
         Object memory object = objects[_id];
-        return (object.id, object.next, object.price, object.validationHash);
+        return (object.id, object.next, object.price, object.validationHash, object.executed);
     }
 
     /**
@@ -135,7 +137,7 @@ contract Queue {
      * @dev Insert a new Object as the new Head with `_price` in the data field.
      */
     function addHead(uint256 _price, bytes32 _validationHash)
-        public
+        internal
         virtual
     {
         uint256 objectId = _createObject(_price, _validationHash);
@@ -147,7 +149,7 @@ contract Queue {
      * @dev Insert a new Object as the new Tail with `_price` in the data field.
      */
     function addTail(uint256 _price, bytes32 _validationHash)
-        public
+        internal
         virtual
     {
         if (head == 0) {
@@ -164,7 +166,7 @@ contract Queue {
      * @dev Remove the Object denoted by `_id` from the List.
      */
     function remove(uint256 _id)
-        public
+        internal
         virtual
     {
         Object memory removeObject = objects[_id];
@@ -184,7 +186,7 @@ contract Queue {
      * @dev Insert a new Object after the Object denoted by `_id` with `_price` in the data field.
      */
     function insertAfter(uint256 _prevId, uint256 _price, bytes32 validationHash)
-        public
+        internal
         virtual
     {
         Object memory prevObject = objects[_prevId];
@@ -197,7 +199,7 @@ contract Queue {
      * @dev Insert a new Object before the Object denoted by `_id` with `_price` in the data field.
      */
     function insertBefore(uint256 _nextId, uint256 _price, bytes32 validatioHash)
-        public
+        internal
         virtual
     {
         if (_nextId == head) {
@@ -255,27 +257,28 @@ contract Queue {
 
        uint256 id = findIdForLesserPrice(_price);
        insertBefore(id, _price, _validationHash);
-        queueCount++;
+       queueCount++;
+    //    emit queueAdded(_price, _validationHash);
 
     }
 
-    function getValidationToProcess() public view returns (bytes32) {
+    // function getValidationToProcess() public view returns (bytes32) {
 
 
-            (,,,bytes32 validationHash) =   get(head);
+    //         (,,,bytes32 validationHash,) =   get(head);
         
-        return validationHash;
-    }
+    //     return validationHash;
+    // }
 
     function getValidationToVote(bytes32 _lastValidationHash) public view returns (bytes32) {
 
         uint256 id = findIdForValidationHash(_lastValidationHash);
-        (,uint256 prevId,,) = get(id);
+        (,uint256 prevId,,,) = get(id);
 
         bytes32 validationHash;
 
             if (objects[prevId].executed){
-                (,,,validationHash) =   get(prevId);
+                (,,,validationHash,) =   get(prevId);
             } else
                 validationHash =  0x0;
 
@@ -287,7 +290,7 @@ contract Queue {
     function getNextValidationToVote() public view returns(bytes32 validationHash) {
 
         if (objects[head].executed){
-                (,,,validationHash) =   get(head);
+                (,,,validationHash,) =   get(head);
             } else
                 validationHash =  0x0;
         return validationHash;
@@ -297,19 +300,19 @@ contract Queue {
 
 
         uint256 id = findIdForValidationHash(_lastValidationHash);
-        (,uint256 prevId,,) = get(id);
+        (,uint256 prevId,,,) = get(id);
 
         if (prevId == 0)
             validationHash = 0x0;
         else{
-            (,,,validationHash) =   get(prevId);
+            (,,,validationHash,) =   get(prevId);
             return validationHash;
         }
     }
 
     function getNextValidation() public view returns(bytes32) {
 
-        (,,,bytes32 validationHash) = get(head);
+        (,,,bytes32 validationHash,) = get(head);
         return validationHash;
     }
 
@@ -321,7 +324,7 @@ contract Queue {
        
     }
 
-    function setValidatedFlag(bytes32 _valHash)public {
+    function setValidatedFlag(bytes32 _valHash) public {
 
         uint256 id = findIdForValidationHash(_valHash);
         objects[id].executed = true;
@@ -331,7 +334,7 @@ contract Queue {
         return queueCount;
     }
 
-    function replaceTransaction(bytes32 _valHash, uint256 newPrice) public {
+    function replaceTransaction(uint256 newPrice, bytes32 _valHash) public {
         removeFromQueue(_valHash);
         addToQueue(newPrice, _valHash); 
     }
