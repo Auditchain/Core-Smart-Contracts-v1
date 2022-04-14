@@ -13,6 +13,7 @@ let BN = require("big-number");
 const {create} = require("ipfs-http-client");
 
 // const ipfs = new ipfsClient();
+require('dotenv').config({ path: './.env' }); // update process.env
 
 
 
@@ -32,7 +33,6 @@ const ipfs = create({
 })
 
 let HDWalletProvider = require('@truffle/hdwallet-provider');
-require('dotenv').config({ path: './.env' }); // update process.env
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
 const MEMBER_HELPERS = require('../build/contracts/MemberHelpers.json');

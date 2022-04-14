@@ -14,8 +14,8 @@ let HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config({ path: './.env' }); // update process.env
 
 
-const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
-const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
+const projectId = process.env.IPFS_USER;
+const projectSecret = process.env.IPFS_PASSWORD;
 const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
 
 const ipfs = ipfsAPI({
@@ -32,23 +32,7 @@ const ipfs = ipfsAPI({
 // const ipfsClient = require("ipfs-http-client");
 const { create } = require("ipfs-http-client");
 
-// const ipfs = new ipfsClient();
 
-
-// const projectId = '1z8qlzYj2AXroPUyrvd4UD70Rd1'
-// const projectSecret = '33a8822b1df29fdc33d0930aab075a7b'
-// const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
-
-
-
-// const ipfs = create({
-//     host: 'ipfs.infura.io',
-//     port: 5001,
-//     protocol: 'https',
-//     headers: {
-//         authorization: auth
-//     }
-// })
 
 const ipfsBase = 'https://ipfs.infura.io/ipfs/';
 
@@ -71,7 +55,8 @@ let providerForUpdate;
 
 const Members = require('../build/contracts/Members.json');
 const Token = require('../build/contracts/AuditToken.json');
-const Validation = require('../build/contracts/ValidationsNoCohort.json')
+const Validation = require('../build/contracts/ValidationsNoCohort.json');
+const { start } = require('pm2');
 
 let members, token, web3, validation, owner;
 
@@ -129,6 +114,8 @@ async function saveToIpfs(url) {
 }
 
 
+let user1, user2;
+
 
 
 
@@ -168,25 +155,7 @@ let dataSubscriber9 = "0x8a08055CB518C8269cE33DDCb397Db2D8FAB7B6E"; // 18
 let dataSubscriber10 = "0xf62Fe4550241B9eEf98DC4249a68269130eAb1b4"; // 19
 let dataSubscriber11 = "0xd0EA6F791aC7a0bbfeE01Dd047b0dB656722e5cb"; //20
 
-let validator1 = "0x5A8bbBdE5bF85Ba241641403001eef87D90087f6"; // 3
-let validator2 = "0x162e952B2F0363613F905abC8c93B519e670Fa4f"; // 4
-let validator3 = "0x06997173F50DDD017a5f0A87480Ed7220039B46e"; // 5
-let validator4 = "0x79b39D5893382ee75e101bFC9c79708ADD480370"; // 6
 
-
-let validator5 = "0xd3956b952a78C7E6C700883924D52CC776F9E4F2"; // 7
-let validator6 = "0x2e5dCB0bdC76d25f8D8349C88e87B44F467171c7"; // 8
-let validator7 = "0xc18251F427C6971FE4da9C05EAf56Db78c7aC0a9"; // 21
-let validator8 = "0x2f17686D0558733eBba0f6c020bDa44D4229625A"; // 22
-let validator9 = "0x327abA0756949C049c0A4dbc490e69142608405D"; // 23
-let validator10 = "0xC22ca6121Ad652B1a5F82abAC5491A45ADB25740"; // 24
-let validator11 = "0x1A966d59690aB3FC1de4b0bE08242Ff29A6F03Fd"; // 25
-let validator12 = "0x6c65db9D7a40b3caeb3AD92AED9c9D89C480D194"; // 26
-
-let validator13 = "0x069dcE9e6C1e34bdd18Aa7A3a13cbE2274b6601F"; // 27
-let validator14 = "0x9596a77DA1d79Cde87E1a499188E1dA8e5A4Fc20"; // 28
-let validator15 = "0xc439417449a0F05dc45dB2fA8f76571169Fb7E75"; // 29
-let validator16 = "0xC56793118415Cf8E900195eFd584A0364e0429b4"; // 30
 
 const validatorTokenAmount = "25000000000000000000000"
 
@@ -203,16 +172,16 @@ async function deploy() {
     await setUpContracts("0x9ca184fa913e7ca5f49b0c89a2665beac582c12cce4308473ef65f4166d58dfa");
     const dataSubscriber1 = providerForUpdate.addresses[0];
     result = await saveToIpfs(reportURL);
-    validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber1, gas: 800000 });
+    await validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber1, gas: 800000 });
     console.log("Submission for dataSubscriber1");
 
-    reportURL =  "http://accounting.auditchain.finance/reporting-scheme/proof/reference-implementation/instance_f.xml";
+    reportURL = "http://accounting.auditchain.finance/reporting-scheme/proof/reference-implementation/instance_f.xml";
 
 
     await setUpContracts("0x254198af956f996631d6231743b8578f07c9745330081e28af0e29642e896786");
     const dataSubscriber2 = providerForUpdate.addresses[0];
     result = await saveToIpfs(reportURL);
-    validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber2, gas: 800000 });
+    await validation.methods.initializeValidationNoCohort(result[0], result[1], 1).send({ from: dataSubscriber2, gas: 800000 });
     console.log("Submission for dataSubscriber2");
 
     reportURL = "http://accounting.auditchain.finance/reporting-scheme/proof/reference-implementation/instance_mf.xml";
@@ -226,12 +195,11 @@ async function deploy() {
 
 
 
-    console.log("FINISHED");
-    process.exit();
-
-
-
+    console.log("Run completed");
+    // process.exit();
 }
 
-deploy();
+
+
+setInterval(deploy, 10000)
 

@@ -11,6 +11,7 @@ var Writable = require('stream').Writable;
 const prompt = require('prompt-sync')({ sigint: true });
 
 const { create } = require("ipfs-http-client");
+require('dotenv').config({ path: './.env' }); // update process.env.
 
 
 
@@ -45,7 +46,6 @@ var rl = readline.createInterface({
 });
 
 let HDWalletProvider = require('@truffle/hdwallet-provider');
-require('dotenv').config({ path: './.env' }); // update process.env.
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
 const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
@@ -158,7 +158,7 @@ async function setUpContracts() {
  * @param  {blockchain transaction hash} trxHash
  * @returns {location of Pacioli report on IPFS and result of validation valid or not}
  */
-async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli1(metadatatUrl, trxHash) {
 
     const result = await ipfs1.files.cat(metadatatUrl);
     const reportUrl = JSON.parse(result)["reportUrl"];
@@ -191,10 +191,10 @@ async function verifyPacioli(metadatatUrl, trxHash) {
 }
 
 // TODO:  Use only for testing to bypass calling Pacioli
-// async function verifyPacioli(metadatatUrl, trxHash) {
+async function verifyPacioli(metadatatUrl, trxHash) {
 
-//     return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
-// }
+    return ["QmSNQetWJuvwahuQbxJwEMoa5yPprfWdSqhJUZaSTKJ4Mg/AuditchainMetadataReport.json", 0]
+}
 
 
 /**

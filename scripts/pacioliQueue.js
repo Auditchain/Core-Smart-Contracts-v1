@@ -8,6 +8,7 @@ let ipfsAPI = require("ipfs-api");
 const fs = require('fs');
 
 const { create } = require("ipfs-http-client");
+require('dotenv').config({ path: './.env' }); // update process.env.
 
 
 const projectId = process.env.IPFS_USER;
@@ -24,7 +25,6 @@ const ipfs = create({
 })
 
 let HDWalletProvider = require('@truffle/hdwallet-provider');
-require('dotenv').config({ path: './.env' }); // update process.env.
 
 const NON_COHORT = require('../build/contracts/ValidationsNoCohort.json');
 const NODE_OPERATIONS = require('../build/contracts/NodeOperations.json')
