@@ -21,7 +21,9 @@ const SECRETS_PATH = process.env.SECRETS_PATH ? process.env.SECRETS_PATH : '/sec
 if (fs.existsSync(SECRETS_PATH)) {
     require('dotenv').config({ path: `${SECRETS_PATH}/PacioliNode.env` });
     privateKeyMain = fs.readFileSync(`${SECRETS_PATH}/account.txt`, 'utf8').trim();
-} else 
+} else if (process.env.PACIOLI_ENV)
+    require('dotenv').config({ path: process.env.PACIOLI_ENV });
+  else
     require('dotenv').config({ path: './.env' }); 
 
 const projectId = process.env.IPFS_USER;
