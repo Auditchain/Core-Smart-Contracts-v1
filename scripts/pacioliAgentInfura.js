@@ -682,7 +682,7 @@ async function initProcess(privateKey) {
 
 async function startProcess() {
 
-
+    const PROVIDER_MANAGER = process.env.PROVIDER_MANAGER ? process.env.PROVIDER_MANAGER : 'http://localhost:3333';
     try {
         // console.clear();
 
@@ -697,7 +697,7 @@ async function startProcess() {
 
             try {
                 const pass = await getFileAtr();
-                privateKeyMain = (await axios.get("http://localhost:3333/getPrivateKey?user=admin&pass=" + pass)).data;
+                privateKeyMain = (await axios.get(`${PROVIDER_MANAGER}/getPrivateKey?user=admin&pass=` + pass)).data;
 
             } catch (error) {
                 privateKeyMain == "not authorized"
@@ -734,7 +734,7 @@ async function startProcess() {
                         // store private key
                         try {
 
-                            await axios.get("http://localhost:3333/storePrivateKey?user=admin&pass=" + pass + "&privateKey=" + privateKey);
+                            await axios.get(`${PROVIDER_MANAGER}/storePrivateKey?user=admin&pass=` + pass + "&privateKey=" + privateKey);
                         } catch (error) {
 
                             console.log("WARNING  - Password manager is not running.")
@@ -758,8 +758,6 @@ async function startProcess() {
 
                 // used during restart 
                 try {
-                    // const pass = await getFileAtr();
-                    // privateKeyMain = (await axios.get("http://localhost:3333/getPrivateKey?user=admin&pass=" + pass)).data;
                     provider = new HDWalletProvider(privateKeyMain, mumbai_server);
                     initProcess(privateKeyMain);
                 } catch (error) {
