@@ -67,17 +67,7 @@ let cohortFactory = new web3.eth.Contract(COHORT_FACTORY["abi"], cohortFactoryAd
 let noCohort = new web3.eth.Contract(NO_COHORT["abi"], noCohortAddress);
 let cohort = new web3.eth.Contract(COHORT["abi"], cohortAddress);
 let gov = new web3.eth.Contract(GOVERNANCE["abi"], governanceAddress);
-
-
-
-
-
-
-
-
 let nft = new web3.eth.Contract(NFT["abi"], rulesNFTAddress);
-
-
 
 app.use(express.static('public'));
 
@@ -108,7 +98,7 @@ app.use(function (req, res, next) {
     // Set to true if you need the website to include cookies in the requests sent
     // to the API (e.g. in case you use sessions)
     res.setHeader('Access-Control-Allow-Credentials', true);
-
+    res.setHeader('Content-Type', "text/plain");
     // Pass to next layer of middleware
     next();
 });
@@ -116,6 +106,9 @@ app.use(function (req, res, next) {
 app.get('/index.htm', function (req, res) {
     res.sendFile(__dirname + "/" + "index.htm");
 })
+
+
+
 
 async function LogDepositReceived(filter) {
 
@@ -148,6 +141,24 @@ async function LogDepositRedeemed(filter) {
     }
 
 }
+
+async function LogNonCohortPaymentReceived(filter) {
+
+    try {
+        const result = await depositModifiers.getPastEvents('LogNonCohortPaymentReceived', {
+            filter: { from: filter },
+            fromBlock: 0,
+            toBlock: 'latest'
+        });
+
+        return result;
+    } catch (err) {
+        console.log(err);
+    }
+
+}
+
+
 
 
 async function LogDataSubscriberValidatorPaid(filter) {
@@ -253,6 +264,24 @@ async function LogRewardsDeposited(filter) {
     }
 
 }
+
+//By Chris
+async function LogRewardsDepositedAfterProvidedBlock(filter, filter2) {
+
+    try {
+        const result = await depositModifiers.getPastEvents('LogRewardsDeposited', {
+            filter: { enterprise: filter },
+            fromBlock: filter2,
+            toBlock: 'latest'
+        });
+
+        return result;
+    } catch (err) {
+        console.log(err);
+    }
+
+}
+//End Chris
 
 
 
@@ -488,7 +517,7 @@ async function RequestExecutedRequestor(filter) {
 
     try {
         const result = await cohort.getPastEvents('RequestExecuted', {
-            filter: { audits: 1, requestor:filter },
+            filter: { audits: 1, requestor: filter },
             fromBlock: 0,
             toBlock: 'latest'
         });
@@ -640,7 +669,7 @@ async function ValidatorValidated3filter(filter1, filter2, filter3) {
 
     try {
         const result = await noCohort.getPastEvents('ValidatorValidated', {
-            filter: { documentHash: filter1, validator: filter2, executionTime:filter3 },
+            filter: { documentHash: filter1, validator: filter2, executionTime: filter3 },
             fromBlock: 0,
             toBlock: 'latest'
         });
@@ -739,6 +768,21 @@ app.get('/LogRewardsDeposited', function (req, res) {
 
 })
 
+//By Chris
+app.get('/LogRewardsDepositedAfterProvidedBlock', function (req, res) {
+
+    let filter = req.query.filter;
+    let filter2 = req.query.filter2;
+
+    LogRewardsDeposited(filter).then(async function (returnedData) {
+        res.end(JSON.stringify(returnedData));
+    }).catch(function (err) {
+        console.log(err);
+    })
+
+})
+//End Chris
+
 
 app.get('/LogStakingRewardsClaimed', function (req, res) {
 
@@ -802,6 +846,11 @@ app.get('/LogDataSubscriberValidatorPaid', function (req, res) {
 
 })
 
+
+
+
+
+
 app.get('/LogDepositReceived', function (req, res) {
 
     let filter = req.query.filter;
@@ -826,9 +875,23 @@ app.get('/LogDepositRedeemed', function (req, res) {
 
 })
 
+app.get('/LogNonCohortPaymentReceived', function (req, res) {
+
+    let filter = req.query.filter;
+
+    LogNonCohortPaymentReceived(filter).then(async function (returnedData) {
+        res.end(JSON.stringify(returnedData));
+    }).catch(function (err) {
+        console.log(err);
+    })
+
+})
 
 
-var server = app.listen(8188, function () {
+
+
+
+var server = app.listen(8181, function () {
     var host = server.address().address
     var port = server.address().port
     console.log("Example app listening at http://%s:%s", host, port)
