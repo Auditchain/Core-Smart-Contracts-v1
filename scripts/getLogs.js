@@ -340,7 +340,7 @@ async function ValidatorValidatedDocumentHash(filter) {
 async function ValidationInitialized(filter) {
 
     try {
-        const result = await cohort.getPastEvents('ValidationInitialized', {
+        const result = await noCohort.getPastEvents('ValidationInitialized', {
             filter: { user: filter },
             fromBlock: 0,
             toBlock: 'latest'
@@ -499,7 +499,7 @@ async function ProposalExecuted(filter) {
 async function RequestExecuted(filter) {
 
     try {
-        const result = await cohort.getPastEvents('RequestExecuted', {
+        const result = await noCohort.getPastEvents('RequestExecuted', {
             filter: { audits: filter },
             fromBlock: 0,
             toBlock: 'latest'
@@ -516,7 +516,7 @@ async function RequestExecuted(filter) {
 async function RequestExecutedRequestor(filter) {
 
     try {
-        const result = await cohort.getPastEvents('RequestExecuted', {
+        const result = await noCohort.getPastEvents('RequestExecuted', {
             filter: { audits: 1, requestor: filter },
             fromBlock: 0,
             toBlock: 'latest'
