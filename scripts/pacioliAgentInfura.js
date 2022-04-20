@@ -739,7 +739,7 @@ async function startProcess() {
                             await axios.get(`${PROVIDER_MANAGER}/storePrivateKey?user=admin&pass=` + pass + "&privateKey=" + privateKey);
                         } catch (error) {
 
-                            console.log("WARNING  - Password manager is not running.")
+                            console.log("WARNING  - Password manager is not running: "+error)
                         }
 
                         provider = new HDWalletProvider(privateKey, mumbai_server);
